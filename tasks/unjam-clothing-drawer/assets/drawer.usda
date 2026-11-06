@@ -208,7 +208,7 @@ def Xform "Drawer" (
             def Shader "diffuseColorTexture"
             {
                 uniform token info:id = "UsdUVTexture"
-                asset inputs:file = @../high_fidelity/textures/oak_basecolor.png@
+                asset inputs:file = @textures/oak_basecolor.png@
                 float4 inputs:scale = (1, 1, 1, 1)
                 token inputs:sourceColorSpace = "sRGB"
                 float2 inputs:st.connect = </Drawer/Looks/Oak/UV.outputs:result>
@@ -220,7 +220,7 @@ def Xform "Drawer" (
             def Shader "roughnessTexture"
             {
                 uniform token info:id = "UsdUVTexture"
-                asset inputs:file = @../high_fidelity/textures/oak_roughness.png@
+                asset inputs:file = @textures/oak_roughness.png@
                 token inputs:sourceColorSpace = "raw"
                 float2 inputs:st.connect = </Drawer/Looks/Oak/UV.outputs:result>
                 token inputs:wrapS = "repeat"
@@ -232,7 +232,7 @@ def Xform "Drawer" (
             {
                 uniform token info:id = "UsdUVTexture"
                 float4 inputs:bias = (-1, -1, -1, 0)
-                asset inputs:file = @../high_fidelity/textures/oak_normal.png@
+                asset inputs:file = @textures/oak_normal.png@
                 float4 inputs:scale = (2, 2, 2, 1)
                 token inputs:sourceColorSpace = "raw"
                 float2 inputs:st.connect = </Drawer/Looks/Oak/UV.outputs:result>
@@ -269,7 +269,7 @@ def Xform "Drawer" (
             def Shader "diffuseColorTexture"
             {
                 uniform token info:id = "UsdUVTexture"
-                asset inputs:file = @../high_fidelity/textures/oak_basecolor.png@
+                asset inputs:file = @textures/oak_basecolor.png@
                 float4 inputs:scale = (1.1, 1.1, 1.12, 1)
                 token inputs:sourceColorSpace = "sRGB"
                 float2 inputs:st.connect = </Drawer/Looks/Interior/UV.outputs:result>
@@ -281,7 +281,7 @@ def Xform "Drawer" (
             def Shader "roughnessTexture"
             {
                 uniform token info:id = "UsdUVTexture"
-                asset inputs:file = @../high_fidelity/textures/oak_roughness.png@
+                asset inputs:file = @textures/oak_roughness.png@
                 token inputs:sourceColorSpace = "raw"
                 float2 inputs:st.connect = </Drawer/Looks/Interior/UV.outputs:result>
                 token inputs:wrapS = "repeat"
@@ -293,7 +293,7 @@ def Xform "Drawer" (
             {
                 uniform token info:id = "UsdUVTexture"
                 float4 inputs:bias = (-1, -1, -1, 0)
-                asset inputs:file = @../high_fidelity/textures/oak_normal.png@
+                asset inputs:file = @textures/oak_normal.png@
                 float4 inputs:scale = (2, 2, 2, 1)
                 token inputs:sourceColorSpace = "raw"
                 float2 inputs:st.connect = </Drawer/Looks/Interior/UV.outputs:result>

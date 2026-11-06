@@ -127,9 +127,8 @@ def main():
     for p in sources:
         d=out/'source'/p.relative_to(here.parent);d.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,d)
         identity[str(p.relative_to(here.parent))]=hashlib.sha256(p.read_bytes()).hexdigest()
-    for folder in ['garment_v6','high_fidelity']:
-        for p in (here.parent/'assets'/folder).rglob('*'):
-            if p.is_file():identity[str(p.relative_to(here.parent))]=hashlib.sha256(p.read_bytes()).hexdigest()
+    for p in sorted((here.parent/'assets').rglob('*')):
+        if p.is_file():identity[str(p.relative_to(here.parent))]=hashlib.sha256(p.read_bytes()).hexdigest()
     (out/'identity.json').write_text(json.dumps(dict(seed=101,scene_revision=6,controller_revision='6.0',mode=args.mode,quality=args.quality,policy='feedback scripted demo; privileged object states; no VLA',files=identity),indent=2))
     os.environ['JAM_TRACE_PATH']=str(out/'jam_trace.jsonl')
     try:

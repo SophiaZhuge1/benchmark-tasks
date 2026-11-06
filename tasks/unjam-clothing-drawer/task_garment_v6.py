@@ -27,7 +27,7 @@ SCORE_OVER = 'end'
 sys.path.insert(0,str(HERE/'cap_v6'))
 from drawer_layout_v6 import *
 FOLD_SIZE = (.104, .050, .026)
-ASSETS = HERE/'assets'/'garment_v6'
+ASSETS = HERE/'assets'
 OBJECTS = [Box(name,pos=pos,size=size) for name,(pos,size) in PANELS.items()] + [
     Box('drawer',pos=DRAWER_ORIGIN,size=(.32,.40,.082),mass=.50),
     Box('garment_fold',pos=FOLD_POS,size=FOLD_SIZE,mass=.04),
@@ -94,8 +94,6 @@ def build_scene_objects():
     result=[]
     for item in OBJECTS:
         path=ASSETS/(item.name+'.usda')
-        if not path.is_file():
-            path=HERE/'assets'/'high_fidelity'/(item.name+'.usda')
         if not path.is_file(): raise FileNotFoundError(path)
         options={'usd_path':str(path)}
         if item.name=='garment_fold':
