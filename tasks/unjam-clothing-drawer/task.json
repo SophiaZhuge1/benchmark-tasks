@@ -15,5 +15,6 @@
   "run_limit": "1,800 control steps (90 simulated seconds at 20 Hz)",
   "reset_notes": "Start a fresh process for each trial to reset the scene and scorer. Fixed layout, object_jitter=0. No consumables.",
   "fidelity": "Rigid cabinet and drawer with passive constrained motion. Folded clothing is rigid; the orange fold is a spring-supported rigid proxy, not deformable fabric. Textures do not imply deformable physics. The scripted demo uses privileged simulator state. No real-world validation or complete collision-safety certification is claimed.",
-  "scores": "Dream-1 run: 0.00; scripted demo: 1.0"
+  "scores": "Dream-1 run: 0.00; scripted demo: 1.0",
+  "media": "M-6SL9KK"
 }
