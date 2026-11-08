@@ -58,4 +58,4 @@ Recorded configuration: `dreamlabs/dream-1-beta`, seed 1, zero object jitter, 20
 
 ## Submission status
 
-This draft contains the validated scripted task and an actual Dream-1 beta trial. Both runs are recorded; the official task-board media upload is pending. The empty `media` field is intentional until the official upload succeeds. Do not substitute a scripted or no-action video for the model run.
+The task includes the full-score scripted demonstration and the actual Dream-1 beta trial. The model video, scripted demo and setup screenshot were uploaded to the task board on 8 November 2026 as **M-SEEP5V**, recorded in `task.json`. Both videos are H.264 MP4. The official Python uploader received Cloudflare error 1010; the same documented endpoint and multipart fields succeeded using curl. The model video is the recorded Dream-1 trial, separate from the scripted demonstration.
