@@ -1,0 +1,19 @@
+{
+  "title": "Semiconductor wafer probing: move without scratching",
+  "category": "Impact on AI timelines",
+  "keywords": [
+    "semiconductor",
+    "wafer probing",
+    "surface protection",
+    "bimanual coordination"
+  ],
+  "instruction": "Move the semiconductor wafer to the next marked test position without dragging the probes across its surface.",
+  "context": "An enlarged probe-station trainer tests safe indexing between wafer test sites. One arm holds a spring-return probe platen raised while the other moves the clamped wafer stage from A to B; probes must then return to B.",
+  "setup": "164 mm diameter rigid wafer surrogate clamped to a 174 mm chuck on a 70 mm X slide. Two gold test-pad pairs, A and B, spaced 60 mm. Two 5 mm diameter probe surrogates on a 60 mm spring-return Z slide, initially at A. Amber probe-lift handle and blue stage handle. Visible LIFT, PAD, FAIL and READY lamps. Dimensions and poses in README.md.",
+  "scoring": "Zero after more than 0.2 mm cumulative lateral travel in the probe contact band; damage is irreversible. 0.25 after lifting at least 8 mm for 0.25 s; 0.75 while within 2 mm of B with probes clear; 1.0 after probes return to contact at B with stage speed at most 1 mm/s and grippers clear for 1 s. Details in README.md.",
+  "run_limit": "1,200 steps (60 seconds at 20 Hz)",
+  "reset_notes": "Fixed layout, seed 1. Restore both slide joints to zero, and reset damage history and dwell timers.",
+  "fidelity": "Enlarged rigid probe-station trainer with a clamped wafer surrogate, two blunt probes and passive slides. Damage uses sampled relative motion in a 0.8 mm lift contact band with a 0.2 mm cumulative travel tolerance. No electrical testing, micron-scale pads, probe flex, silicon fracture or real scratch mechanics. Scripted demo uses simulator joint state.",
+  "scores": "Dream-1 run: 0.0 (1,200 steps / 60 seconds, probe-contact damage). Scripted demo: 1.0 (340 steps / 17 seconds, zero scrape). Controls: probes-down drag 0.0; premature probe release 0.0; leave probes raised 0.75.",
+  "media": "M-6HJRKW"
+}
