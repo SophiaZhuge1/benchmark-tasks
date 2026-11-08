@@ -1,0 +1,426 @@
+{
+  "bypass-left-on-events": {
+    "score": 0.75,
+    "success": false,
+    "steps": 653,
+    "seconds": 32.65,
+    "wall_s": 160.66,
+    "blank_frames": 0,
+    "events": [
+      {
+        "step": 1,
+        "time": 0.05,
+        "powered": true,
+        "old_seated": true,
+        "new_seated": false,
+        "ready": false,
+        "old_parked": false,
+        "unsafe_removal": false
+      },
+      {
+        "step": 194,
+        "time": 9.7,
+        "old_seated": false
+      },
+      {
+        "step": 305,
+        "time": 15.25,
+        "old_parked": true
+      },
+      {
+        "step": 514,
+        "time": 25.7,
+        "new_seated": true
+      },
+      {
+        "step": 533,
+        "time": 26.65,
+        "ready": true
+      }
+    ],
+    "final": {
+      "step": 653,
+      "t": 32.65,
+      "score": 0.75,
+      "dropped": false,
+      "time": 32.65,
+      "switch_mm": 67.97,
+      "powered": true,
+      "outage_s": 0,
+      "first_outage": null,
+      "unsafe_removal": false,
+      "old_seated": false,
+      "new_seated": true,
+      "ready": true,
+      "old_parked": true,
+      "clear": true,
+      "final_s": 0,
+      "old_pos": [
+        0.3655,
+        -0.2348,
+        0.7595
+      ],
+      "new_pos": [
+        0.286,
+        -0.0248,
+        0.7595
+      ],
+      "new_axis": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "bypass-left-on-result": {
+    "mode": "leave_bypass",
+    "task_score": 0.75,
+    "success": false,
+    "termination": null,
+    "steps": 653,
+    "seconds": 32.65,
+    "script_ended_at_step": 613,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 4.06,
+    "script_s": 3.85,
+    "sim_s": 151.16,
+    "wall_s": 160.66,
+    "slowest_30_steps_s": 8.61,
+    "blank_frames": 0,
+    "video": "results/ups-bypass-control/leave_bypass/demo.mp4",
+    "ik_worst": {
+      "left": [
+        0.1,
+        0
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": false,
+      "score": 0.75
+    },
+    "task_metrics": {
+      "step": 653,
+      "t": 32.65,
+      "score": 0.75,
+      "dropped": false,
+      "time": 32.65,
+      "switch_mm": 67.97,
+      "powered": true,
+      "outage_s": 0,
+      "first_outage": null,
+      "unsafe_removal": false,
+      "old_seated": false,
+      "new_seated": true,
+      "ready": true,
+      "old_parked": true,
+      "clear": true,
+      "final_s": 0,
+      "old_pos": [
+        0.3655,
+        -0.2348,
+        0.7595
+      ],
+      "new_pos": [
+        0.286,
+        -0.0248,
+        0.7595
+      ],
+      "new_axis": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "full-events": {
+    "score": 1,
+    "success": true,
+    "steps": 705,
+    "seconds": 35.25,
+    "wall_s": 177.23,
+    "blank_frames": 0,
+    "events": [
+      {
+        "step": 1,
+        "time": 0.05,
+        "powered": true,
+        "old_seated": true,
+        "new_seated": false,
+        "ready": false,
+        "old_parked": false,
+        "unsafe_removal": false
+      },
+      {
+        "step": 194,
+        "time": 9.7,
+        "old_seated": false
+      },
+      {
+        "step": 305,
+        "time": 15.25,
+        "old_parked": true
+      },
+      {
+        "step": 514,
+        "time": 25.7,
+        "new_seated": true
+      },
+      {
+        "step": 533,
+        "time": 26.65,
+        "ready": true
+      }
+    ],
+    "final": {
+      "step": 705,
+      "t": 35.25,
+      "score": 1,
+      "dropped": false,
+      "time": 35.25,
+      "switch_mm": 1.35,
+      "powered": true,
+      "outage_s": 0,
+      "first_outage": null,
+      "unsafe_removal": false,
+      "old_seated": false,
+      "new_seated": true,
+      "ready": true,
+      "old_parked": true,
+      "clear": true,
+      "final_s": 1.95,
+      "old_pos": [
+        0.3655,
+        -0.2348,
+        0.7595
+      ],
+      "new_pos": [
+        0.286,
+        -0.0248,
+        0.7595
+      ],
+      "new_axis": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "full-result": {
+    "mode": "full",
+    "task_score": 1,
+    "success": true,
+    "termination": "success",
+    "steps": 705,
+    "seconds": 35.25,
+    "script_ended_at_step": null,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 3.98,
+    "script_s": 4.32,
+    "sim_s": 165.43,
+    "wall_s": 177.23,
+    "slowest_30_steps_s": 8.72,
+    "blank_frames": 0,
+    "video": "results/ups-v5/full/demo.mp4",
+    "ik_worst": {
+      "left": [
+        0.1,
+        0
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": true,
+      "score": 1
+    },
+    "task_metrics": {
+      "step": 705,
+      "t": 35.25,
+      "score": 1,
+      "dropped": false,
+      "time": 35.25,
+      "switch_mm": 1.35,
+      "powered": true,
+      "outage_s": 0,
+      "first_outage": null,
+      "unsafe_removal": false,
+      "old_seated": false,
+      "new_seated": true,
+      "ready": true,
+      "old_parked": true,
+      "clear": true,
+      "final_s": 1.95,
+      "old_pos": [
+        0.3655,
+        -0.2348,
+        0.7595
+      ],
+      "new_pos": [
+        0.286,
+        -0.0248,
+        0.7595
+      ],
+      "new_axis": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "outage-recovery-events": {
+    "score": 0,
+    "success": false,
+    "steps": 429,
+    "seconds": 21.45,
+    "wall_s": 104.17,
+    "blank_frames": 0,
+    "events": [
+      {
+        "step": 1,
+        "time": 0.05,
+        "powered": true,
+        "old_seated": true,
+        "new_seated": false,
+        "ready": false,
+        "old_parked": false,
+        "unsafe_removal": false
+      },
+      {
+        "step": 72,
+        "time": 3.6,
+        "powered": false,
+        "old_seated": false,
+        "unsafe_removal": true
+      },
+      {
+        "step": 184,
+        "time": 9.2,
+        "old_parked": true
+      },
+      {
+        "step": 308,
+        "time": 15.4,
+        "powered": true
+      }
+    ],
+    "final": {
+      "step": 429,
+      "t": 21.45,
+      "score": 0,
+      "dropped": false,
+      "time": 21.45,
+      "switch_mm": 68.13,
+      "powered": true,
+      "outage_s": 11.8,
+      "first_outage": 3.599999999999995,
+      "unsafe_removal": true,
+      "old_seated": false,
+      "new_seated": false,
+      "ready": false,
+      "old_parked": true,
+      "clear": false,
+      "final_s": 0,
+      "old_pos": [
+        0.3662,
+        -0.2345,
+        0.7595
+      ],
+      "new_pos": [
+        0.195,
+        -0.235,
+        0.7595
+      ],
+      "new_axis": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "outage-recovery-result": {
+    "mode": "outage_recovery",
+    "task_score": 0,
+    "success": false,
+    "termination": null,
+    "steps": 429,
+    "seconds": 21.45,
+    "script_ended_at_step": 389,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 4.12,
+    "script_s": 2.27,
+    "sim_s": 98.24,
+    "wall_s": 104.17,
+    "slowest_30_steps_s": 8.61,
+    "blank_frames": 0,
+    "video": "results/ups-controls/outage_recovery/demo.mp4",
+    "ik_worst": {
+      "left": [
+        0.1,
+        0
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": false,
+      "score": 0
+    },
+    "task_metrics": {
+      "step": 429,
+      "t": 21.45,
+      "score": 0,
+      "dropped": false,
+      "time": 21.45,
+      "switch_mm": 68.13,
+      "powered": true,
+      "outage_s": 11.8,
+      "first_outage": 3.599999999999995,
+      "unsafe_removal": true,
+      "old_seated": false,
+      "new_seated": false,
+      "ready": false,
+      "old_parked": true,
+      "clear": false,
+      "final_s": 0,
+      "old_pos": [
+        0.3662,
+        -0.2345,
+        0.7595
+      ],
+      "new_pos": [
+        0.195,
+        -0.235,
+        0.7595
+      ],
+      "new_axis": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "source-hashes": {
+    "task.py": "7bcf91cb95289a72ceaf2ffd578738f185abbd2ce42e9e2213b21eb0abc6a2a3",
+    "power_model.py": "9188c7ac815b9ba9fc42d7c348ff482e37507f2f50a202c5496de8859cd7da56",
+    "labels.py": "a7c4566a13c49804fb40e545a5031f258ca27d0b49ddd1494bfee447d7da20b7",
+    "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+    "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66"
+  }
+}
