@@ -33,7 +33,7 @@ Score is evaluated at the end after the syringe has been lifted above its initia
 - 0.3: at most 0.75 mL air remains and sample loss is at most 0.50 mL.
 - 0 otherwise. Dropping the syringe, losing over 0.50 mL sample or drawing in over 0.20 mL air permanently invalidates the episode.
 
-The reference controller reads geometric state to grasp and advance the piston. The floating articulation uses eight velocity solver iterations to reduce numerical drift. It is a feasibility demonstration, not a vision-policy result. Dream-1 has not been run. Validation results are recorded separately; do not treat a playable video as proof of a full score.
+The reference controller reads geometric state to grasp and advance the piston. The floating articulation uses eight velocity solver iterations to reduce numerical drift. It is a feasibility demonstration, not a vision-policy result. Dream-1 beta completed a separate 1,800-step vision-policy trial on 8 November 2026 and scored **0.0**. It did not lift the syringe or expel air; 1.5 mL air remained with 0.0 mL sample loss. See [dream_result.json](dream_result.json) for the measured result, source hashes and package versions. Validation results are recorded separately; do not treat a playable video as proof of a full score.
 
 ## Novelty check
 
@@ -43,6 +43,19 @@ A broader follow-up search on 8 November found **robotic syringe air removal alr
 
 See `ATTRIBUTION.md` for the shared scene/demo infrastructure.
 
+## Dream-1 trial
+
+Run from this task directory using the configured Brev environment:
+
+```bash
+/data/IsaacLab-Arena/.venv/bin/python run_dream.py --check
+/data/IsaacLab-Arena/.venv/bin/python run_dream.py
+```
+
+The runner prompts privately for an existing API key (or uses `DREAM_API_KEY`), freezes the source and exact instruction, records all camera frames, and starts a detached trial. It prints the result directory and progress command. The key is used in memory and is not written into source, results or shell history. Specify `--cli /path/to/inspect-robots` if the CLI is elsewhere; run with that environment's Python so video export can use `imageio_ffmpeg` when needed.
+
+Recorded configuration: `dreamlabs/dream-1-beta`, seed 1, zero object jitter, 20 Hz, three 320 × 176 cameras, `task_score` scorer, 1,800-step limit. The trial finished normally at the step limit with score **0.0**, no evaluation errors and no blank frames. Evaluation wall time was 231.61 s including startup and inference; simulated duration was 90 s. The 1,801 recorded frames per camera include the initial observation, giving a 90.05 s video at 20 fps. The three-camera H.264 `model_run.mp4` is 7.48 MB. This single trial does not estimate a success rate.
+
 ## Submission status
 
-This draft contains the validated scripted task. The required Dream-1 run and task-board media upload are pending. The empty `media` field is intentional until the official upload succeeds. Do not substitute a scripted or no-action video for the model run.
+This draft contains the validated scripted task and an actual Dream-1 beta trial. Both runs are recorded; the official task-board media upload is pending. The empty `media` field is intentional until the official upload succeeds. Do not substitute a scripted or no-action video for the model run.
