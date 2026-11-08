@@ -14,7 +14,7 @@
   "run_limit": "1800 control steps (90 seconds at 20 Hz)",
   "fidelity": "The barrel and plunger are a free PhysX articulation. The coalesced air pocket and sample follow a reduced-order volume-conserving model, not CFD. No viscosity, breakup, surface adhesion or clinical-dose claims. Passive seal is an uncalibrated bounded elastic/sliding model (0.6 N maximum force); it never sets piston position.",
   "scores": "Dream-1 beta: 0.0 (1800 steps, seed 1, 8 November 2026); scripted full return-to-rack demo: 1.0 (675 steps, seed 1); no-action, horizontal-push and excessive-push controls: 0.0.",
-  "media": "",
+  "media": "M-SEEP5V",
   "context": "Air removal before laboratory dispensing requires coordinating syringe orientation and plunger travel while limiting sample loss. Two free arms perform the operation and return the needle-free syringe to its rack.",
   "reset_notes": "Start a fresh process for each independent trial to restore the syringe, plunger, 10.5 mL sample, 1.5 mL air and failure flags."
 }
