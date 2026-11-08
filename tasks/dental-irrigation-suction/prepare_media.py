@@ -49,7 +49,7 @@ setup.paste(Image.fromarray(starts['left_cam']).resize((426, 240)), (854, 0))
 setup.paste(Image.fromarray(starts['right_cam']).resize((426, 240)), (854, 240))
 setup.save(p / 'setup.png')
 shutil.copy2(demo / 'demo.mp4', p / 'demo.mp4')
-lines = Path('/tmp/dental-dream-circular.log').read_text().splitlines()
+lines = (p/'run.log').read_text().splitlines()
 state = ast.literal_eval([x.split('[chairside] ', 1)[1] for x in lines if x.startswith('[chairside] ')][-1])
 sample = report['samples'][0]
 result = dict(model='dreamlabs/dream-1-beta', date='2026-11-08', seed=1,
