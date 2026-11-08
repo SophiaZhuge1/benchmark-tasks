@@ -1,0 +1,19 @@
+{
+  "title": "Keep the servers online: UPS cartridge replacement",
+  "category": "Impact on AI timelines",
+  "keywords": [
+    "data centre maintenance",
+    "UPS",
+    "continuous power",
+    "bypass transfer"
+  ],
+  "instruction": "Use the bypass to replace the faulty UPS cartridge without interrupting the server, then restore normal power.",
+  "context": "A bench-scale maintenance-bypass trainer tests continuity-preserving service. The initial cartridge has a fault alarm but still passes power; its external bypass must take over before isolation and withdrawal.",
+  "setup": "Guided vertical cartridge socket at (285,-25) mm, 12 mm above the table, with 112x102 mm base and 29 mm flared guide rails. Two 60x50x40 mm, 120 g cartridges with 28x24x75 mm handles: amber faulted initially seated; blue replacement on its tray at (195,-235) mm. Amber service tray at (365,-235) mm. Contact-driven 70 mm bypass slider at (245,190) mm. Rigid server surrogate with four labelled status lamps at (490,195) mm. Full dimensions, materials and tolerances in README.md.",
+  "scoring": "Any sampled power interruption or withdrawal before isolation or a cartridge falling below the table gives zero. 0.25 for establishing isolated maintenance bypass with the old cartridge seated; 0.75 after a qualified replacement is seated and the old cartridge is parked; 1.0 after normal supply is restored, bypass is off and both cartridges are released for one second.",
+  "run_limit": "1,600 steps (80 seconds at 20 Hz)",
+  "reset_notes": "Fixed layout, seed 1. Reset contacts, readiness dwell, outage latch and all physical poses.",
+  "fidelity": "Bench-scale rigid trainer with enlarged handles and a vertical cartridge socket. Contact-driven manipulation; idealised electrical contacts, 1 s readiness delay and sampled continuity at 20 Hz. No mains voltage, arcing, AC synchronisation, thermal or battery physics. Initial faulted cartridge still passes power. Scripted demo uses simulator poses.",
+  "scores": "Dream-1 beta: 0.0 (1,600 steps, 80 s, no evaluation errors); no bypass or exchange achieved. Scripted demo: 1.0 (705 steps, 35.25 s, zero sampled outage). Outage then recovery: 0.0; bypass left on: 0.75. Thirteen scoring tests pass. Fixed layout, seed 1.",
+  "media": "M-MTR85G"
+}
