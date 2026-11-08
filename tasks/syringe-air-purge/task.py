@@ -17,10 +17,7 @@ SCENE='station'
 TOP=TABLE_TOP[SCENE]
 SCORE_OVER='end'
 SUCCESS_HOLD_S=1.0
-INSTRUCTION=('Lift the needle-free syringe by its barrel, tip its nozzle upward and wait for the white air pocket to reach the nozzle. '
- 'Hold the barrel with one arm while the other gently advances the blue plunger to expel the air. '
- 'Leave at most 0.05 mL air and lose at most 0.30 mL sample. Do not pull the plunger back. '
- 'Return the syringe horizontally to the two white saddles, open both grippers and withdraw.')
+INSTRUCTION='Remove the air from the syringe while preserving the sample, then return it to its rack and let go.'
 ORIGIN=np.array([.25, .0, TOP+.140])
 GRASP=np.array([0., .025, 0.])
 NOZZLE_Y=.050
