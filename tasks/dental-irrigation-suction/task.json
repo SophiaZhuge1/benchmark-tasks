@@ -1,0 +1,19 @@
+{
+  "title": "Dental hygienist assistant: circular tooth rinsing with coordinated suction",
+  "category": "Impact on jobs",
+  "keywords": [
+    "dental assistance",
+    "continuous bimanual coordination",
+    "irrigation",
+    "suction"
+  ],
+  "instruction": "Clean each highlighted tooth with circular rinsing motions while keeping the suction tube beside it.",
+  "context": "A dental training phantom tests the coordinated irrigation and aspiration role of a dental assistant. The second arm must follow the active treatment site throughout irrigation.",
+  "setup": "Rigid dental phantom centred at (270,0) mm on the YAM station table: 170x130 mm base, pink rigid gum rails, six molar crowns and three incisors. Three treatment sites at (235,25), (270,25), (305,25) mm, 37 mm above the table. Blue irrigator and white suction instrument rest on 30 mm stands at (280,200) and (280,-200) mm. Each has a 28x24x55 mm grasp handle and a 90 mm lateral offset bent metal tube; outlet radii 2.5 and 4.5 mm. Yellow lamps indicate the upcoming/active site; blue pool levels and a collection vial display model water volumes. Coordinates and collision meshes are in task.py. Each tooth has nine visual training markers, changing from yellow to green when its coverage dwell is met.",
+  "scoring": "0 for tip entry below 30 mm above the table over the gum region, tool tip separation at most 6 mm, an instrument origin below 5 mm above the table, or suction obstruction of the active tooth for over 0.25 s. Otherwise 0.25 per completed site: at least 1.8 mL delivered and collected, at most 0.10 mL left pooled, and all nine crown regions reached for at least 0.15 s each during active irrigation. Regions are the centre disk (radius <=2.5 mm) and eight 45-degree sectors in the 4.5-9.5 mm annulus; they are evaluated from the actual projected jet impact. A motion without flowing water earns no coverage. Full 1.0 additionally requires all three sites, total loss at most 0.30 mL, peak per-site pool at most 0.45 mL, both tools retained and their tips withdrawn above 80 mm or laterally beyond 75 mm. Volume conservation is checked. The water model supplies 0.4 mL/s during 16-21,24-29,32-37 s; suction capacity is 0.65 mL/s with position and orientation dependent effectiveness.",
+  "run_limit": "1,200 steps (60 seconds at 20 Hz)",
+  "reset_notes": "Fixed initial layout; reset tool poses, all fluid volumes, timer, guard violations and indicators. Seed 1, zero object jitter.",
+  "fidelity": "Non-clinical rigid phantom with enlarged grasp handles and simplified dental instruments. Contact-driven tool grasping and movement. Water is a conservative lumped-volume model, not CFD: no aerosol, wetting, splashing, biological tissue or deformable hose simulation. A timed metering pump substitutes for a foot pedal. Numeric clearance and volume thresholds are benchmark design choices, not clinical safety limits. Demonstration uses simulator object poses. Coverage is of defined regions on the exposed crown top; it does not establish whole-tooth cleaning, plaque removal or access to side, interproximal or subgingival surfaces.",
+  "scores": "Dream-1 beta run: 0.0 (1,200 steps, 0/27 regions); scripted demo: 1.0 (783 steps, 27/27 regions); stationary point-rinse control: 0.0 (3/27 regions). Fixed layout, seed 1; 17 unit tests pass.",
+  "media": "M-MKVTE5"
+}
