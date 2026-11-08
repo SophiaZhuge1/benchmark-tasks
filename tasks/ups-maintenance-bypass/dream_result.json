@@ -1,0 +1,84 @@
+{
+  "model": "dreamlabs/dream-1-beta",
+  "date": "2026-11-08",
+  "seed": 1,
+  "object_jitter": 0,
+  "control_hz": 20,
+  "camera_resolution": [
+    320,
+    176
+  ],
+  "instruction": "Use the bypass to replace the faulty UPS cartridge without interrupting the server, then restore normal power.",
+  "task_score": 0,
+  "control_steps": 1600,
+  "simulated_seconds": 80,
+  "evaluation_wall_seconds": 408.02785305100406,
+  "mean_inference_latency_seconds": 0.510892518329076,
+  "termination_reasons": [
+    "max_steps"
+  ],
+  "errored_trials": 0,
+  "final_logged_state": {
+    "score": 0,
+    "dropped": false,
+    "time": 80,
+    "switch_mm": 0,
+    "powered": true,
+    "outage_s": 0,
+    "first_outage": null,
+    "unsafe_removal": false,
+    "old_seated": true,
+    "new_seated": false,
+    "ready": false,
+    "old_parked": false,
+    "clear": false,
+    "final_s": 0,
+    "old_pos": [
+      0.2848,
+      -0.025,
+      0.7595
+    ],
+    "new_pos": [
+      0.1951,
+      -0.235,
+      0.7595
+    ],
+    "new_axis": [
+      1,
+      1,
+      1
+    ]
+  },
+  "frames_per_camera": {
+    "top_cam": 1601,
+    "left_cam": 1601,
+    "right_cam": 1601
+  },
+  "blank_frames_per_camera": {
+    "top_cam": 0,
+    "left_cam": 0,
+    "right_cam": 0
+  },
+  "source_sha256": {
+    "task.py": "7bcf91cb95289a72ceaf2ffd578738f185abbd2ce42e9e2213b21eb0abc6a2a3",
+    "power_model.py": "9188c7ac815b9ba9fc42d7c348ff482e37507f2f50a202c5496de8859cd7da56",
+    "prepare_preview.py": "2fdea15f6cb236699797767630feb2debd06858ddac701312e5c203c4298b806",
+    "prepare_media.py": "ee7c7586e798c616cf2b58b94b61dfd9c106d1bcf46e2898d41f74cc943c4967",
+    "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+    "analyze_trace.py": "6f30d73c9d1ed0f55baaa550869ed899bcc72e5fae7436a817f3c872121b57a2",
+    "task.json": "ac31a9c0791faed888a174a8c82052c88c7c3becb0977ac513984389036cc56c",
+    "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+    "test_power.py": "c5caa68e4651dfb86c0407728e673e2f88a9d2495f95a7f570141b6f93bb9d82",
+    "labels.py": "a7c4566a13c49804fb40e545a5031f258ca27d0b49ddd1494bfee447d7da20b7"
+  },
+  "media_bytes": {
+    "model_run.mp4": 6778898,
+    "demo.mp4": 2943863,
+    "setup.png": 258399
+  },
+  "media_sha256": {
+    "model_run.mp4": "ba5ae33d89059ee7787d1bb4963492c2837da98631314bfede422be9377b375f",
+    "demo.mp4": "4b99a41ceabd48610ccecdf68c1ced7bbd23cc02e003963c9dd59a9ea48e0b55",
+    "setup.png": "37377a612f0b1db50e982780d6b82f76a7751c914f8be6eaddf52e5a6f3c15e9"
+  }
+}
