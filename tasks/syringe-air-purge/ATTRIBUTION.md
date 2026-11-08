@@ -1,0 +1,1 @@
+The task scene, scoring, domain models and demo are new work. Generic mechkit.py and demokit.py are adapted from robocurve/benchmark-tasks PR #937, commit 3121ffe (Kevin X / K-XZY). These helpers are credited as shared infrastructure, not claimed as original task contributions.
