@@ -1,0 +1,67 @@
+{
+  "model": "dreamlabs/dream-1-beta",
+  "date": "2026-11-08",
+  "seed": 1,
+  "object_jitter": 0,
+  "control_hz": 20,
+  "camera_resolution": [
+    320,
+    176
+  ],
+  "instruction": "Move the semiconductor wafer to the next marked test position without dragging the probes across its surface.",
+  "task_score": 0,
+  "control_steps": 1200,
+  "simulated_seconds": 60,
+  "evaluation_wall_seconds": 342.3127233829946,
+  "mean_inference_latency_seconds": 0.5106376604918466,
+  "termination_reasons": [
+    "max_steps"
+  ],
+  "errored_trials": 0,
+  "final_logged_state": {
+    "score": 0,
+    "time": 60,
+    "stage_mm": 0.0094,
+    "lift_mm": 0,
+    "contact": true,
+    "aligned": false,
+    "scrape_mm": 10.11881,
+    "damaged": true,
+    "first_damage": 22.600000000000186,
+    "lifted": false,
+    "released": true,
+    "final_dwell": 0
+  },
+  "frames_per_camera": {
+    "top_cam": 1201,
+    "left_cam": 1201,
+    "right_cam": 1201
+  },
+  "blank_frames_per_camera": {
+    "top_cam": 0,
+    "left_cam": 0,
+    "right_cam": 0
+  },
+  "source_sha256": {
+    "task.py": "342e67b6d10b18f10d45ec54f6abc4fbfb8b61e995a6fe2d14b69e6039c247ef",
+    "prepare_preview.py": "902a6af2a0dc788347cbde54bd22ff98ebdf5983bc48c96517498147ffd361fd",
+    "prepare_media.py": "26af6444ca80ad597d83d7c564db4beaece11bf8dc2a1f5450b22eeeffe71868",
+    "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+    "analyze_trace.py": "5433c6c408d485ff78670313eea18c382b9b2e56a828056a661be4c158ea8328",
+    "test_probe_model.py": "2af8abcd8abf209bbfe2431bd15c8375d182c030c7f53b90144fe0cdae7cb943",
+    "task.json": "544ae1b7f8bfe3d86e8af391369551a7de7f4f02b6ecccb47c03938f0179fc9b",
+    "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+    "probe_model.py": "84066528394a1a07e3d2c9124d33645390d488d7e16046e676ff6a5572e5b3b0",
+    "labels.py": "4c67faf5b5624b876ed57c37bd2ea0fd20879b6dab9c70c3248c3ae052592813"
+  },
+  "media_bytes": {
+    "model_run.mp4": 5346486,
+    "demo.mp4": 1314652,
+    "setup.png": 258869
+  },
+  "media_sha256": {
+    "model_run.mp4": "242e91cce3a99d7f1eb37647e3463929d48b6acc8fca12f534de6e69c0ebc615",
+    "demo.mp4": "2ea774e4c0529addd902c7f15bf0df78f2942c5524b9c8465461e1912347b008",
+    "setup.png": "6db6a1751912c48564d70ae3f2244b88b07405123679904e63bb6d766af913e8"
+  }
+}
