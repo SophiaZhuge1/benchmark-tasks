@@ -18,7 +18,7 @@ The no-action, horizontal-push and excessive-push controls each scored **0.0**. 
 
 Nine fluid/scoring checks and four passive-seal checks pass. The current submission files match the live Brev source used for the successful run. The original diagnostic variants remain outside this submission.
 
-The demo reads simulator state. The fluid and seal models are illustrative, uncalibrated approximations; this single seed establishes simulation feasibility only. Hardware validation is outstanding. No task-board media ID has yet been issued for this task.
+The demo reads simulator state. The fluid and seal models are illustrative, uncalibrated approximations; this single seed establishes simulation feasibility only. Hardware validation is outstanding. Task-board media ID: **M-SEEP5V** (model video, full-score demo and setup screenshot).
 
 ## Dream-1 beta — actual model trial
 
@@ -39,4 +39,4 @@ On 8 November 2026, `dreamlabs/dream-1-beta` completed one independent trial usi
 
 The arms moved around the syringe, but the logged state never achieved the required lift or air removal. Initial, midpoint and final camera frames were inspected. The final logged syringe position remained (0.25, 0, 0.8868) m. A three-camera H.264 model video was assembled from the recorded trial frames; no scripted actions were substituted. The existing full-score scripted demo remains separate.
 
-The automatic video export initially could not find FFmpeg on PATH. Export succeeded using the installed `imageio_ffmpeg` binary; this did not rerun or change the model trial. The runner now resolves that binary automatically. Media upload is the remaining submission step.
+The automatic video export initially could not find FFmpeg on PATH. Export succeeded using the installed `imageio_ffmpeg` binary; this did not rerun or change the model trial. The runner now resolves that binary automatically. The three required media files were uploaded successfully as **M-SEEP5V**. The model video is H.264, 1280 × 480, 20 fps, 90.05 s (7,475,578 bytes); the full-score demo is H.264, 1280 × 480, 20 fps, 33.8 s (2,797,164 bytes); the setup screenshot is 48,065 bytes. The official Python upload request returned Cloudflare error 1010; curl succeeded with the same documented endpoint, bearer authentication and multipart fields.
