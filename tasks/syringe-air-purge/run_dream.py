@@ -43,10 +43,14 @@ def main():
         try:
             completed = subprocess.run(config['command'], check=False)
             video_codes = []
+            ffmpeg = shutil.which('ffmpeg')
+            if not ffmpeg:
+                import imageio_ffmpeg
+                ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
             for log in sorted((run / 'eval').glob('*.json')):
                 if log.name.endswith('.live.json'):
                     continue
-                video_codes.append(subprocess.run([args.cli, 'video', str(log), '--out', str(run / 'videos'), '--fps', '20'], check=False).returncode)
+                video_codes.append(subprocess.run([args.cli, 'video', str(log), '--out', str(run / 'videos'), '--fps', '20', '--ffmpeg', ffmpeg], check=False).returncode)
             (run / 'runner_status.json').write_text(json.dumps({'run_exit_code': completed.returncode, 'video_exit_codes': video_codes, 'finished_at': datetime.now(timezone.utc).isoformat()}, indent=2) + '\n')
             print('Trial process finished; inspect evaluation score and runner_status.json.', flush=True)
         except Exception as error:
