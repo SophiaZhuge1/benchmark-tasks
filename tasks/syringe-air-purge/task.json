@@ -13,7 +13,7 @@
   "scoring": "Final-state score requires a previous lift of barrel origin above tabletop+190 mm, return within 25 mm of start XY and 125-155 mm above tabletop, axis |z|<0.15 and y>0.985, linear speed<25 mm/s, and all fingertips >65 mm from both grasp and thumb-plate points. 1.0: air<=0.05 mL and sample loss<=0.30 mL; otherwise 0.6: air<=0.30 mL and loss<=0.50 mL; otherwise 0.3: air<=0.75 mL and loss<=0.50 mL; otherwise 0.0. Persistent failure (score 0): barrel below tabletop+15 mm or >350 mm from initial XY, sample loss>0.50 mL, aspiration>0.20 mL, or invalid fluid inputs. Success must hold for 1 second.",
   "run_limit": "1800 control steps (90 seconds at 20 Hz)",
   "fidelity": "The barrel and plunger are a free PhysX articulation. The coalesced air pocket and sample follow a reduced-order volume-conserving model, not CFD. No viscosity, breakup, surface adhesion or clinical-dose claims. Passive seal is an uncalibrated bounded elastic/sliding model (0.6 N maximum force); it never sets piston position.",
-  "scores": "Scripted full return-to-rack demo: 1.0 (syringe-seal-v16, seed 1); no-action, horizontal-push and excessive-push controls: 0.0. Dream-1 not run.",
+  "scores": "Dream-1 beta: 0.0 (1800 steps, seed 1, 8 November 2026); scripted full return-to-rack demo: 1.0 (675 steps, seed 1); no-action, horizontal-push and excessive-push controls: 0.0.",
   "media": "",
   "context": "Air removal before laboratory dispensing requires coordinating syringe orientation and plunger travel while limiting sample loss. Two free arms perform the operation and return the needle-free syringe to its rack.",
   "reset_notes": "Start a fresh process for each independent trial to restore the syringe, plunger, 10.5 mL sample, 1.5 mL air and failure flags."
