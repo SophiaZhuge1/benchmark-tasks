@@ -1,0 +1,846 @@
+{
+  "drag-events": {
+    "mode": "drag",
+    "score": 0,
+    "steps": 222,
+    "seconds": 11.1,
+    "wall_seconds": 57.23,
+    "blank_frames": 0,
+    "final": {
+      "step": 222,
+      "t": 11.1,
+      "score": 0,
+      "time": 11.1,
+      "stage_mm": 60.0776,
+      "lift_mm": 0,
+      "contact": true,
+      "aligned": true,
+      "scrape_mm": 60.099449,
+      "damaged": true,
+      "first_damage": 2.8999999999999977,
+      "lifted": false,
+      "released": true,
+      "final_dwell": 0
+    },
+    "minimum_lift_during_observed_motion_mm": 0,
+    "transitions": [
+      {
+        "time": 0.05,
+        "field": "lifted",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "aligned",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "contact",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "damaged",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "score",
+        "value": 0
+      },
+      {
+        "time": 1.75,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 1.95,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 2.5,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 2.9,
+        "field": "damaged",
+        "value": true
+      },
+      {
+        "time": 5.1,
+        "field": "aligned",
+        "value": true
+      },
+      {
+        "time": 5.95,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 6.15,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 6.7,
+        "field": "released",
+        "value": true
+      }
+    ]
+  },
+  "drag-manifest": {
+    "entrypoint": "task.py",
+    "sha256": {
+      "task.py": "342e67b6d10b18f10d45ec54f6abc4fbfb8b61e995a6fe2d14b69e6039c247ef",
+      "prepare_preview.py": "902a6af2a0dc788347cbde54bd22ff98ebdf5983bc48c96517498147ffd361fd",
+      "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+      "analyze_trace.py": "5433c6c408d485ff78670313eea18c382b9b2e56a828056a661be4c158ea8328",
+      "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+      "test_probe_model.py": "2af8abcd8abf209bbfe2431bd15c8375d182c030c7f53b90144fe0cdae7cb943",
+      "task.json": "114ad4d5e3e54fbb5a5c3ec9dce8a876537cab9db5cd3e011a2b6d8557f7a9b7",
+      "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+      "README.md": "9406b6f5db8103c2885767b9d4778b7c7f55c028d877a9387c9aa6998d6c29ba",
+      "probe_model.py": "84066528394a1a07e3d2c9124d33645390d488d7e16046e676ff6a5572e5b3b0",
+      "labels.py": "4c67faf5b5624b876ed57c37bd2ea0fd20879b6dab9c70c3248c3ae052592813"
+    }
+  },
+  "drag-result": {
+    "mode": "drag",
+    "task_score": 0,
+    "success": false,
+    "termination": null,
+    "steps": 222,
+    "seconds": 11.1,
+    "script_ended_at_step": 182,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 3.88,
+    "script_s": 0.72,
+    "sim_s": 54.76,
+    "wall_s": 57.23,
+    "slowest_30_steps_s": 8.61,
+    "blank_frames": 0,
+    "video": "results/drag/drag/demo.mp4",
+    "ik_worst": {
+      "left": [
+        0,
+        0
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": false,
+      "score": 0
+    },
+    "task_metrics": {
+      "step": 222,
+      "t": 11.1,
+      "score": 0,
+      "time": 11.1,
+      "stage_mm": 60.0776,
+      "lift_mm": 0,
+      "contact": true,
+      "aligned": true,
+      "scrape_mm": 60.099449,
+      "damaged": true,
+      "first_damage": 2.8999999999999977,
+      "lifted": false,
+      "released": true,
+      "final_dwell": 0
+    }
+  },
+  "early_release-events": {
+    "mode": "early_release",
+    "score": 0,
+    "steps": 367,
+    "seconds": 18.35,
+    "wall_seconds": 97.35,
+    "blank_frames": 0,
+    "final": {
+      "step": 367,
+      "t": 18.35,
+      "score": 0,
+      "time": 18.35,
+      "stage_mm": 59.6134,
+      "lift_mm": 0,
+      "contact": true,
+      "aligned": true,
+      "scrape_mm": 58.583306,
+      "damaged": true,
+      "first_damage": 10.400000000000013,
+      "lifted": true,
+      "released": true,
+      "final_dwell": 0
+    },
+    "minimum_lift_during_observed_motion_mm": 0,
+    "transitions": [
+      {
+        "time": 0.05,
+        "field": "lifted",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "aligned",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "contact",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "damaged",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "score",
+        "value": 0
+      },
+      {
+        "time": 1.75,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 2,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 2.5,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 3.5,
+        "field": "contact",
+        "value": false
+      },
+      {
+        "time": 3.95,
+        "field": "lifted",
+        "value": true
+      },
+      {
+        "time": 3.95,
+        "field": "score",
+        "value": 0.25
+      },
+      {
+        "time": 8.6,
+        "field": "contact",
+        "value": true
+      },
+      {
+        "time": 10.4,
+        "field": "damaged",
+        "value": true
+      },
+      {
+        "time": 10.4,
+        "field": "score",
+        "value": 0
+      },
+      {
+        "time": 12.4,
+        "field": "aligned",
+        "value": true
+      },
+      {
+        "time": 13.2,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 13.4,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 13.95,
+        "field": "released",
+        "value": true
+      }
+    ]
+  },
+  "early_release-manifest": {
+    "entrypoint": "task.py",
+    "sha256": {
+      "task.py": "342e67b6d10b18f10d45ec54f6abc4fbfb8b61e995a6fe2d14b69e6039c247ef",
+      "prepare_preview.py": "902a6af2a0dc788347cbde54bd22ff98ebdf5983bc48c96517498147ffd361fd",
+      "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+      "analyze_trace.py": "5433c6c408d485ff78670313eea18c382b9b2e56a828056a661be4c158ea8328",
+      "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+      "test_probe_model.py": "2af8abcd8abf209bbfe2431bd15c8375d182c030c7f53b90144fe0cdae7cb943",
+      "task.json": "114ad4d5e3e54fbb5a5c3ec9dce8a876537cab9db5cd3e011a2b6d8557f7a9b7",
+      "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+      "README.md": "9406b6f5db8103c2885767b9d4778b7c7f55c028d877a9387c9aa6998d6c29ba",
+      "probe_model.py": "84066528394a1a07e3d2c9124d33645390d488d7e16046e676ff6a5572e5b3b0",
+      "labels.py": "4c67faf5b5624b876ed57c37bd2ea0fd20879b6dab9c70c3248c3ae052592813"
+    }
+  },
+  "early_release-result": {
+    "mode": "early_release",
+    "task_score": 0,
+    "success": false,
+    "termination": null,
+    "steps": 367,
+    "seconds": 18.35,
+    "script_ended_at_step": 327,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 3.77,
+    "script_s": 1.74,
+    "sim_s": 92.43,
+    "wall_s": 97.35,
+    "slowest_30_steps_s": 8.89,
+    "blank_frames": 0,
+    "video": "results/early_release/early_release/demo.mp4",
+    "ik_worst": {
+      "left": [
+        3,
+        0.7
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": false,
+      "score": 0
+    },
+    "task_metrics": {
+      "step": 367,
+      "t": 18.35,
+      "score": 0,
+      "time": 18.35,
+      "stage_mm": 59.6134,
+      "lift_mm": 0,
+      "contact": true,
+      "aligned": true,
+      "scrape_mm": 58.583306,
+      "damaged": true,
+      "first_damage": 10.400000000000013,
+      "lifted": true,
+      "released": true,
+      "final_dwell": 0
+    }
+  },
+  "full-events": {
+    "mode": "full",
+    "score": 1,
+    "steps": 340,
+    "seconds": 17,
+    "wall_seconds": 91.78,
+    "blank_frames": 0,
+    "final": {
+      "step": 340,
+      "t": 17,
+      "score": 1,
+      "time": 17,
+      "stage_mm": 59.8575,
+      "lift_mm": 0,
+      "contact": true,
+      "aligned": true,
+      "scrape_mm": 0,
+      "damaged": false,
+      "first_damage": null,
+      "lifted": true,
+      "released": true,
+      "final_dwell": 1.95,
+      "robot": {
+        "left": {
+          "tcp": [
+            0.24677817916037173,
+            0.1987636222474946,
+            0.9439222634060889
+          ],
+          "command": [
+            0.2460277774236433,
+            0.19895841241156625,
+            0.9438477186944705
+          ],
+          "trim": [
+            0,
+            0,
+            0
+          ],
+          "grip": [
+            [
+              -2.220446049250313e-16,
+              -1.0000000000000002,
+              0
+            ],
+            [
+              -1.0000000000000002,
+              -4.440892098500626e-16,
+              0
+            ],
+            [
+              0,
+              0,
+              -1.0000000000000009
+            ]
+          ]
+        },
+        "right": {
+          "tcp": [
+            0.341289745709677,
+            -0.2734169831657622,
+            0.8875480268458154
+          ],
+          "command": [
+            0.3404594869590894,
+            -0.27407896826032196,
+            0.8875228147639772
+          ],
+          "trim": [
+            0,
+            0,
+            0
+          ],
+          "grip": [
+            [
+              -2.220446049250313e-16,
+              -1.0000000000000002,
+              0
+            ],
+            [
+              -1.0000000000000002,
+              -4.440892098500626e-16,
+              0
+            ],
+            [
+              0,
+              0,
+              -1.0000000000000009
+            ]
+          ]
+        }
+      }
+    },
+    "minimum_lift_during_observed_motion_mm": 39.3557,
+    "transitions": [
+      {
+        "time": 0.05,
+        "field": "lifted",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "aligned",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "contact",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "damaged",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "score",
+        "value": 0
+      },
+      {
+        "time": 1.75,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 2,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 2.5,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 3.5,
+        "field": "contact",
+        "value": false
+      },
+      {
+        "time": 3.95,
+        "field": "lifted",
+        "value": true
+      },
+      {
+        "time": 3.95,
+        "field": "score",
+        "value": 0.25
+      },
+      {
+        "time": 10.2,
+        "field": "aligned",
+        "value": true
+      },
+      {
+        "time": 10.2,
+        "field": "score",
+        "value": 0.75
+      },
+      {
+        "time": 13.55,
+        "field": "score",
+        "value": 0.25
+      },
+      {
+        "time": 14.15,
+        "field": "contact",
+        "value": true
+      },
+      {
+        "time": 14.4,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 14.65,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 15.1,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 16.05,
+        "field": "score",
+        "value": 1
+      }
+    ]
+  },
+  "full-result": {
+    "mode": "full",
+    "task_score": 1,
+    "success": true,
+    "termination": "success",
+    "steps": 340,
+    "seconds": 17,
+    "script_ended_at_step": null,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 3.7,
+    "script_s": 1.64,
+    "sim_s": 87.27,
+    "wall_s": 91.78,
+    "slowest_30_steps_s": 8.71,
+    "blank_frames": 0,
+    "video": "results/safe/full/demo.mp4",
+    "ik_worst": {
+      "left": [
+        0.1,
+        0
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": true,
+      "score": 1
+    },
+    "task_metrics": {
+      "step": 340,
+      "t": 17,
+      "score": 1,
+      "time": 17,
+      "stage_mm": 59.8575,
+      "lift_mm": 0,
+      "contact": true,
+      "aligned": true,
+      "scrape_mm": 0,
+      "damaged": false,
+      "first_damage": null,
+      "lifted": true,
+      "released": true,
+      "final_dwell": 1.95,
+      "robot": {
+        "left": {
+          "tcp": [
+            0.24677817916037173,
+            0.1987636222474946,
+            0.9439222634060889
+          ],
+          "command": [
+            0.2460277774236433,
+            0.19895841241156625,
+            0.9438477186944705
+          ],
+          "trim": [
+            0,
+            0,
+            0
+          ],
+          "grip": [
+            [
+              -2.220446049250313e-16,
+              -1.0000000000000002,
+              0
+            ],
+            [
+              -1.0000000000000002,
+              -4.440892098500626e-16,
+              0
+            ],
+            [
+              0,
+              0,
+              -1.0000000000000009
+            ]
+          ]
+        },
+        "right": {
+          "tcp": [
+            0.341289745709677,
+            -0.2734169831657622,
+            0.8875480268458154
+          ],
+          "command": [
+            0.3404594869590894,
+            -0.27407896826032196,
+            0.8875228147639772
+          ],
+          "trim": [
+            0,
+            0,
+            0
+          ],
+          "grip": [
+            [
+              -2.220446049250313e-16,
+              -1.0000000000000002,
+              0
+            ],
+            [
+              -1.0000000000000002,
+              -4.440892098500626e-16,
+              0
+            ],
+            [
+              0,
+              0,
+              -1.0000000000000009
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "leave_lifted-events": {
+    "mode": "leave_lifted",
+    "score": 0.75,
+    "steps": 323,
+    "seconds": 16.15,
+    "wall_seconds": 89.64,
+    "blank_frames": 0,
+    "final": {
+      "step": 323,
+      "t": 16.15,
+      "score": 0.75,
+      "time": 16.15,
+      "stage_mm": 59.8575,
+      "lift_mm": 39.4341,
+      "contact": false,
+      "aligned": true,
+      "scrape_mm": 0,
+      "damaged": false,
+      "first_damage": null,
+      "lifted": true,
+      "released": false,
+      "final_dwell": 0
+    },
+    "minimum_lift_during_observed_motion_mm": 39.3557,
+    "transitions": [
+      {
+        "time": 0.05,
+        "field": "lifted",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "aligned",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "contact",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "damaged",
+        "value": false
+      },
+      {
+        "time": 0.05,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 0.05,
+        "field": "score",
+        "value": 0
+      },
+      {
+        "time": 1.75,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 2,
+        "field": "released",
+        "value": true
+      },
+      {
+        "time": 2.5,
+        "field": "released",
+        "value": false
+      },
+      {
+        "time": 3.5,
+        "field": "contact",
+        "value": false
+      },
+      {
+        "time": 3.95,
+        "field": "lifted",
+        "value": true
+      },
+      {
+        "time": 3.95,
+        "field": "score",
+        "value": 0.25
+      },
+      {
+        "time": 10.2,
+        "field": "aligned",
+        "value": true
+      },
+      {
+        "time": 10.2,
+        "field": "score",
+        "value": 0.75
+      }
+    ]
+  },
+  "leave_lifted-manifest": {
+    "entrypoint": "task.py",
+    "sha256": {
+      "task.py": "342e67b6d10b18f10d45ec54f6abc4fbfb8b61e995a6fe2d14b69e6039c247ef",
+      "prepare_preview.py": "902a6af2a0dc788347cbde54bd22ff98ebdf5983bc48c96517498147ffd361fd",
+      "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+      "analyze_trace.py": "5433c6c408d485ff78670313eea18c382b9b2e56a828056a661be4c158ea8328",
+      "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+      "test_probe_model.py": "2af8abcd8abf209bbfe2431bd15c8375d182c030c7f53b90144fe0cdae7cb943",
+      "task.json": "114ad4d5e3e54fbb5a5c3ec9dce8a876537cab9db5cd3e011a2b6d8557f7a9b7",
+      "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+      "README.md": "9406b6f5db8103c2885767b9d4778b7c7f55c028d877a9387c9aa6998d6c29ba",
+      "probe_model.py": "84066528394a1a07e3d2c9124d33645390d488d7e16046e676ff6a5572e5b3b0",
+      "labels.py": "4c67faf5b5624b876ed57c37bd2ea0fd20879b6dab9c70c3248c3ae052592813"
+    }
+  },
+  "leave_lifted-result": {
+    "mode": "leave_lifted",
+    "task_score": 0.75,
+    "success": false,
+    "termination": null,
+    "steps": 323,
+    "seconds": 16.15,
+    "script_ended_at_step": 283,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 3.6,
+    "script_s": 1.36,
+    "sim_s": 85.33,
+    "wall_s": 89.64,
+    "slowest_30_steps_s": 8.89,
+    "blank_frames": 0,
+    "video": "results/leave_lifted/leave_lifted/demo.mp4",
+    "ik_worst": {
+      "left": [
+        0.1,
+        0
+      ],
+      "right": [
+        0.1,
+        0
+      ]
+    },
+    "final_info": {
+      "success": false,
+      "score": 0.75
+    },
+    "task_metrics": {
+      "step": 323,
+      "t": 16.15,
+      "score": 0.75,
+      "time": 16.15,
+      "stage_mm": 59.8575,
+      "lift_mm": 39.4341,
+      "contact": false,
+      "aligned": true,
+      "scrape_mm": 0,
+      "damaged": false,
+      "first_damage": null,
+      "lifted": true,
+      "released": false,
+      "final_dwell": 0
+    }
+  },
+  "source-manifest": {
+    "entrypoint": "task.py",
+    "sha256": {
+      "task.py": "342e67b6d10b18f10d45ec54f6abc4fbfb8b61e995a6fe2d14b69e6039c247ef",
+      "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+      "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+      "test_probe_model.py": "2af8abcd8abf209bbfe2431bd15c8375d182c030c7f53b90144fe0cdae7cb943",
+      "task.json": "114ad4d5e3e54fbb5a5c3ec9dce8a876537cab9db5cd3e011a2b6d8557f7a9b7",
+      "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+      "probe_model.py": "84066528394a1a07e3d2c9124d33645390d488d7e16046e676ff6a5572e5b3b0",
+      "labels.py": "4c67faf5b5624b876ed57c37bd2ea0fd20879b6dab9c70c3248c3ae052592813"
+    }
+  }
+}
