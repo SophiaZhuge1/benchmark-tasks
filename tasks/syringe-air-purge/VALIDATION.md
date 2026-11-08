@@ -18,4 +18,25 @@ The no-action, horizontal-push and excessive-push controls each scored **0.0**. 
 
 Nine fluid/scoring checks and four passive-seal checks pass. The current submission files match the live Brev source used for the successful run. The original diagnostic variants remain outside this submission.
 
-The demo reads simulator state. The fluid and seal models are illustrative, uncalibrated approximations; this single seed establishes simulation feasibility only. Dream-1 and hardware validation are outstanding. No task-board media ID has yet been issued for this task.
+The demo reads simulator state. The fluid and seal models are illustrative, uncalibrated approximations; this single seed establishes simulation feasibility only. Hardware validation is outstanding. No task-board media ID has yet been issued for this task.
+
+## Dream-1 beta — actual model trial
+
+On 8 November 2026, `dreamlabs/dream-1-beta` completed one independent trial using the same physics source and exact submitted instruction. See [dream_result.json](dream_result.json).
+
+| Measure | Result |
+|---|---:|
+| Task score | 0.0 |
+| Control steps / simulated time | 1,800 / 90 s |
+| Evaluation wall time, including startup and inference | 231.61 s |
+| Mean inference latency | 0.603 s |
+| Residual air / sample loss / aspiration | 1.5 / 0.0 / 0.0 mL |
+| Lift achieved | No |
+| End condition | Step limit |
+| Evaluation errors | 0 |
+| Recorded frames per camera | 1,801 |
+| Blank frames per camera | 0 |
+
+The arms moved around the syringe, but the logged state never achieved the required lift or air removal. Initial, midpoint and final camera frames were inspected. The final logged syringe position remained (0.25, 0, 0.8868) m. A three-camera H.264 model video was assembled from the recorded trial frames; no scripted actions were substituted. The existing full-score scripted demo remains separate.
+
+The automatic video export initially could not find FFmpeg on PATH. Export succeeded using the installed `imageio_ffmpeg` binary; this did not rerun or change the model trial. The runner now resolves that binary automatically. Media upload is the remaining submission step.
