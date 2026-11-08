@@ -26,7 +26,7 @@ This approximation omits bubble breakup, capillary pinning, fluid viscosity and 
 
 ## Scoring
 
-Score is evaluated at the end after the syringe has been lifted above its initial rack, returned with its axis with axis components |z| < 0.15 and y > 0.985 relative to the original +Y direction, within 25 mm of its start XY position and between 125 and 155 mm above the tabletop, stopped below 25 mm/s, and the fingers withdrawn at least 65 mm from the grasp and thumb-plate locations.
+Score is evaluated at the end after the syringe has been lifted above its initial rack, returned with axis components |z| < 0.15 and y > 0.985 relative to the original +Y direction, within 25 mm of its start XY position and between 125 and 155 mm above the tabletop, stopped below 25 mm/s, and the fingers withdrawn at least 65 mm from the grasp and thumb-plate locations.
 
 - 1.0: at most 0.05 mL air remains and sample loss is at most 0.30 mL.
 - 0.6: at most 0.30 mL air remains and sample loss is at most 0.50 mL.
