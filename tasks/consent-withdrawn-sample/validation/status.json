@@ -1,0 +1,164 @@
+{
+  "scoring_unit_tests": 14,
+  "scoring_tests_passed": true,
+  "gpu_connected": true,
+  "gpu_simulation_run": true,
+  "dream1_run": true,
+  "status": "PHYSICS_AND_DREAM_VALIDATED_SUBMISSION_PREPARED",
+  "checked_on": "2026-11-11",
+  "reference_helpers_source": "robocurve/benchmark-tasks PR 1354",
+  "workstation": "chrysler",
+  "scoring_tests_passed_on_workstation": true,
+  "nominal_ik_checked": true,
+  "gpu_smoke_attempted": true,
+  "gpu_smoke_passed": true,
+  "runtime": {
+    "torch": "2.11.0+cu128",
+    "arena": "c7edf3a9d5d8276565208f72422f8f8a0806d6cf",
+    "isaaclab": "91a0906f93802eb859192dcb0bca879f891e92d6",
+    "isaacsim": "6.2.0",
+    "adapter": "0059d02a1a91bc6834c1d0846022891df0c78730"
+  },
+  "trials": [
+    {
+      "name": "control",
+      "score": 1.0,
+      "success": true,
+      "seed": 0,
+      "sim_seconds": 17.9,
+      "wall_seconds": 52.04,
+      "blank_frames": 0,
+      "reason": null,
+      "source": "runs/final/demo_control_seed0_20261111T133426Z/full/result.json"
+    },
+    {
+      "name": "early",
+      "score": 1.0,
+      "success": true,
+      "seed": 0,
+      "sim_seconds": 31.75,
+      "wall_seconds": 100.49,
+      "blank_frames": 0,
+      "reason": null,
+      "source": "runs/final/demo_early_seed0_20261111T133010Z/full/result.json"
+    },
+    {
+      "name": "late",
+      "score": 1.0,
+      "success": true,
+      "seed": 0,
+      "sim_seconds": 34.15,
+      "wall_seconds": 107.37,
+      "blank_frames": 0,
+      "reason": null,
+      "source": "runs/final/demo_late_seed0_20261111T133217Z/full/result.json"
+    },
+    {
+      "name": "middle",
+      "score": 1.0,
+      "success": true,
+      "seed": 0,
+      "sim_seconds": 32.95,
+      "wall_seconds": 106.69,
+      "blank_frames": 0,
+      "reason": null,
+      "source": "runs/final/demo_middle_seed0_20261111T133010Z/full/result.json"
+    },
+    {
+      "name": "ignore",
+      "score": 0.0,
+      "success": false,
+      "seed": 0,
+      "sim_seconds": 23.0,
+      "wall_seconds": 78.03,
+      "blank_frames": 0,
+      "reason": "release_after_withdrawal",
+      "source": "runs/final/negative/ignore/result.json"
+    },
+    {
+      "name": "none",
+      "score": 0.0,
+      "success": false,
+      "seed": 0,
+      "sim_seconds": 5.0,
+      "wall_seconds": 13.32,
+      "blank_frames": 0,
+      "reason": null,
+      "source": "runs/final/negative/none/result.json"
+    },
+    {
+      "name": "return_open",
+      "score": 0.25,
+      "success": false,
+      "seed": 0,
+      "sim_seconds": 28.8,
+      "wall_seconds": 89.78,
+      "blank_frames": 0,
+      "reason": null,
+      "source": "runs/final/return_open/return_open/result.json"
+    }
+  ],
+  "trace_replays": [
+    {
+      "trace": "demo_control_seed0_20261111T133426Z__monitor__episode_001.jsonl",
+      "score": 1.0,
+      "matches": true
+    },
+    {
+      "trace": "demo_early_seed0_20261111T133010Z__monitor__episode_001.jsonl",
+      "score": 1.0,
+      "matches": true
+    },
+    {
+      "trace": "demo_late_seed0_20261111T133217Z__monitor__episode_001.jsonl",
+      "score": 1.0,
+      "matches": true
+    },
+    {
+      "trace": "demo_middle_seed0_20261111T133010Z__monitor__episode_001.jsonl",
+      "score": 1.0,
+      "matches": true
+    },
+    {
+      "trace": "negative__monitor__episode_001.jsonl",
+      "score": 0.0,
+      "matches": true
+    },
+    {
+      "trace": "negative__monitor__episode_002.jsonl",
+      "score": 0.0,
+      "matches": true
+    },
+    {
+      "trace": "return_open__monitor__episode_001.jsonl",
+      "score": 0.25,
+      "matches": true
+    }
+  ],
+  "camera_cue_verified": true,
+  "scope": "Seed 0 only; scripted privileged-state policy, not a VLA evaluation or universal collision certification.",
+  "dream1": {
+    "policy": "Dream-1",
+    "variant": "middle",
+    "seed": 0,
+    "steps": 2400,
+    "sim_seconds": 120,
+    "wall_seconds": 448.38991567498306,
+    "mean_inference_latency_seconds": 0.7622718912176788,
+    "score": 0.0,
+    "reason": "release_after_withdrawal",
+    "withdrawal_t": 87.49999999999717,
+    "violation_t": 89.99999999999703,
+    "trace_replay_matches": true,
+    "completed_at": "2026-11-11T14:16:42.953009+00:00",
+    "cue_frames": {
+      "before_private_step": 1749,
+      "first_private_step": 1750,
+      "violation_step": 1800,
+      "verified": true
+    }
+  },
+  "media_uploaded": true,
+  "media_id": "M-6XHD57",
+  "submission_status": "Prepared for submission"
+}

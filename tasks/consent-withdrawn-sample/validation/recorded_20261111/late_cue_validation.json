@@ -1,0 +1,26 @@
+{
+  "run": "runs/final/demo_late_seed0_20261111T133217Z/full",
+  "withdrawal_t": 8.6,
+  "control_hz": 20,
+  "sample_times_s": [
+    8.55,
+    8.6,
+    8.65
+  ],
+  "colour_pixels": [
+    {
+      "red": 0,
+      "green": 1462
+    },
+    {
+      "red": 1324,
+      "green": 0
+    },
+    {
+      "red": 1323,
+      "green": 0
+    }
+  ],
+  "cue_frame_check_passed": true,
+  "scope": "Fixed scene, recorded top camera; full-frame dominant red/green colour check, plus manual word readability review."
+}

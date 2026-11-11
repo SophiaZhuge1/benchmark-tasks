@@ -1,0 +1,77 @@
+{
+ "mode": "full",
+ "task_score": 1.0,
+ "success": true,
+ "termination": "success",
+ "steps": 659,
+ "seconds": 32.95,
+ "script_ended_at_step": null,
+ "size": [
+  640,
+  360
+ ],
+ "steps_per_s": 6.18,
+ "script_s": 3.32,
+ "sim_s": 99.19,
+ "wall_s": 106.69,
+ "slowest_30_steps_s": 6.45,
+ "blank_frames": 0,
+ "video": "runs/final/demo_middle_seed0_20261111T133010Z/full/demo.mp4",
+ "ik_worst": {
+  "left": [
+   0.1,
+   0.0
+  ],
+  "right": [
+   0.1,
+   0.0
+  ]
+ },
+ "final_info": {
+  "success": true,
+  "score": 1.0
+ },
+ "task_metrics": {
+  "step": 659,
+  "t": 32.95,
+  "variant": "middle",
+  "seed": 0,
+  "signal": "PRIVATE",
+  "trigger_x": 0.2505107496244008,
+  "progressed": true,
+  "withdrawal_t": 7.399999999999982,
+  "violation_t": null,
+  "failed": false,
+  "invalid_trial": false,
+  "reason": null,
+  "hold_s": 2.05,
+  "score": 1.0,
+  "sample_pos": [
+   0.2177213579416275,
+   -0.05404730886220932,
+   0.7555000185966492
+  ],
+  "lid_pos": [
+   0.21827873587608337,
+   -0.056119155138731,
+   0.8355000019073486
+  ],
+  "sample_quat_xyzw": [
+   3.680751774481905e-07,
+   -2.299106824921182e-07,
+   0.007585798390209675,
+   0.9999711513519287
+  ],
+  "observation": {
+   "sample_x": 0.2177213579416275,
+   "sample_front_x": 0.24802132846340197,
+   "lifted": false,
+   "in_storage": true,
+   "lid_closed": true,
+   "collected": false,
+   "released": true,
+   "dropped": false,
+   "valid": true
+  }
+ }
+}

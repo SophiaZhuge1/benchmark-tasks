@@ -1,0 +1,21 @@
+{
+  "left_recovery": {
+    "nominal_waypoints": 17,
+    "worst_ik_mm": 0.0797,
+    "worst_ik_deg": 0.0123,
+    "joint_limits_ok": true
+  },
+  "left_delivery": {
+    "nominal_waypoints": 16,
+    "worst_ik_mm": 0.0826,
+    "worst_ik_deg": 0.0129,
+    "joint_limits_ok": true
+  },
+  "right_lid": {
+    "nominal_waypoints": 11,
+    "worst_ik_mm": 0.0786,
+    "worst_ik_deg": 0.0118,
+    "joint_limits_ok": true
+  },
+  "physics_tested": false
+}
