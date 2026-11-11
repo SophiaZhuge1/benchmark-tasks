@@ -1,0 +1,9 @@
+{
+  "objects": 5,
+  "pucks": 4,
+  "meshes": 27,
+  "usd_valid": true,
+  "geometric_checks_passed": true,
+  "physics_run": false,
+  "scope": "Authored USD and synthetic geometric observations only"
+}

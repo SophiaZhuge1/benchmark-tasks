@@ -1,0 +1,15 @@
+{
+  "entrypoint": "task.py",
+  "sha256": {
+    "test_curling_model.py": "b897aaac7adf844bbb64c321b328c6da39a642a04e452f8bb6c59833b07a81ce",
+    "task.py": "fc163cf94398c0f2672a4bd94f629e8c2032e9479683fa5d2aa542b21eed9358",
+    "run.sh": "aa3902a817816f82f2b7167b7a3dc67876bd32470f0882438a5924e6a87e6ca8",
+    "labels.py": "12884de0d4ff37596a655b0a5e80437b4c204de75cd5d0c3a40ccc88dca7e8b9",
+    "curling_model.py": "fbd8d783cfc76546aef531eaa7e6ccfd63e7db47a512d3f16c927e539d4ad1fd",
+    "demokit.py": "4f1e1a7c945d0ad9e82be01f9b430ea45dc819fd8bd25ebcec920f1c51232b66",
+    "mechkit.py": "0ac0d90f4f650240aaeacc05db89e3e6bcb6cf208b9f6ebf163cd2044b39211f",
+    "replay_trace.py": "3a4b93aeb64b8ba54535b5621430bd99795a088d167d8efbeffb827469e854ac",
+    "task.json": "0a5c31959f440cfe4e67214040e4a2c3671d40d6015b97c7baafc90011014931",
+    "validate_scene.py": "ba3dcd1c5b88091b36334e1f9644e9f611d2b0066b1ac7306a0d39230fd0f076"
+  }
+}

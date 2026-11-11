@@ -1,0 +1,18 @@
+{
+  "title": "Tabletop curling: take the shot and save the runaway stone",
+  "category": "Other",
+  "keywords": [
+    "bimanual",
+    "curling",
+    "reactive interception",
+    "dynamic manipulation"
+  ],
+  "instruction": "Slide blue towards the target with the left arm and release before the yellow line; use the right arm to stop red if it heads off the side, then withdraw both arms and leave all four stones on the board.",
+  "context": "One arm launches a curling shot through four-stone play while the other watches for an outgoing stone and prevents it leaving the board. The task combines aim, momentum prediction and a reactive physical block.",
+  "setup": "An 84 x 42 cm flat board spans station x=0.04..0.88 m and y=-0.07..0.35 m. Four 100 g, radius-32-mm rigid pucks with small handles: blue (0.12,0.04), red (0.35,-0.005), green (0.51,0.29), orange (0.72,0.06). Target centre (0.71,0.18), rings 15/10/6.5 cm. Release x=0.30. No rails or automatic catcher.",
+  "scoring": "After legal release and 2 s with all stones still and both hands clear: 0.25 for a legal shot; 0.5 if blue centre is within 10 cm of target; 0.75 for a confirmed right-arm rescue; 1.0 for both. Any stone centre leaving the board, lifting/tipping, left-hand recontact with blue after release, or unauthorised contact scores 0. Right-hand contact with red is allowed only after a predicted edge threat and when red y<=-0.025 m.",
+  "run_limit": "1,200 steps (60 seconds at 20 Hz)",
+  "reset_notes": "Reset all four stones to their fixed starting poses at rest. One shot per episode.",
+  "fidelity": "Rigid low-friction pucks; no ice curl. Contact uses sampled finger proximity and rules run at 20 Hz. No whole-arm collision certification.",
+  "scores": "Scripted two-arm demo: 1.0; no-rescue and no-action: 0.0; Dream-1 not run."
+}

@@ -1,0 +1,182 @@
+{
+  "status": "TWO_ARM_RESCUE_VALIDATED",
+  "date": "2026-11-11",
+  "seed": 0,
+  "board_m": [
+    0.84,
+    0.42
+  ],
+  "pucks": 4,
+  "rule_tests": 15,
+  "rule_tests_passed": true,
+  "recording_source_matches": {
+    "task.py": true,
+    "curling_model.py": true,
+    "demokit.py": true,
+    "mechkit.py": true,
+    "labels.py": true
+  },
+  "results": [
+    {
+      "mode": "full",
+      "score": 1.0,
+      "steps": 200,
+      "sim_seconds": 10.0,
+      "wall_seconds": 26.07,
+      "blank_frames": 0,
+      "reason": null,
+      "threat_t": 6.099999999999986,
+      "block_t": 6.499999999999985,
+      "saved": true,
+      "blue_distance_m": 0.06260497839268875,
+      "puck_positions": {
+        "blue": [
+          0.7710807919502258,
+          0.19373026490211487,
+          0.7754999399185181
+        ],
+        "red": [
+          0.43050339818000793,
+          -0.05745610594749451,
+          0.7754999399185181
+        ],
+        "green": [
+          0.5100000500679016,
+          0.2900000214576721,
+          0.7754999399185181
+        ],
+        "orange": [
+          0.7200000882148743,
+          0.060000043362379074,
+          0.7754999399185181
+        ]
+      },
+      "ik_worst": {
+        "left": [
+          0.1,
+          0.0
+        ],
+        "right": [
+          0.1,
+          0.0
+        ]
+      }
+    },
+    {
+      "mode": "no_rescue",
+      "score": 0.0,
+      "steps": 374,
+      "sim_seconds": 18.7,
+      "wall_seconds": 44.18,
+      "blank_frames": 0,
+      "reason": "puck_left_board",
+      "threat_t": 6.099999999999986,
+      "block_t": null,
+      "saved": false,
+      "blue_distance_m": 0.06273734788093603,
+      "puck_positions": {
+        "blue": [
+          0.7712037563323975,
+          0.19378677010536194,
+          0.7754999399185181
+        ],
+        "red": [
+          0.43989166617393494,
+          -0.1147652342915535,
+          0.7594999074935913
+        ],
+        "green": [
+          0.5100000500679016,
+          0.2900000214576721,
+          0.7754999399185181
+        ],
+        "orange": [
+          0.7200000882148743,
+          0.060000043362379074,
+          0.7754999399185181
+        ]
+      },
+      "ik_worst": {
+        "left": [
+          0.1,
+          0.0
+        ],
+        "right": [
+          0.1,
+          0.0
+        ]
+      }
+    },
+    {
+      "mode": "none",
+      "score": 0.0,
+      "steps": 120,
+      "sim_seconds": 6.0,
+      "wall_seconds": 13.87,
+      "blank_frames": 0,
+      "reason": null,
+      "threat_t": null,
+      "block_t": null,
+      "saved": false,
+      "blue_distance_m": 0.6063768086390952,
+      "puck_positions": {
+        "blue": [
+          0.1200055480003357,
+          0.040002211928367615,
+          0.7754999399185181
+        ],
+        "red": [
+          0.3500000536441803,
+          -0.0049999793991446495,
+          0.7754999399185181
+        ],
+        "green": [
+          0.5100000500679016,
+          0.2900000214576721,
+          0.7754999399185181
+        ],
+        "orange": [
+          0.7200000882148743,
+          0.060000043362379074,
+          0.7754999399185181
+        ]
+      },
+      "ik_worst": {
+        "left": [
+          0.0,
+          0.0
+        ],
+        "right": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ],
+  "trace_replays": [
+    {
+      "trace": "validation/full_trace.json",
+      "steps": 200,
+      "score": 1.0,
+      "reason": null,
+      "matches": true
+    },
+    {
+      "trace": "validation/no_rescue_trace.json",
+      "steps": 374,
+      "score": 0.0,
+      "reason": "puck_left_board",
+      "matches": true
+    },
+    {
+      "trace": "validation/none_trace.json",
+      "steps": 120,
+      "score": 0.0,
+      "reason": null,
+      "matches": true
+    }
+  ],
+  "dream1_run": false,
+  "published": false,
+  "scope": "Fixed-layout seed-0 scripted physics demo and paired controls; no general hardware certification"
+}
