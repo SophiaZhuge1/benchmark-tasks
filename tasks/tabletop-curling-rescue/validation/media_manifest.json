@@ -1,0 +1,17 @@
+{
+  "media_id": "M-YXHCB5",
+  "files": {
+    "model_run.mp4": {
+      "bytes": 5247212,
+      "sha256": "7e7e72ce5b1e8cdc4ddaefc33d3dcfbb9eee64730bcde44423a42a08d3b39ea7"
+    },
+    "demo.mp4": {
+      "bytes": 1116437,
+      "sha256": "08048098b285c957f67907a42da9a925da43274a2abca03497fcffbf308040ae"
+    },
+    "setup.png": {
+      "bytes": 163860,
+      "sha256": "2e2e24051fc17d3031e727f9629fd2321174f496d209214e6ae6c5eac5826a55"
+    }
+  }
+}

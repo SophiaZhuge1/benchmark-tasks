@@ -70,6 +70,10 @@ Outputs include source snapshots, per-step traces, result JSON, setup images and
 
 ## Validation
 
-Final recording results are stored in `validation/status.json`. The recorded demo and paired no-rescue control have been validated; their task-board media upload is pending. Running the commands above generates new recordings. Dream-1 has not been run. This PR remains a draft until its required model video and task-board media upload are complete.
+The scripted demo and paired controls are recorded in `validation/status.json`. Dream-1 (`dreamlabs/dream-1-beta`) was evaluated at seed 0 on 12 November 2026 for the full 1,200-step limit (60 simulated seconds; 197.74 wall seconds). It scored **0.0** after an unauthorised stone contact; the scripted two-arm demo scored **1.0**. The model run completed normally with no runtime error. Its score and provenance are in `validation/dream_result.json`, with observations in `validation/dream_trace.json`. Replay all four recorded traces with `python replay_trace.py validation/*_trace.json`.
 
 The YAM and simulation helpers are reused from the preceding implementation. This revision changes the board, stones, two-arm script and rules. Recorded trials use the fixed layout at seed 0; they establish feasibility for that trial, not a broad model success rate or real-hardware safety certification.
+
+## Submission media
+
+The Dream-1 run, full-score demo and fixed-layout setup screenshot are uploaded together as **M-YXHCB5**. Both videos are H.264/yuv420p MP4 at 20 fps and 1280 x 480, showing the overhead view and both wrist cameras. File hashes are in `validation/media_manifest.json`.

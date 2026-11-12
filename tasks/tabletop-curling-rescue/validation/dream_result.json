@@ -1,0 +1,17 @@
+{
+  "model": "dreamlabs/dream-1-beta",
+  "date": "2026-11-12",
+  "seed": 0,
+  "score": 0.0,
+  "steps": 1200,
+  "sim_seconds": 60.0,
+  "wall_seconds": 197.74,
+  "termination": "max_steps",
+  "run_status": "success",
+  "reason": "unauthorised_puck_contact",
+  "first_failure_step": 1061,
+  "first_failure_seconds": 53.04999999999912,
+  "task_source_sha256": "fc163cf94398c0f2672a4bd94f629e8c2032e9479683fa5d2aa542b21eed9358",
+  "scorer_source_sha256": "fbd8d783cfc76546aef531eaa7e6ccfd63e7db47a512d3f16c927e539d4ad1fd",
+  "trace_sha256": "b65e9f0f463c36b41207bf6e3a23d61d4715b22ec92be5e45e9d3442e08a9960"
+}

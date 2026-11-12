@@ -14,5 +14,6 @@
   "run_limit": "1,200 steps (60 seconds at 20 Hz)",
   "reset_notes": "Reset all four stones to their fixed starting poses at rest. One shot per episode.",
   "fidelity": "Rigid low-friction pucks; no ice curl. Contact uses sampled finger proximity and rules run at 20 Hz. No whole-arm collision certification.",
-  "scores": "Scripted two-arm demo: 1.0; no-rescue and no-action: 0.0; Dream-1 not run."
+  "scores": "Dream-1 (dreamlabs/dream-1-beta), seed 0: 0.0; scripted two-arm demo, seed 0: 1.0.",
+  "media": "M-YXHCB5"
 }
