@@ -1,0 +1,609 @@
+{
+  "recorded_on": "2026-11-12",
+  "evidence_level": "scripted_rigid_body_simulation_with_reduced_order_fluid_model",
+  "seed": 1,
+  "jitter": 0,
+  "runtime": {
+    "arena_commit": "c7edf3a",
+    "IsaacLab_submodule": "91a0906",
+    "python_environment": "consent-env",
+    "device": "cuda:0",
+    "source_selection": "Arena checkout plus every directory under submodules/IsaacLab/source on PYTHONPATH"
+  },
+  "trials": [
+    {
+      "mode": "full",
+      "result": {
+        "mode": "full",
+        "task_score": 1.0,
+        "success": true,
+        "termination": "success",
+        "steps": 783,
+        "seconds": 39.15,
+        "script_ended_at_step": null,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.65,
+        "script_s": 3.36,
+        "sim_s": 160.32,
+        "wall_s": 168.53,
+        "slowest_30_steps_s": 7.89,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-dental/full/full/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 784,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": true,
+          "score": 1.0
+        },
+        "task_metrics": {
+          "step": 783,
+          "t": 39.15,
+          "score": 1.0,
+          "time": 39.15,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "pool": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "coverage": [
+            9,
+            9,
+            9
+          ],
+          "coverage_s": [
+            [
+              0.6,
+              0.35,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.4
+            ],
+            [
+              0.6,
+              0.4,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ],
+            [
+              0.6,
+              0.35,
+              0.4,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ]
+          ],
+          "lost": 0.0,
+          "peak_pool": 0.0,
+          "balance_error": 0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0168,
+          "irrigator_tip": [
+            0.3063,
+            0.0242,
+            0.1009
+          ],
+          "suction_tip": [
+            0.3057,
+            0.0092,
+            0.0933
+          ],
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "automated_evidence_check": {
+        "mode": "full",
+        "score": 1.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "video_decode": "pass",
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92",
+          "VALIDATION.md": "d318f03990fa4e02e7cddb3a885a1fa078115c32fe6aa76620ffae687930cc63",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b",
+          "PHYSICAL_PROTOCOL.md": "ee5dba1bdc5429fec72955f4f8dc81bb2563f7b2d18928434efcede9e67095af",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "b3a209bf26f546654f51824ce8797a8e532a6c5679a3d144811f1e0ef516b2e5",
+          "fluid_model.py": "d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "dfbd5f2608a3ddd575b1202ff3e091fcf9a319431eb1013d1adac87794069395",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "61ef60cbdc3af6a29a7d570122a52ef9dc002fa17a688020912b8d48641ee46c",
+          "task.json": "fc0c31cb9d07d27cc6f166ea8faa8777b74dd353402dc36e20f1a16386788f8e",
+          "SCENARIOS.md": "651ea4097ba5e51e62d202a8082783c56ca39793be632772a66da0949601115b",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "evidence_files": {
+        "demo.mp4": {
+          "sha256": "3d7ed9300a4af78ef0f0c170734238f40b94c2db97aee9eb2e6a8bd2547f603c",
+          "bytes": 3364322
+        },
+        "top_cam.mp4": {
+          "sha256": "71d9ba5dedc36e5f47cef5c31598f16c42b61dd29a7e4ce63a67d594d1c7373a",
+          "bytes": 1949672
+        },
+        "left_cam.mp4": {
+          "sha256": "d6d7cc3f308ac04db24459c66dbcfcadb809aad0a2b4c1e606f84b8814fbbbcb",
+          "bytes": 2877933
+        },
+        "right_cam.mp4": {
+          "sha256": "68b6e901e929fb5643630dfce333c539bf36f8287a81cf83b017275d9b1a426c",
+          "bytes": 2658700
+        },
+        "setup.png": {
+          "sha256": "3bda47e8338b2be645440bfd43bd3fa4118abb1fb59dae8f2d1ed07443e444a1",
+          "bytes": 158493
+        },
+        "trace.json": {
+          "sha256": "742d5ed5edb9402f0dc2d18a97d450b315234e290d304e5832e7ae41b61549e8",
+          "bytes": 499183
+        },
+        "result.json": {
+          "sha256": "1c2baafc461f130f27dc42c572b0adea96e4bdfda8116127f5609ce310aca04b",
+          "bytes": 1538
+        },
+        "dental-full.mp4": {
+          "sha256": "1437c02101a7bcc821f7b722c3a3876fd54c6d1b9923f00c1614fc94f705c08b",
+          "bytes": 92940,
+          "description": "Full-duration top-camera review copy, 400x224 at 8 fps; original cameras retained remotely."
+        }
+      },
+      "recording_directory": "recorded-dental/full/full",
+      "visual_review": {
+        "method": "initial/intermediate/final contact sheets plus 10\u201312 timestamped top-camera frames per trial",
+        "status": "consistent with intended broad scene/actions",
+        "limits": "Not a continuous manual playback or independent measurement of sub-millimetre tool clearances; numeric criteria verified from traces."
+      }
+    },
+    {
+      "mode": "point",
+      "result": {
+        "mode": "point",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 832,
+        "seconds": 41.6,
+        "script_ended_at_step": 792,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.63,
+        "script_s": 1.82,
+        "sim_s": 172.69,
+        "wall_s": 179.79,
+        "slowest_30_steps_s": 8.02,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-dental/point/point/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 833,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 832,
+          "t": 41.6,
+          "score": 0.0,
+          "time": 41.6,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "pool": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "coverage": [
+            1,
+            1,
+            1
+          ],
+          "coverage_s": [
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "lost": 0.0,
+          "peak_pool": 0.0,
+          "balance_error": 0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.018,
+          "irrigator_tip": [
+            0.3044,
+            0.0246,
+            0.1004
+          ],
+          "suction_tip": [
+            0.3049,
+            0.0084,
+            0.0926
+          ],
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "automated_evidence_check": {
+        "mode": "point",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "video_decode": "pass",
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92",
+          "VALIDATION.md": "d318f03990fa4e02e7cddb3a885a1fa078115c32fe6aa76620ffae687930cc63",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b",
+          "PHYSICAL_PROTOCOL.md": "ee5dba1bdc5429fec72955f4f8dc81bb2563f7b2d18928434efcede9e67095af",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "b3a209bf26f546654f51824ce8797a8e532a6c5679a3d144811f1e0ef516b2e5",
+          "fluid_model.py": "d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "dfbd5f2608a3ddd575b1202ff3e091fcf9a319431eb1013d1adac87794069395",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "61ef60cbdc3af6a29a7d570122a52ef9dc002fa17a688020912b8d48641ee46c",
+          "task.json": "fc0c31cb9d07d27cc6f166ea8faa8777b74dd353402dc36e20f1a16386788f8e",
+          "SCENARIOS.md": "651ea4097ba5e51e62d202a8082783c56ca39793be632772a66da0949601115b",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "evidence_files": {
+        "demo.mp4": {
+          "sha256": "4b96bd5b362007c26de1985ba9b41df7a7cd5a7d3dea5d51fdf3f71cebcb52f6",
+          "bytes": 2716251
+        },
+        "top_cam.mp4": {
+          "sha256": "ecf6a4396d4517c4e671904a497124d96225d72fa29557dcc7bb56e82602a3e6",
+          "bytes": 1597578
+        },
+        "left_cam.mp4": {
+          "sha256": "6caa27c625fc2ac28e982b7fa90dd6ba3a52df141088b31154036c342187525f",
+          "bytes": 2247844
+        },
+        "right_cam.mp4": {
+          "sha256": "bf9e1754879cac1fcb3ceef9bb9ec458f97ed66988ad421f86b8ec291a482367",
+          "bytes": 2267485
+        },
+        "setup.png": {
+          "sha256": "3bda47e8338b2be645440bfd43bd3fa4118abb1fb59dae8f2d1ed07443e444a1",
+          "bytes": 158493
+        },
+        "trace.json": {
+          "sha256": "6f1e51054951d2662357c6391de06e63f136e26a0b12178df439bee69174b218",
+          "bytes": 527867
+        },
+        "result.json": {
+          "sha256": "0565059246d7f80f37c7a2b49c5b8e88e780dba10704e07f20743c5eb0399cb7",
+          "bytes": 1524
+        },
+        "dental-point.mp4": {
+          "sha256": "325a05e842d8579e44cd23fa7ab38b0a0a37439b08bcff20e37204df7271f739",
+          "bytes": 76565,
+          "description": "Full-duration top-camera review copy, 400x224 at 8 fps; original cameras retained remotely."
+        }
+      },
+      "recording_directory": "recorded-dental/point/point",
+      "visual_review": {
+        "method": "initial/intermediate/final contact sheets plus 10\u201312 timestamped top-camera frames per trial",
+        "status": "consistent with intended broad scene/actions",
+        "limits": "Not a continuous manual playback or independent measurement of sub-millimetre tool clearances; numeric criteria verified from traces."
+      }
+    },
+    {
+      "mode": "late_suction",
+      "result": {
+        "mode": "late_suction",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 994,
+        "seconds": 49.7,
+        "script_ended_at_step": 954,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.94,
+        "script_s": 2.63,
+        "sim_s": 192.59,
+        "wall_s": 201.24,
+        "slowest_30_steps_s": 7.79,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-dental/late_suction/late_suction/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 995,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 994,
+          "t": 49.7,
+          "score": 0.0,
+          "time": 49.7,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            0.45,
+            0.45,
+            0.45
+          ],
+          "pool": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "coverage": [
+            9,
+            9,
+            9
+          ],
+          "coverage_s": [
+            [
+              0.6,
+              0.35,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.4
+            ],
+            [
+              0.6,
+              0.4,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ],
+            [
+              0.6,
+              0.35,
+              0.4,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ]
+          ],
+          "lost": 4.65,
+          "peak_pool": 0.47,
+          "balance_error": 0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0183,
+          "irrigator_tip": [
+            0.3049,
+            0.0246,
+            0.1007
+          ],
+          "suction_tip": [
+            0.3046,
+            0.0082,
+            0.0926
+          ],
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "automated_evidence_check": {
+        "mode": "late_suction",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "video_decode": "pass",
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92",
+          "VALIDATION.md": "d318f03990fa4e02e7cddb3a885a1fa078115c32fe6aa76620ffae687930cc63",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b",
+          "PHYSICAL_PROTOCOL.md": "ee5dba1bdc5429fec72955f4f8dc81bb2563f7b2d18928434efcede9e67095af",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "b3a209bf26f546654f51824ce8797a8e532a6c5679a3d144811f1e0ef516b2e5",
+          "fluid_model.py": "d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "dfbd5f2608a3ddd575b1202ff3e091fcf9a319431eb1013d1adac87794069395",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "61ef60cbdc3af6a29a7d570122a52ef9dc002fa17a688020912b8d48641ee46c",
+          "task.json": "fc0c31cb9d07d27cc6f166ea8faa8777b74dd353402dc36e20f1a16386788f8e",
+          "SCENARIOS.md": "651ea4097ba5e51e62d202a8082783c56ca39793be632772a66da0949601115b",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "evidence_files": {
+        "demo.mp4": {
+          "sha256": "c3f2bf30a8d2b9f22c8290edc894adc32a5bf9bcf9c8f9b171da5ff0f686bb79",
+          "bytes": 3552116
+        },
+        "top_cam.mp4": {
+          "sha256": "65c56bf3a49c62469750017a5804a434ae98241292114406cf3ac8d513489683",
+          "bytes": 2070843
+        },
+        "left_cam.mp4": {
+          "sha256": "ee747ece08121190fa8e7753cd744e81597328603cc92a0aa7587b9369c9dde0",
+          "bytes": 3789212
+        },
+        "right_cam.mp4": {
+          "sha256": "c0575678d34e8d8ffc20d3f9eb1846ae1f8f99ea55d1b0cf0ac3e8d1e15fca1d",
+          "bytes": 2053226
+        },
+        "setup.png": {
+          "sha256": "3bda47e8338b2be645440bfd43bd3fa4118abb1fb59dae8f2d1ed07443e444a1",
+          "bytes": 158493
+        },
+        "trace.json": {
+          "sha256": "376b705ca8b8b30faf3e68fefcbea8f247dfc13cdc6192515857be8e272c8008",
+          "bytes": 638222
+        },
+        "result.json": {
+          "sha256": "fd53c143bbd9d48a2e68416aac4f5b9c88219627c97cc90e0f2147110d8f3fbb",
+          "bytes": 1560
+        },
+        "dental-late_suction.mp4": {
+          "sha256": "8f73cbf82485641ce5b73f305106b5939e7afa0dd55a4e26c17b8b808311cb45",
+          "bytes": 94462,
+          "description": "Full-duration top-camera review copy, 400x224 at 8 fps; original cameras retained remotely."
+        }
+      },
+      "recording_directory": "recorded-dental/late_suction/late_suction",
+      "visual_review": {
+        "method": "initial/intermediate/final contact sheets plus 10\u201312 timestamped top-camera frames per trial",
+        "status": "consistent with intended broad scene/actions",
+        "limits": "Not a continuous manual playback or independent measurement of sub-millimetre tool clearances; numeric criteria verified from traces."
+      }
+    }
+  ]
+}

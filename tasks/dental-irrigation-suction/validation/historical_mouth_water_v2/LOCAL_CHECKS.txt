@@ -1,0 +1,8 @@
+Mouth-water v2, 12 November 2026
+35 unit/evidence tests passed; 14 model comparisons passed.
+Recorded CPU PhysX / RTX controls: full 1.0, wrong_place 0.0, point 0.0.
+All retain/withdraw tools, no guard failure; intended water/coverage contrasts verified.
+All cameras nonblank; source SHA256s checked against current runtime Python; complete traces and frame counts.
+Three-view MP4s H264, 1280x760, 20 fps. Initial/rinse/endpoint frames inspected.
+JSON, Python syntax, instruction consistency, fidelity limit, CSV structure and git diff whitespace checks pass.
+No push or media upload. Hardware calibration and new Dream-1 remain pending.

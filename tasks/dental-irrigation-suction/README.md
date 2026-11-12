@@ -1,68 +1,112 @@
-# Dental hygienist assistant: circular tooth rinsing with coordinated suction
+# Dental hygienist assistant: rinse, clear the mouth and return both tools
+Current submission media: **M-XPKWYY** — Dream-1 beta **0.0**, scripted demo **1.0**; source and video hashes accompany the current evidence. Earlier media IDs below are historical.
 
-Two YAM arms operate dental instruments on a rigid training phantom: one rinses the highlighted tooth and the other positions an HVE-like suction tip beside the jet. The task measures simultaneous tool coordination, fluid removal and clearance of the working area.
 
-## Why the dental context changes the task
+**Current revision: mouth-water v4 (continuous raw-score endpoint hold).** Category: Societal relevance.
 
-A completed motion alone earns nothing. Each tooth receives a metered water burst, so the robot must arrive on time, aim the irrigator, keep suction effective throughout the burst and prevent retained water from overflowing. Suction must be close enough to collect water but outside the working-area exclusion zone. Moving only the irrigator while leaving suction at the first tooth cannot earn full credit. 
+> Rinse the highlighted teeth, lift the rinsing tool while suction clears the mouth, then return and release both tools on their stands.
 
-The real clinical role motivating the task is irrigation and aspiration of the treatment site. Published dental-assistant guidance describes placing the suction inlet near the aerosol/water source while avoiding soft-tissue suction and interference with the working instrument. This benchmark uses a rigid, dry training surrogate and does not establish patient safety.
+The procedure represents rinsing/evacuation after professional air polishing on an inert dental phantom. It does not simulate polishing, plaque removal or clinical treatment. Equipment, dimensions, physical measurement procedures and limitations are in [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md).
 
-## Instruction
+## Relevance and the ability being tested
 
-Clean each highlighted tooth with circular rinsing motions while keeping the suction tube beside it.
+**Societal relevance** (called societal relatability in the review rubric): a familiar dental-visit procedure, rinsing and evacuating water after tooth polishing. The difficulty is simultaneous wet crown coverage and removal of runoff through an inlet that must actually reach pooled water. Neither a dry circular motion nor suction in the wrong location meets the score; clearing later cannot undo an excessive earlier peak. The final return/release is a completion requirement, not the source of the task's distinctiveness. This is an inert training phantom, with no claim to plaque removal or patient-treatment safety. The workflow reference is the [Cavitron JET Plus instructions](https://www.dentsplysirona.com/content/dam/master/product-procedure-brand-categories/preventive/product-categories/ultrasonic-scaling/table-top-units/cavitron-jet-plus-ultrasonic-scaler-and-air-polishing-prophylaxis-system-with-tap-on-technology/documents/PRE-IFU-Cavitron-Jet-Plus-Ultrasonic-Scaler-and-Air-Polishing-Prophylaxis-System-with-Tap-On-Technology-2020-05.pdf), section9.8; the metered bench rig does not reproduce that commercial instrument.
 
-## Run
+## Physical rig and measurement essentials
 
-```bash
-bash run_brev.sh ~/yam-eval/dental-chairside-demo --render 640x360 --mode full,point
-bash run_brev.sh ~/yam-eval/dental-chairside-debug --no-record --stills 100 --mode full
-bash run_dream.sh "$PWD/results/dream"
-python3 prepare_media.py "$PWD/results/dream" ~/yam-eval/dental-chairside-demo/full
-python3 -m unittest -v test_fluid
-```
+All coordinates below are millimetres relative to the tabletop, not robot-base coordinates. Use the standard fixed bimanual YAM station, seed1 and zero jitter; the setup image fixes the starting arm pose.
 
-Use the installed RoboCurve YAM/Isaac Lab Python on Brev, selected by run_brev.sh. For Dream-1, provide DREAM_API_KEY in the environment; the run script never stores it. The media export uses numpy, Pillow and ffmpeg. The runner saves exact source hashes, per-step traces and per-trial result.json. Use `python3 analyze_trace.py OUT/full/trace.json` to inspect measured circular travel and minimum coverage dwell. Recorded trials include a setup image, a three-camera H.264 demo and individual camera videos. The demonstration reads simulator object poses and is not a VLA. Do not label unrecorded debug runs as final media validation.
+| Component | Reproduction specification |
+|---|---|
+| Phantom | Acetal base170x130x12 centred(270,0); gum rails115x28x18 at(270,+/-25,19), front rail28x70x18 at(209,0,19). Clamp the base. |
+| Crowns | Six acetal cylinders diameter20,height14 at(235/270/305,+/-25,30); four rounded cusps per crown, half-ellipsoid radii4.5x4.5x3 at offsets+/-4. Treat the three +Y crowns, nominal planez37. Front teeth12x12x18 at(209,-18/0/18,35); rigid tongue ellipsoid radii43x10x7 at(275,0,18). |
+| Mouth water | Three transparent PMMA wells28x18 centred(235/270/305,0), floorz31, walls1 thick with inner facesy+/-9 and topz34.5; sealed7x3 connecting gutters. PETG runoff guides6 wide slope from crowns toward wells, drop6 over25. Calibrate1 mL overflow ports into the external catch. Include films and gutter water in the inventory. |
+| Instruments | PETG handles28x24x55 with silicone grip29x25x20 centred40 above origin; target75 g each. Rounded hollow316 stainless irrigation OD5/ID3 and suction OD9/ID7. Tube centreline(0,0,22),(0,s25,22),(0,s90,-9),(0,s90,-25); s=-1 irrigation,+1 suction. |
+| Original stands | Acetal cylinders diameter50,height30: basez0,centrez15,topz30, XY(280,+200)/(280,-200); tool origins start on the tops atz30, in the specified starting orientation. |
+| Irrigation | Pump11 Elite,20 mL syringe, distilled water,1 m of2 mm-ID silicone hose; normally closed pinch valve, microcontroller/reset LED. Calibrate actual outlet0.40 mL/s at16-21,24-29,32-37 s:2.00 +/-0.02 mL/pulse,6.00 +/-0.03 total. Include delayed drips. |
+| Evacuation | KNF N838 gas-pump family with regulator/gauge/relief, water trap, overflow trap and hydrophobic filter; record exact variant. Tool to150 mm ID6/OD9 silicone hose, combined vacuum-rated receiver; support hose slack. Commission at-10 kPa gauge and calibrate liquid recovery; gas ratings are not liquid performance. |
+| Metrology | >=60 fps synchronized overhead and two macro/oblique cameras, grid/backlight/reset LED; calibrated pipette,0.001 g-readability balance, thermometer,10 mL receiver with0.1 mL divisions and1 mL fine receiver with0.01 mL divisions. Catch tray220x180x15. |
 
-## Circular coverage
+The retained inventory is **all** water on crowns, guides, pools and channels. Water crossing the suction inlet counts as recovered, including calibrated hose holdup; water leaving the mouth otherwise is loss. Check supplied = recovered + retained + lost. Use calibrated macro images throughout for peak volume, with supply/recovery/line-delay cross-checks. After recording the final settled endpoint, independently collect and weigh retained water/films against dry tare. A single final cup reading cannot establish a historical peak.
 
-For each five-second rinse, the scripted arm starts at the centre, makes a 3 mm radius inner circle, expands to a 7.5 mm radius outer circle, and returns to the centre. The suction tip stays on the open side, 17 mm laterally from the crown centre, while matching the rinsing tip’s x motion. Its height is 10 mm above the treatment plane. This keeps the two bent instruments from crossing as the irrigator circles the tooth. The sweep uses a mounted-tool offset measured at the start of each tooth; the scorer independently measures the resulting tool pose.
+Track the wet jet impact in calibrated video: downward axisz<-0.94, height8-30 above crown plane, radius<=10. Nine regions per tooth are centre radius<=2.5 and eight45-degree sectors at radii4.5-9.5, sector0 starting+X toward+Y. Integrate calibrated flow only where it hits that crown; require>=1.8 mL delivery and>=0.15 s wet dwell in each region. Dry motion earns no dwell. Target uncertainty: jet position/height<=0.5 mm, peak volume<=0.05 mL, final volume<=0.01 mL, recovered/lost<=0.03 mL. These are calibration requirements, not achieved hardware results. At60 fps count nine complete intervals for0.15 s, and bound unobserved between-frame peak increases using measured maximum inflow.
 
-The scorer uses the actual tool pose and jet axis to project an impact onto the crown plane. A centre disk (radius up to 2.5 mm) and eight 45-degree sectors in the 4.5–9.5 mm annulus must each receive at least 0.15 seconds of correctly aimed irrigation. Coverage only accumulates while the timed pump is flowing. Yellow/green markers are training overlays showing this state, not simulated plaque. `--mode point` repeats the old point-rinse behaviour and must fail the new coverage requirement even if it removes all water.
+Pass numerical limits only when the complete uncertainty interval passes; missing/occluded or threshold-straddling evidence is unverified. Calibrate suction over wet/dry cells and inlet heights, and verify collision-free access before a physical trial. See [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md) for exact fabrication, calibration, guards, reset, measurement and rejection procedures. The numerical water limits define the inert benchmark, not patient safety.
 
-This covers defined regions of the exposed crown top. Circular motion alone does not establish clinical cleaning of every tooth surface: side faces, tight interproximal spaces, the gingival margin, plaque removal and tissue interaction are outside this model.
+## Required finishing sequence
 
-## Fixed fixture and timing
+1. Finish rinsing the third tooth; the timed water pulse stops.
+2. Lift the rinsing tool clear while keeping suction inside the mouth.
+3. Suction all remaining mouth-floor regions until total retained water is <=0.05 mL; the demo aims for <=0.005 mL. Continue in-mouth suction for at least1 s after the rinsing tool lifts.
+4. Withdraw suction, return both tools to their **original** stands, open both grippers and withdraw the fingers. Both tools must settle for1 s.
 
-The geometry and all positions are in task.py and task.json. The phantom has six molar crowns and three incisors on a rigid pink gum model. Three molars on one side are treatment sites. The blue irrigator and white suction instrument begin on separate stands, with enlarged grasp handles and narrow bent tips that keep the grippers apart near the mouth.
-
-The metering pump supplies 0.4 mL/s for five seconds at each site: 16–21, 24–29 and 32–37 seconds after reset. The upcoming/active site is indicated by a yellow lamp. Total supply is 6 mL. A timed external pump substitutes for a clinician's foot pedal. The robot cannot earn credit by simply switching off irrigation. Blue surface levels show pooling; the collection vial shows recovered volume. The reset fixes the initial layout with seed 1 and zero object jitter.
+Water still visibly travels from the nozzle onto crowns, runs into connected mouth-floor pools and enters the suction inlet only when the volume model actually recovers it. Pool depth follows retained volume. Blue is a visibility cue, not a measured liquid colour or CFD solution.
 
 ## Scoring
 
-Each completed site earns 0.25 only after all nine coverage regions meet their dwell requirement, plus: at least 1.8 mL delivered to that tooth, at least 1.8 mL recovered from it and no more than 0.10 mL left pooled. Full 1.0 additionally requires all three sites, total loss no more than 0.30 mL, peak per-site pool no more than 0.45 mL, tools retained and tips withdrawn clear of the phantom.
+| Condition | Requirement |
+|---|---|
+| Whole-trial peak mouth water | <=1.00 mL total |
+| Final mouth water | <=0.50 mL for partial credit; **<=0.05 mL for1.0** |
+| Recovery | >=90% of supplied water |
+| Spill/loss | <=0.30 mL |
+| Each completed tooth | >=1.8 mL delivery and >=0.15 s wet dwell in each of9 regions |
+| Full-score cleanup | Irrigator lifted; suction remains in mouth>=1 s after the final pulse and mouth water reaches<=0.05 mL |
+| Full-score return | Each original stand: XY<=10 mm, Z<=5 mm, orientation<=10 degrees, speed<20 mm/s |
+| Full-score release | Every fingertip>65 mm from both handle references; settled endpoint holds1 s |
 
-A tip entering the conservative gum guard, tools approaching within 6 mm at their tips, an instrument origin below 5 mm above the table, invalid state, or suction obstructing the working tooth for more than 0.25 seconds makes failure irreversible. These numerical zones and volumes are benchmark choices, not validated clinical limits. The implementation defines exact geometric boundaries. Tool retention uses finger-to-handle proximity (35 mm), not a force sensor. The low-height guard is not a complete detector of every possible drop or bench contact. This task does not certify clearance of every arm and instrument surface.
+Any permanent guard or general water-gate failure gives0. Otherwise zero/one/two/three completed teeth earn0/0.25/0.50/0.75. Full1.0 additionally requires the complete cleanup, return and release sequence. Exact geometry/measurement boundaries are in the protocol. These are inert-fixture benchmark choices, not patient-treatment limits.
 
-A benchtop physical reconstruction could use a rigid dental phantom with three shallow collection regions, a metered water source, a low-power aspirator and graduated receiving vessels. Video and calibrated geometry would judge placement and clearance; volume measurements would judge recovery and loss. The simulation's conductance constants would need calibration to that physical rig.
+The fixed water schedule is0.4 mL/s during16-21,24-29,32-37 s, independent of robot readiness. Limit1,200 actions/60 s at20 Hz, seed1, no jitter. The setup wait before16 s is retained.
 
-## Fluid and hardware fidelity
+## Verification
 
-Tool motion and grasping use rigid-body contact. Water uses a conservative lumped-volume model: supplied volume is accounted for as captured water, remaining pools or loss. Capture is limited by a finite suction capacity and depends on the actual suction tip's position and orientation. The water animation displays this model; it is not a particle or CFD simulation. Surface wetting, splashing, aerosols, tissue deformation, biological contamination and hose drag are not modelled. The visual jaw is a simplified training fixture, not a clinical anatomical replica.
+```bash
+python -m unittest -v test_fluid test_mouth_water test_finish test_evidence
+python scenario_checks.py --output validation/mouth_water_v3/scenario_results.json
+export YAM_PYTHON=/path/to/yam-environment/bin/python
+bash run_scenarios.sh /new/output/root full early_return no_return
+```
 
-The coupled model is stronger than a final-pose reward but does not establish real suction performance. The 17 unit tests include volume conservation across step sizes, static/off/reversed suction, working-area obstruction, tool retention, withdrawal, sticky failure and invalid inputs.
+51 tests and14 prescribed-coordinate model comparisons pass. Model comparisons supply endpoint assumptions and do not establish robot feasibility. The three recorded robot cases below passed trace, camera and source checks; sampled finishing frames were visually inspected. The scripted controller uses privileged geometric/volume state only to choose arm actions; it never sets fluid inventories, object poses, coverage or rewards.
 
-## Sources
+Earlier mouth-water v2 recordings remain historical: its full1.0 ended with both tools held and is **not** evidence for the new finishing requirement. The current Dream-1 trial completed on 12 November 2026; hardware calibration remains pending; current media are identified in task.json. Current media are identified in task.json.
 
-- U.S. Air Force dental-assistant training, "Irrigate and Aspirate the Treatment Site": https://static.e-publishing.af.mil/production/1/af_sg/publication/qtp4y0x1-3/qtp4y0x1-3.pdf
-- Mamoun, "Clinical techniques of performing suctioning tasks and of positioning the high volume evacuation (HVE) attachment and inlet when assisting a dentist. A guide for dental assistants: Part 1": https://pubmed.ncbi.nlm.nih.gov/22039690/
+## Earlier v3 recorded robot results — 12 November 2026
 
-## Related-task check
+CPU PhysX with RTX rendering, seed 1, no jitter, 20 Hz; all three native cameras contain no blank frames. Runtime Python source hashes match the reviewed source. Each run covers all 27 regions, peaks at 0.4650 mL retained water, loses 0 mL and passes the mechanical guard.
 
-A title scan of the 1,150 PRs retrieved on 8 November 2026 found no dental irrigation/aspiration entry. The suction-related matches concerned suction lifters, an HVAC suction line and pump-valve sequencing. This is a limited duplicate check, not proof of novelty across every benchmark or a guarantee of acceptance.
+| Scenario | Score | Duration | Final mouth water | Recovered | Cleanup | Tools returned/released |
+|---|---:|---:|---:|---:|---|---|
+| Complete sequence | 1.00 | 50.35 s | 0.0027 mL | 5.9973 mL | Yes | Both |
+| Return before clearance | 0.75 | 47.20 s | 0.2222 mL | 5.7778 mL | No | Both |
+| Clear mouth but omit return | 0.75 | 48.40 s | 0.0027 mL | 5.9973 mL | Yes | Neither |
 
-## Status
+In the successful run, the near-dry cleanup condition first latches at 43.15 s; full reward is awarded only after original-stand placement, release and the 1 s settled hold. The no_release case has unit coverage but has not been recorded as a robot rollout. These are scripted simulations, not Dream-1 or real-water results. Detailed evidence and source/video hashes: `validation/mouth_water_v3/recorded_results_20261112.json`.
 
-Recorded on Brev: circular demo score 1.0 with all 27 coverage regions reached; stationary point-rinse control score 0.0 with only the three centre regions reached. Both recovered all 6.0 mL, confirming that water collection alone does not satisfy the revised task. All 17 unit tests pass. See VALIDATION.md for measurements, output paths and limitations. Dream-1 beta completed 1,200 control steps (60 simulated seconds) with score 0.0, no covered regions and no evaluation errors. Its three cameras recorded 1,201 frames each with zero blank frames. Evaluation wall time was 334.48 s, including an initial wait for model capacity. Model instruction exactly matches the sentence above. Media is uploaded separately to the task board; videos are not committed to this source folder.
+## Exact guard and endpoint checks
 
-Task-board media bundle: `M-MKVTE5` (Dream-1 video, full-score demo and initial setup screenshot).
+Every trial checks tip separation>6 mm; a tip entering195<x<340,abs(y)<45 belowz30 or a tool originz<=5 permanently fails. During flowing pulses, suction within9 mm XY of the active crown centre belowz65 may obstruct it for at most0.25 s cumulatively. Water gates apply to every partial tier. Aftert37, cleanup needs irrigator tipz>80 while downward suction axisz<-0.94 remains atx221-319,abs(y)<=9,z30.5-32.5 for>=1 s and total retained water<=0.05 mL. Both tools then return within10 mm XY,5 mm Z and10 degrees of their own starting stands, speed<20 mm/s; all fingertips>65 mm from both handle references, and both tips withdrawn(z>80 orabs(y)>75). Hold the returned/released endpoint1 s.
+
+## Source and asset provenance
+
+The task phantom, instruments, water indicators and racks are procedural geometry in task.py; no additional third-party task mesh, scan or texture is bundled. Robot/station assets come from the installed YAM/Arena runtime. A scripted controller may read simulator state to select actions; it does not teleport objects or set coverage, water inventories or score.
+
+## Endpoint-hold correction after independent review
+
+The raw scorer now requires **one continuous second** of the complete full-score endpoint before returning1.0. The first eligible observation starts the clock; loss of any full-score condition resets it. Timing out just after placement cannot earn full marks. Before that hold completes, otherwise complete dental endpoints receive0.75. Runtime success adds no second hold. This changes scoring timing only; the scene, controller, liquid limits and operational instruction are unchanged. Earlier videos/manifests preserve their original scorer; the current scorer-version evidence is reported below.
+
+Check with `python -m unittest -v test_endpoint_hold`.
+
+## Current v4 held-endpoint recording — 12 November 2026
+
+The corrected scorer completes the full scripted sequence at **1008/1200 steps,50.40 s,score1.0**, leaving0.0027 mL, recovering5.9973 mL, peaking at0.4650 mL, with no spill. Both tools return and release. All three640x360 camera streams have zero blank frames. Raw score remains0.75 at step1007 with0.95 s hold and becomes1.0 at step1008 with1.00 s hold. Fifty-one offline tests pass. Current task.py hash: `4e1c014efffee6276c4c58b7da8aea57d6f264e3f19c85e41a1ed4d2ef40dc34`.
+
+Both recordings use CPU PhysX and RTX rendering, seed1, zero jitter and20 Hz; these are scripted runs, not Dream-1 or physical experiments. Complete traces, source snapshots and three-camera footage are retained. Source bytes were independently checked against the separate pre-run run_config hashes. The automatically generated manifest mistakenly hashed its own preceding version; its original and original failed verification were preserved, that self-entry was removed with a correction note, and all remaining source hashes and evidence checks pass. No source/score was changed to repair packaging. The current Dream-1 result is recorded below; current official media are identified in task.json.
+
+
+## Current Dream-1 evidence — 12 November 2026
+
+Dream-1 beta (`dreamlabs/dream-1-beta`) completed the current instruction, scene and continuous-hold scorer with **score0.0** after **1200 control steps**, with no evaluation error. This is an actual model-policy run, not a refusal or an access failure. Seed1, zero jitter,20 Hz, CPU PhysX and RTX rendering; three640x360 camera recordings are retained. Model failure does not alter the independently recorded full-score scripted demonstration. The run configuration, results, source hashes and recording validation are in `validation/current_dream_20261112.json`. Current demo, model and setup media are prepared separately from the historical media ID; current media are identified in task.json.
+
+Prepared current `model_run.mp4`, `demo.mp4` and `setup.png` are recorded in `validation/current_media_20261112.json`; both videos are H.264 and below50 MB. Current public media mapping: M-XPKWYY.

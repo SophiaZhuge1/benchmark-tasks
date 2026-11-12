@@ -1,0 +1,22 @@
+Revision checks — 12 November 2026
+Unit tests passed: 24
+Reduced-order model scenario comparisons passed: 12
+Fresh recorded robot controls: 3; all expected outcomes and intended causes verified.
+Three cameras per run; steps+1 frames each; no individual-camera blank frames.
+Complete trace/result agreement, snapshot hashes and composite-video decode: PASS.
+Initial/intermediate/final and 10–12 sampled video frames inspected per run; no continuous-playback claim.
+JSON/instruction/fidelity/Python/shell/local links/diff checks: PASS.
+Fidelity: 395 / 500 characters.
+Scope: only this task folder. Production scene, fluid/seal models and scoring unchanged.
+Demo controllers expanded; recording checks strengthened; dental diagnostic fields added.
+New Dream-1 run pending; official media references remain historical.
+Hardware protocol specified but not built or calibrated.
+No GitHub push or reviewer comment sent.
+
+Current executable source SHA-256:
+52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92  task.py
+381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896  demokit.py
+15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b  scenario_checks.py
+bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6  verify_scenarios.py
+d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9  fluid_model.py
+fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb  test_evidence.py

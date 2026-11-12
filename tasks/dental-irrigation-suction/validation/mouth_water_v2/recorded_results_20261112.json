@@ -1,0 +1,684 @@
+{
+  "model_version": "mouth-water-v2",
+  "physics_device": "cpu",
+  "rendering": "RTX",
+  "results": [
+    {
+      "mode": "full",
+      "result": {
+        "mode": "full",
+        "task_score": 1.0,
+        "success": true,
+        "termination": "success",
+        "steps": 785,
+        "seconds": 39.25,
+        "script_ended_at_step": null,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 9.55,
+        "script_s": 4.03,
+        "sim_s": 73.36,
+        "wall_s": 82.16,
+        "slowest_30_steps_s": 3.7,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/mouth-water-v2/recorded-v2f/full/full/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 786,
+        "ik_worst": {
+          "left": [
+            2.6,
+            0.6
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": true,
+          "score": 1.0
+        },
+        "task_metrics": {
+          "step": 785,
+          "t": 39.25,
+          "score": 1.0,
+          "time": 39.25,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            1.941,
+            1.837,
+            2.0
+          ],
+          "pool": [
+            0.076,
+            0.092,
+            0.054
+          ],
+          "coverage": [
+            9,
+            9,
+            9
+          ],
+          "coverage_s": [
+            [
+              0.75,
+              0.35,
+              0.35,
+              0.35,
+              0.4,
+              0.35,
+              0.5,
+              0.5,
+              0.35
+            ],
+            [
+              0.7,
+              0.3,
+              0.4,
+              0.35,
+              0.45,
+              0.35,
+              0.5,
+              0.5,
+              0.35
+            ],
+            [
+              0.7,
+              0.3,
+              0.35,
+              0.35,
+              0.45,
+              0.4,
+              0.5,
+              0.5,
+              0.35
+            ]
+          ],
+          "lost": 0.0,
+          "peak_pool": 0.465,
+          "balance_error": -0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0322,
+          "irrigator_tip": [
+            0.3084,
+            0.0227,
+            0.1413
+          ],
+          "suction_tip": [
+            0.3056,
+            0.0006,
+            0.118
+          ],
+          "mouth_water_ml": 0.2222,
+          "peak_mouth_water_ml": 0.465,
+          "crown_water_ml": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "floor_water_ml": [
+            0.0758,
+            0.0923,
+            0.0541
+          ],
+          "recovered_total_ml": 5.7778,
+          "capture_rate_ml_s": 0.0,
+          "model_version": "mouth-water-v2",
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "check": {
+        "mode": "full",
+        "score": 1.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "ca1adeb275e34c62e80128428b44faee5e241037cc77f977deb1d29866206e89",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "33848e6cc5c6591429297534b8754d5b45b8cf483eb977298f5da2f899b54d4d",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "5f7278fcae5290408121f0a1beebd1e54f3a31dbdde3214355358efdf5d1808c",
+          "fluid_model.py": "599baa3505ca60e3c690be2f2a72f2f7d89e99e9126a0261bcf7f8b4ff14d071",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "4228028185312e58f2bbfb1dc6021c9b7ab5135b2f20aee775354334193265d2",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "test_mouth_water.py": "6150b8eb3c167d2035e6559fbdf4a6bb6f1a00fa93f29b8c5e75923ee1e3993f",
+          "task.json": "b9acf3dd19d0b9183be39b2858cc36bdf223871e93168856abe4fe613a4a14d1",
+          "verify_scenarios.py": "c6924e6638ebd24afba3c71383aa587c2dc1fac3ee298c2a69f98a2cee8b234d",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "review_video": "dental-full-three-views.mp4",
+      "review_video_sha256": "3742eddf18340852be08b25e87f6716d675cea51846ddb3a93b6efd2b8babe9d",
+      "review_frames": 786,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-v2f/full/full",
+      "original_remote_review_sha256": "567be593ebb78d2dcf6882780710b7c328e77aeea879acbcd28a117b18be6452",
+      "review_annotation": "Endpoint-only limit label clarified locally; original remote export hash retained. Camera footage, timing and metric values unchanged.",
+      "visual_inspection": "Initial, rinse-phase and endpoint frames checked in all three views; water display and placement contrast visible."
+    },
+    {
+      "mode": "wrong_place",
+      "result": {
+        "mode": "wrong_place",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 840,
+        "seconds": 42.0,
+        "script_ended_at_step": 800,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 9.2,
+        "script_s": 4.28,
+        "sim_s": 81.67,
+        "wall_s": 91.26,
+        "slowest_30_steps_s": 3.89,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/mouth-water-v2/recorded-v2f/wrong_place/wrong_place/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 841,
+        "ik_worst": {
+          "left": [
+            2.6,
+            0.6
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 840,
+          "t": 42.0,
+          "score": 0.0,
+          "time": 42.0,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pool": [
+            0.904,
+            0.93,
+            0.979
+          ],
+          "coverage": [
+            9,
+            9,
+            9
+          ],
+          "coverage_s": [
+            [
+              0.75,
+              0.35,
+              0.35,
+              0.35,
+              0.4,
+              0.35,
+              0.5,
+              0.5,
+              0.35
+            ],
+            [
+              0.7,
+              0.3,
+              0.4,
+              0.35,
+              0.45,
+              0.35,
+              0.5,
+              0.5,
+              0.35
+            ],
+            [
+              0.7,
+              0.3,
+              0.35,
+              0.35,
+              0.45,
+              0.4,
+              0.5,
+              0.5,
+              0.35
+            ]
+          ],
+          "lost": 3.187,
+          "peak_pool": 2.896,
+          "balance_error": -0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0809,
+          "irrigator_tip": [
+            0.3079,
+            0.0228,
+            0.1412
+          ],
+          "suction_tip": [
+            0.3046,
+            -0.0545,
+            0.1176
+          ],
+          "mouth_water_ml": 2.8131,
+          "peak_mouth_water_ml": 2.896,
+          "crown_water_ml": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "floor_water_ml": [
+            0.904,
+            0.9298,
+            0.9793
+          ],
+          "recovered_total_ml": 0.0,
+          "capture_rate_ml_s": 0.0,
+          "model_version": "mouth-water-v2",
+          "obstruction_s": 0.0,
+          "guard_safe": true,
+          "robot": {
+            "left": {
+              "tcp": [
+                0.3057350933227735,
+                0.11273726043416354,
+                0.953602230889751
+              ],
+              "command": [
+                0.30528156099268433,
+                0.11319737872308197,
+                0.9531580664793677
+              ],
+              "trim": [
+                1.905562890358592e-05,
+                -0.0009562430676806621,
+                0.001684088575776066
+              ],
+              "grip": [
+                [
+                  -2.220446049250313e-16,
+                  -1.0000000000000002,
+                  0.0
+                ],
+                [
+                  -1.0000000000000002,
+                  -4.440892098500626e-16,
+                  0.0
+                ],
+                [
+                  -0.0,
+                  0.0,
+                  -1.0000000000000009
+                ]
+              ]
+            },
+            "right": {
+              "tcp": [
+                0.30673722651566576,
+                -0.1439364419850811,
+                0.9308742545533417
+              ],
+              "command": [
+                0.3075209826094054,
+                -0.14448241407248044,
+                0.9301730882203542
+              ],
+              "trim": [
+                -8.755983417790825e-05,
+                0.001270953311498596,
+                0.0021224200052527564
+              ],
+              "grip": [
+                [
+                  -2.220446049250313e-16,
+                  -1.0000000000000002,
+                  0.0
+                ],
+                [
+                  -1.0000000000000002,
+                  -4.440892098500626e-16,
+                  0.0
+                ],
+                [
+                  -0.0,
+                  0.0,
+                  -1.0000000000000009
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "check": {
+        "mode": "wrong_place",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "ca1adeb275e34c62e80128428b44faee5e241037cc77f977deb1d29866206e89",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "33848e6cc5c6591429297534b8754d5b45b8cf483eb977298f5da2f899b54d4d",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "5f7278fcae5290408121f0a1beebd1e54f3a31dbdde3214355358efdf5d1808c",
+          "fluid_model.py": "599baa3505ca60e3c690be2f2a72f2f7d89e99e9126a0261bcf7f8b4ff14d071",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "4228028185312e58f2bbfb1dc6021c9b7ab5135b2f20aee775354334193265d2",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "test_mouth_water.py": "6150b8eb3c167d2035e6559fbdf4a6bb6f1a00fa93f29b8c5e75923ee1e3993f",
+          "task.json": "b9acf3dd19d0b9183be39b2858cc36bdf223871e93168856abe4fe613a4a14d1",
+          "verify_scenarios.py": "c6924e6638ebd24afba3c71383aa587c2dc1fac3ee298c2a69f98a2cee8b234d",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "review_video": "dental-wrong_place-three-views.mp4",
+      "review_video_sha256": "87870c1f49515fb315b9d3d06502b179747222ed9530a5e8703c531722b97243",
+      "review_frames": 841,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-v2f/wrong_place/wrong_place",
+      "original_remote_review_sha256": "0eaf569d9f8c33124a1c1f0281edb419b093dd77cb82da0ffd88b36fe751eb4b",
+      "review_annotation": "Endpoint-only limit label clarified locally; original remote export hash retained. Camera footage, timing and metric values unchanged.",
+      "visual_inspection": "Initial, rinse-phase and endpoint frames checked in all three views; water display and placement contrast visible."
+    },
+    {
+      "mode": "point",
+      "result": {
+        "mode": "point",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 840,
+        "seconds": 42.0,
+        "script_ended_at_step": 800,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 9.8,
+        "script_s": 2.22,
+        "sim_s": 78.36,
+        "wall_s": 85.76,
+        "slowest_30_steps_s": 3.67,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/mouth-water-v2/recorded-v2f/point/point/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 841,
+        "ik_worst": {
+          "left": [
+            2.0,
+            0.5
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 840,
+          "t": 42.0,
+          "score": 0.0,
+          "time": 42.0,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            1.381,
+            2.32,
+            1.942
+          ],
+          "pool": [
+            0.151,
+            0.117,
+            0.089
+          ],
+          "coverage": [
+            1,
+            1,
+            1
+          ],
+          "coverage_s": [
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "lost": 0.0,
+          "peak_pool": 0.888,
+          "balance_error": -0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0328,
+          "irrigator_tip": [
+            0.3071,
+            0.0234,
+            0.1407
+          ],
+          "suction_tip": [
+            0.3054,
+            0.0002,
+            0.1175
+          ],
+          "mouth_water_ml": 0.3569,
+          "peak_mouth_water_ml": 0.8883,
+          "crown_water_ml": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "floor_water_ml": [
+            0.151,
+            0.1166,
+            0.0893
+          ],
+          "recovered_total_ml": 5.6431,
+          "capture_rate_ml_s": 0.0,
+          "model_version": "mouth-water-v2",
+          "obstruction_s": 0.0,
+          "guard_safe": true,
+          "robot": {
+            "left": {
+              "tcp": [
+                0.30508125689932347,
+                0.113166601469665,
+                0.9532456745588032
+              ],
+              "command": [
+                0.3045439391034193,
+                0.11350973014645005,
+                0.9527495614401703
+              ],
+              "trim": [
+                0.0001215954500801697,
+                -0.000795244608911061,
+                0.0017157399688451092
+              ],
+              "grip": [
+                [
+                  -2.220446049250313e-16,
+                  -1.0000000000000002,
+                  0.0
+                ],
+                [
+                  -1.0000000000000002,
+                  -4.440892098500626e-16,
+                  0.0
+                ],
+                [
+                  -0.0,
+                  0.0,
+                  -1.0000000000000009
+                ]
+              ]
+            },
+            "right": {
+              "tcp": [
+                0.30753849524322163,
+                -0.08991455992023004,
+                0.9299214477733727
+              ],
+              "command": [
+                0.30698662326092985,
+                -0.09032947222654608,
+                0.9291877333814781
+              ],
+              "trim": [
+                0.0008968255075886278,
+                0.0001500837281315226,
+                0.0020576783398823517
+              ],
+              "grip": [
+                [
+                  -2.220446049250313e-16,
+                  -1.0000000000000002,
+                  0.0
+                ],
+                [
+                  -1.0000000000000002,
+                  -4.440892098500626e-16,
+                  0.0
+                ],
+                [
+                  -0.0,
+                  0.0,
+                  -1.0000000000000009
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "check": {
+        "mode": "point",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "ca1adeb275e34c62e80128428b44faee5e241037cc77f977deb1d29866206e89",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "33848e6cc5c6591429297534b8754d5b45b8cf483eb977298f5da2f899b54d4d",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "5f7278fcae5290408121f0a1beebd1e54f3a31dbdde3214355358efdf5d1808c",
+          "fluid_model.py": "599baa3505ca60e3c690be2f2a72f2f7d89e99e9126a0261bcf7f8b4ff14d071",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "4228028185312e58f2bbfb1dc6021c9b7ab5135b2f20aee775354334193265d2",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "test_mouth_water.py": "6150b8eb3c167d2035e6559fbdf4a6bb6f1a00fa93f29b8c5e75923ee1e3993f",
+          "task.json": "b9acf3dd19d0b9183be39b2858cc36bdf223871e93168856abe4fe613a4a14d1",
+          "verify_scenarios.py": "c6924e6638ebd24afba3c71383aa587c2dc1fac3ee298c2a69f98a2cee8b234d",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "review_video": "dental-point-three-views.mp4",
+      "review_video_sha256": "42319c46fba01b07dfdb14e3053539dc941a88d740b85d65b578105f4176b2e1",
+      "review_frames": 841,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-v2f/point/point",
+      "original_remote_review_sha256": "26da2c48d67475575cb02d5af7518c8c9d5423749ed137cf969d9dd8b2fd5316",
+      "review_annotation": "Endpoint-only limit label clarified locally; original remote export hash retained. Camera footage, timing and metric values unchanged.",
+      "visual_inspection": "Initial, rinse-phase and endpoint frames checked in all three views; water display and placement contrast visible."
+    }
+  ]
+}

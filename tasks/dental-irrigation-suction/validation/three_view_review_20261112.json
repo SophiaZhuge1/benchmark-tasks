@@ -1,0 +1,517 @@
+{
+  "date": "2026-11-12",
+  "physics_device": "cuda:0",
+  "rendering": "RTX GPU cameras",
+  "camera_views": [
+    "top_cam",
+    "left_cam",
+    "right_cam"
+  ],
+  "per_camera_pixels": [
+    640,
+    360
+  ],
+  "camera_fps": 20,
+  "review_layout_pixels": [
+    1280,
+    760
+  ],
+  "annotation": "Reviewer-only labels, clock and trace metrics; not added to robot observations. No time removed.",
+  "trials": [
+    {
+      "mode": "full",
+      "result": {
+        "mode": "full",
+        "task_score": 1.0,
+        "success": true,
+        "termination": "success",
+        "steps": 783,
+        "seconds": 39.15,
+        "script_ended_at_step": null,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.65,
+        "script_s": 3.36,
+        "sim_s": 160.32,
+        "wall_s": 168.53,
+        "slowest_30_steps_s": 7.89,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-dental/full/full/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 784,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": true,
+          "score": 1.0
+        },
+        "task_metrics": {
+          "step": 783,
+          "t": 39.15,
+          "score": 1.0,
+          "time": 39.15,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "pool": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "coverage": [
+            9,
+            9,
+            9
+          ],
+          "coverage_s": [
+            [
+              0.6,
+              0.35,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.4
+            ],
+            [
+              0.6,
+              0.4,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ],
+            [
+              0.6,
+              0.35,
+              0.4,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ]
+          ],
+          "lost": 0.0,
+          "peak_pool": 0.0,
+          "balance_error": 0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0168,
+          "irrigator_tip": [
+            0.3063,
+            0.0242,
+            0.1009
+          ],
+          "suction_tip": [
+            0.3057,
+            0.0092,
+            0.0933
+          ],
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "check": {
+        "mode": "full",
+        "score": 1.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92",
+          "VALIDATION.md": "d318f03990fa4e02e7cddb3a885a1fa078115c32fe6aa76620ffae687930cc63",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b",
+          "PHYSICAL_PROTOCOL.md": "ee5dba1bdc5429fec72955f4f8dc81bb2563f7b2d18928434efcede9e67095af",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "b3a209bf26f546654f51824ce8797a8e532a6c5679a3d144811f1e0ef516b2e5",
+          "fluid_model.py": "d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "dfbd5f2608a3ddd575b1202ff3e091fcf9a319431eb1013d1adac87794069395",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "61ef60cbdc3af6a29a7d570122a52ef9dc002fa17a688020912b8d48641ee46c",
+          "task.json": "fc0c31cb9d07d27cc6f166ea8faa8777b74dd353402dc36e20f1a16386788f8e",
+          "SCENARIOS.md": "651ea4097ba5e51e62d202a8082783c56ca39793be632772a66da0949601115b",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "review_video": "dental-full-three-views.mp4",
+      "review_video_sha256": "62760f191b8fbb1003ce4624c35e436b5bb7d72789d83d54fb238859e80dd39f",
+      "review_frames": 784,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-dental/full/full"
+    },
+    {
+      "mode": "point",
+      "result": {
+        "mode": "point",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 832,
+        "seconds": 41.6,
+        "script_ended_at_step": 792,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.63,
+        "script_s": 1.82,
+        "sim_s": 172.69,
+        "wall_s": 179.79,
+        "slowest_30_steps_s": 8.02,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-dental/point/point/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 833,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 832,
+          "t": 41.6,
+          "score": 0.0,
+          "time": 41.6,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "pool": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "coverage": [
+            1,
+            1,
+            1
+          ],
+          "coverage_s": [
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "lost": 0.0,
+          "peak_pool": 0.0,
+          "balance_error": 0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.018,
+          "irrigator_tip": [
+            0.3044,
+            0.0246,
+            0.1004
+          ],
+          "suction_tip": [
+            0.3049,
+            0.0084,
+            0.0926
+          ],
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "check": {
+        "mode": "point",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92",
+          "VALIDATION.md": "d318f03990fa4e02e7cddb3a885a1fa078115c32fe6aa76620ffae687930cc63",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b",
+          "PHYSICAL_PROTOCOL.md": "ee5dba1bdc5429fec72955f4f8dc81bb2563f7b2d18928434efcede9e67095af",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "b3a209bf26f546654f51824ce8797a8e532a6c5679a3d144811f1e0ef516b2e5",
+          "fluid_model.py": "d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "dfbd5f2608a3ddd575b1202ff3e091fcf9a319431eb1013d1adac87794069395",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "61ef60cbdc3af6a29a7d570122a52ef9dc002fa17a688020912b8d48641ee46c",
+          "task.json": "fc0c31cb9d07d27cc6f166ea8faa8777b74dd353402dc36e20f1a16386788f8e",
+          "SCENARIOS.md": "651ea4097ba5e51e62d202a8082783c56ca39793be632772a66da0949601115b",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "review_video": "dental-point-three-views.mp4",
+      "review_video_sha256": "61b9c704c75505b1209db6cf808c8619f18c56cf073ba6e33d6aa06a7af71da4",
+      "review_frames": 833,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-dental/point/point"
+    },
+    {
+      "mode": "late_suction",
+      "result": {
+        "mode": "late_suction",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 994,
+        "seconds": 49.7,
+        "script_ended_at_step": 954,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.94,
+        "script_s": 2.63,
+        "sim_s": 192.59,
+        "wall_s": 201.24,
+        "slowest_30_steps_s": 7.79,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-dental/late_suction/late_suction/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 995,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 994,
+          "t": 49.7,
+          "score": 0.0,
+          "time": 49.7,
+          "active": -1,
+          "supplied": 6.0,
+          "delivered": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "captured": [
+            0.45,
+            0.45,
+            0.45
+          ],
+          "pool": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "coverage": [
+            9,
+            9,
+            9
+          ],
+          "coverage_s": [
+            [
+              0.6,
+              0.35,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.4
+            ],
+            [
+              0.6,
+              0.4,
+              0.35,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ],
+            [
+              0.6,
+              0.35,
+              0.4,
+              0.3,
+              0.4,
+              0.3,
+              0.35,
+              0.7,
+              0.35
+            ]
+          ],
+          "lost": 4.65,
+          "peak_pool": 0.47,
+          "balance_error": 0.0,
+          "failed": false,
+          "held": true,
+          "clear": true,
+          "separation": 0.0183,
+          "irrigator_tip": [
+            0.3049,
+            0.0246,
+            0.1007
+          ],
+          "suction_tip": [
+            0.3046,
+            0.0082,
+            0.0926
+          ],
+          "obstruction_s": 0.0,
+          "guard_safe": true
+        }
+      },
+      "check": {
+        "mode": "late_suction",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+          "task.py": "52404bf14e95d6b8661cb4a9790aa5a7c6a9ef79b5cdec284ffb28ee38c2fb92",
+          "VALIDATION.md": "d318f03990fa4e02e7cddb3a885a1fa078115c32fe6aa76620ffae687930cc63",
+          "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+          "scenario_checks.py": "15d6516884feb74a35b2ebb471583ba8400f35e80f203e9ec256c1e8098e903b",
+          "PHYSICAL_PROTOCOL.md": "ee5dba1bdc5429fec72955f4f8dc81bb2563f7b2d18928434efcede9e67095af",
+          "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+          "test_fluid.py": "b3a209bf26f546654f51824ce8797a8e532a6c5679a3d144811f1e0ef516b2e5",
+          "fluid_model.py": "d03f8d2fee271e20f32006b5b6ca0186e4e4da2656c0c724656dd58aaea0b6a9",
+          "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+          "test_evidence.py": "fa34d50a3181defa4e9a2839fb6da0abe946da5ac87a08b61aa89f20abe5f7cb",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "dfbd5f2608a3ddd575b1202ff3e091fcf9a319431eb1013d1adac87794069395",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "61ef60cbdc3af6a29a7d570122a52ef9dc002fa17a688020912b8d48641ee46c",
+          "task.json": "fc0c31cb9d07d27cc6f166ea8faa8777b74dd353402dc36e20f1a16386788f8e",
+          "SCENARIOS.md": "651ea4097ba5e51e62d202a8082783c56ca39793be632772a66da0949601115b",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556"
+        }
+      },
+      "review_video": "dental-late_suction-three-views.mp4",
+      "review_video_sha256": "6c32705bcd68874640d5efab73ae54c0851afd94f96fd3956e84db87c3bb1900",
+      "review_frames": 995,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-dental/late_suction/late_suction"
+    }
+  ]
+}

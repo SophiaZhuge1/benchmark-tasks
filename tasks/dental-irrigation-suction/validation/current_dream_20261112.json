@@ -1,0 +1,337 @@
+{
+  "eval": {
+    "eval": {
+      "benchmark": null,
+      "created": "2026-11-12T22:11:19.815118+00:00",
+      "embodiment": "yam_arena",
+      "embodiment_info": {
+        "capabilities": [
+          "privileged_success",
+          "resettable",
+          "seedable"
+        ],
+        "control_hz": 20.0,
+        "evaluation_interface": [],
+        "is_simulated": true,
+        "morphology": null
+      },
+      "environment_id": "isaaclab-arena-0.3.1-yam-bimanual-station-calibrated-task-task",
+      "environment_revision": "4e1c014efffe",
+      "git_commit": null,
+      "grader": null,
+      "grader_config": {},
+      "inspect_robots_version": "1.0.0",
+      "max_seconds": null,
+      "max_steps": 1200,
+      "policy": "dream",
+      "policy_checkpoint": "dreamlabs/dream-1-beta",
+      "policy_config": {
+        "action_horizon": 1,
+        "replan_interval": null,
+        "temperature": null
+      },
+      "reducer": "mean",
+      "rubrics": [
+        {
+          "kind": "capability",
+          "metadata": {},
+          "name": "task_score",
+          "scorer": "task_score",
+          "text": ""
+        }
+      ],
+      "seed": 1,
+      "task": "adhoc"
+    },
+    "stats": {
+      "completed_at": "2026-11-12T22:14:16.740873+00:00",
+      "duration_s": 176.92307316395454,
+      "frames_dir": "/home/sophia/robocurve/review-iteration2-20261112/dream-results/dental-irrigation-suction/eval/frames/20261112_221119_ba2549e4",
+      "mean_inference_latency_s": 0.6170900226728517,
+      "records_dir": "/home/sophia/robocurve/review-iteration2-20261112/dream-results/dental-irrigation-suction/eval/records/20261112_221119_ba2549e4",
+      "started_at": "2026-11-12T22:11:19.817811+00:00",
+      "total_steps": 1200
+    },
+    "status": "success",
+    "error": null,
+    "results": {
+      "abstentions": {},
+      "errored_trials": 0,
+      "metrics": {
+        "task_score": 0.0
+      },
+      "total_scenes": 1,
+      "total_trials": 1
+    }
+  },
+  "run_config": {
+    "command": [
+      "/home/sophia/robocurve/consent-env/bin/inspect-robots",
+      "run",
+      "--embodiment",
+      "yam_arena",
+      "--policy",
+      "dream",
+      "-E",
+      "task=/home/sophia/robocurve/review-iteration2-20261112/dream-results/dental-irrigation-suction/source/task.py",
+      "-E",
+      "device=cpu",
+      "-E",
+      "object_jitter=0",
+      "-E",
+      "control_hz=20",
+      "-E",
+      "cam_width=640",
+      "-E",
+      "cam_height=360",
+      "-P",
+      "rows_per_request=20",
+      "--instruction",
+      "Rinse the highlighted teeth, lift the rinsing tool while suction clears the mouth, then return and release both tools on their stands.",
+      "--scorer",
+      "task_score",
+      "--max-steps",
+      "1200",
+      "--seed",
+      "1",
+      "--store-frames",
+      "--no-prompt",
+      "--log-dir",
+      "/home/sophia/robocurve/review-iteration2-20261112/dream-results/dental-irrigation-suction/eval"
+    ],
+    "instruction": "Rinse the highlighted teeth, lift the rinsing tool while suction clears the mouth, then return and release both tools on their stands.",
+    "source_sha256": {
+      "run_brev.sh": "4d0ccbe82deb465fab34f4c942729244e2bf97943e3229bdf5dc13fecbc281aa",
+      "test_endpoint_hold.py": "dd800cf4b1cb1e2e918ae13ab301ea3a4cac2c4c2927f4c872038f7097898ad8",
+      "task.py": "4e1c014efffee6276c4c58b7da8aea57d6f264e3f19c85e41a1ed4d2ef40dc34",
+      "VALIDATION.md": "5eec21b1df26cd21af57d7d2bf29d31d17ca028ff19efe1be465415c43f35cd3",
+      "analyze_trace.py": "7604767cc1b05c90f9960787414553e5e381de5bae438823e9f2213bb962daef",
+      "scenario_checks.py": "995dbf34ebd5e1c890bad1b209dcf988545a7d4fc9dddfbf86d25fc1142552cb",
+      "PHYSICAL_PROTOCOL.md": "909191c193016f0cc5bbe496a35b91a8e31a1d3b9824e27cba302aae7683edff",
+      "prepare_media.py": "46c715e67814727af866a30d52de328860d7bea4776274ac9cef5fc8a83785fd",
+      "test_fluid.py": "fa1da61a0ed004f6d3c5d7692a834c31750adae8589b948e03e3faf36046e838",
+      "fluid_model.py": "8540f78860cb20393cadcb389dcee72e7d8398693625278abc604f97ffc6d499",
+      "run_scenarios.sh": "787ba37f36cfe21e634572d09c3dfab4994bde08893c7018f649edf5d093a57a",
+      "test_evidence.py": "4228028185312e58f2bbfb1dc6021c9b7ab5135b2f20aee775354334193265d2",
+      "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+      "REVISION_NOTES.md": "4e203eea06f349ca4cf84768575bc3b1315518b51201449031364ec079bc454d",
+      "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+      "MEASUREMENT_SHEET.csv": "9074292807e276e224d2604da66c8814111057ce82a11db612db3e69dce357ff",
+      "README.md": "eab9e9a3f5663cca13f651c1d5b08062e60f9c30b385908a932f40f27718a031",
+      "test_mouth_water.py": "643f7509bbfc0e40d8fada71f7cc91345a42481bbed511ed47a3775c7231d87f",
+      "endpoint_hold.py": "a9b41b3b580d86426ef2728add332a98a539f92ff770fa2536c09636575825a7",
+      "task.json": "6dbd58b2eec3a0fe44524162e350fb05cf7940017168b8055128c5f5259a3c05",
+      "SCENARIOS.md": "614e96eab1dd52f3189e6034801b1ec639b37525edec52f568b0eb3b2fa62a6b",
+      "verify_scenarios.py": "561ad8745cc3a64388cc0937a5099f1fbbd7a04ca334ff550da5c80fbaa328d3",
+      "run_dream.sh": "786a4a1b4054059d2600c002e4b0ea176d57cc85ea7e723cbc80e3bbfdaba556",
+      "finish.py": "de875c59c7f00c3688947f52c1a8cf3ae8e3a18ff53fa276761ae1c243a340fe",
+      "test_finish.py": "b24a4e403059bed91920a3e2ed34fc52421a24bc68a54b7a534c0ec9a88222bb"
+    },
+    "physics": "CPU PhysX",
+    "render": "RTX GPU0",
+    "kind": "dream"
+  },
+  "source_hashes_verified": true,
+  "demo_python_hashes_match": true,
+  "record": {
+    "record_id": "2ede441816c24de784f9bf4c89fbed90",
+    "steps": 1200,
+    "status": "success",
+    "error": null,
+    "termination": {
+      "reason": "max_steps",
+      "detail": null,
+      "terminated": false,
+      "truncated": true
+    }
+  },
+  "videos": [
+    {
+      "name": "~f1~scene-0-e0~left_cam.mp4",
+      "bytes": 1504254,
+      "sha256": "76fdec74f2e94f2cfee86498ced5cfc1a08c892f7f2541bf2e4ccb87d2399c03",
+      "full_decode": "pass"
+    },
+    {
+      "name": "~f1~scene-0-e0~right_cam.mp4",
+      "bytes": 1510169,
+      "sha256": "9c4a99d35eb871fa8b57948117f079a910eae066490e6233d425314c872a7bad",
+      "full_decode": "pass"
+    },
+    {
+      "name": "~f1~scene-0-e0~top_cam.mp4",
+      "bytes": 1144449,
+      "sha256": "c25aa3cce1a2b1b8a97ed3e2094506c4c05c838273ade58bc86a93648207eb73",
+      "full_decode": "pass"
+    }
+  ],
+  "model_frames_per_camera": 1201,
+  "model_sample_indices": [
+    0,
+    240,
+    480,
+    720,
+    960,
+    1200
+  ],
+  "demo_sample_indices": [
+    0,
+    202,
+    403,
+    605,
+    806,
+    1008
+  ],
+  "demo_result": {
+    "mode": "full",
+    "task_score": 1.0,
+    "success": true,
+    "termination": "success",
+    "steps": 1008,
+    "seconds": 50.4,
+    "script_ended_at_step": null,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 8.65,
+    "script_s": 5.64,
+    "sim_s": 103.15,
+    "wall_s": 116.58,
+    "slowest_30_steps_s": 3.89,
+    "blank_frames": 0,
+    "video": "/home/sophia/robocurve/review-iteration2-20261112/demo-results/dental-irrigation-suction/full/demo.mp4",
+    "blank_frames_by_camera": {
+      "top_cam": 0,
+      "left_cam": 0,
+      "right_cam": 0
+    },
+    "recorded_frames_per_camera": 1009,
+    "ik_worst": {
+      "left": [
+        0.1,
+        0.0
+      ],
+      "right": [
+        0.1,
+        0.0
+      ]
+    },
+    "final_info": {
+      "success": true,
+      "score": 1.0
+    },
+    "task_metrics": {
+      "step": 1008,
+      "t": 50.4,
+      "score": 1.0,
+      "time": 50.4,
+      "active": -1,
+      "supplied": 6.0,
+      "delivered": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "captured": [
+        2.007,
+        1.92,
+        2.071
+      ],
+      "pool": [
+        0.0,
+        0.001,
+        0.002
+      ],
+      "coverage": [
+        9,
+        9,
+        9
+      ],
+      "coverage_s": [
+        [
+          0.75,
+          0.35,
+          0.35,
+          0.35,
+          0.4,
+          0.35,
+          0.5,
+          0.5,
+          0.35
+        ],
+        [
+          0.7,
+          0.3,
+          0.4,
+          0.35,
+          0.45,
+          0.35,
+          0.5,
+          0.5,
+          0.35
+        ],
+        [
+          0.7,
+          0.3,
+          0.35,
+          0.35,
+          0.45,
+          0.4,
+          0.5,
+          0.5,
+          0.35
+        ]
+      ],
+      "lost": 0.0,
+      "peak_pool": 0.465,
+      "balance_error": -0.0,
+      "failed": false,
+      "held": false,
+      "clear": true,
+      "separation": 0.2185,
+      "irrigator_tip": [
+        0.2828,
+        0.1091,
+        0.005
+      ],
+      "suction_tip": [
+        0.2787,
+        -0.1094,
+        0.005
+      ],
+      "mouth_water_ml": 0.0027,
+      "peak_mouth_water_ml": 0.465,
+      "crown_water_ml": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floor_water_ml": [
+        0.0002,
+        0.0007,
+        0.0018
+      ],
+      "recovered_total_ml": 5.9973,
+      "capture_rate_ml_s": 0.0,
+      "model_version": "mouth-water-v4-held-return",
+      "endpoint_hold_s": 1.0,
+      "cleanup_complete": true,
+      "cleanup_time": 43.149999999999686,
+      "suction_after_lift_s": 0.0,
+      "irrigator_lifted": false,
+      "suction_in_mouth": false,
+      "parked": {
+        "irrigator": true,
+        "suction": true
+      },
+      "released": {
+        "irrigator": true,
+        "suction": true
+      },
+      "finish_ready": true,
+      "obstruction_s": 0.0,
+      "guard_safe": true
+    }
+  }
+}

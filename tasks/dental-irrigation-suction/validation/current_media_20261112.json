@@ -1,0 +1,19 @@
+{
+  "remote_directory": "/home/sophia/robocurve/review-iteration2-20261112/submission-media/dental-irrigation-suction",
+  "publication": "uploaded",
+  "files": {
+    "model_run.mp4": {
+      "bytes": 4049597,
+      "sha256": "a53cd2a93a76a76d0e5af8872f2a97685b07f7a4823c8e6bd88e149dd56643ab"
+    },
+    "demo.mp4": {
+      "bytes": 4452881,
+      "sha256": "a43b7d6c476f0ac61f38402f348f80317f2a6d733e0609677fafa50382e5b507"
+    },
+    "setup.png": {
+      "bytes": 158229,
+      "sha256": "fcaf5b9f8a3d0386c2b0d00b98d708c3886374db741b8e5532a0a3c2bbb2adbf"
+    }
+  },
+  "media_id": "M-XPKWYY"
+}

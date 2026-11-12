@@ -1,0 +1,5 @@
+Mouth-water v3 return sequence — 2026-11-12
+47 unit/evidence tests passed. 14 model comparisons passed (prescribed endpoint assumptions).
+3 recorded robot checks passed: full 1.0; early_return 0.75; no_return 0.75.
+All runtime .py hashes match frozen recording manifests; all three videos decode and contain steps+1 frames at 20 Hz, composite 1280x760, native tiles 640x360.
+Sampled finishing frames visually reviewed. No hardware/Dream-1 claim. No push.
