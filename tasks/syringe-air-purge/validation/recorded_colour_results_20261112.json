@@ -1,0 +1,340 @@
+{
+  "date": "2026-11-12",
+  "physics_device": "cpu",
+  "rendering": "RTX GPU cameras",
+  "camera_views": [
+    "top_cam",
+    "left_cam",
+    "right_cam"
+  ],
+  "per_camera_pixels": [
+    640,
+    360
+  ],
+  "camera_fps": 20,
+  "review_layout_pixels": [
+    1280,
+    760
+  ],
+  "annotation": "Reviewer-only labels, clock and trace metrics; not added to robot observations. No time removed.",
+  "trials": [
+    {
+      "mode": "full",
+      "result": {
+        "mode": "full",
+        "task_score": 1.0,
+        "success": true,
+        "termination": "success",
+        "steps": 699,
+        "seconds": 34.95,
+        "script_ended_at_step": null,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 10.05,
+        "script_s": 3.48,
+        "sim_s": 62.1,
+        "wall_s": 69.54,
+        "slowest_30_steps_s": 3.25,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-syringe-colour-cpu/full/full/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 700,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": true,
+          "distance": 0.010610361964164799,
+          "score": 1.0
+        },
+        "task_metrics": {
+          "step": 699,
+          "t": 34.95,
+          "air_ml": 0.0106,
+          "sample_loss_ml": 0.2059,
+          "aspirated_ml": 0.0604,
+          "piston_mm": 9.593,
+          "upward": 0.002,
+          "lifted": true,
+          "parked": true,
+          "released": true,
+          "failed": false,
+          "score": 1.0,
+          "pos": [
+            0.2517,
+            0.0004,
+            0.8866
+          ]
+        }
+      },
+      "check": {
+        "mode": "full",
+        "score": 1.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+          "test_sample_visuals.py": "9ec6af9505cc87d4742a6552349ac74733caf4edf566bf77fcbf8f5dc686b0e3",
+          "task.py": "c882a9703df13277cc7d67a28ef5da3b2f97b338530831b7e4fe057da70b93cb",
+          "VALIDATION.md": "0e667facd3c598ca39d213f1ef5249c9c2ed14bf77d331dec30347d5800df406",
+          "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+          "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+          "PHYSICAL_PROTOCOL.md": "df88798a624cfe9c68c7904283b3175077f2f35be7c31b50d81490fb245a110e",
+          "sample_visuals.py": "6126f16a877e00c033bddb866f40d26c866a106350df808faef24257d1385998",
+          "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+          "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "bdc2a815d1d1582bfedac842c50a5c1d159d2e5618466b1f92a539375186328d",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "1ce0458eb1d82bf37f647907f29460e43dc439440fcc44e7ee0a07135f965a35",
+          "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+          "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+          "task.json": "508bb12af15236562cfe94f03caa17dd6c940a01eac1f22ae66099b0df98fc3e",
+          "SCENARIOS.md": "2714b61d1866208e615c2588be8cf398fee1d75c67a8c4033fbe2c0f5d64a734",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.py": "602bbf5e5c0463d565f2a959f3e4b649dec779ea475b5a10d7a6fd4ddcc1fa6a",
+          "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+          "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+        }
+      },
+      "review_video": "syringe-full-three-views.mp4",
+      "review_video_sha256": "37fd832fbcdd55c4b01ac1398fe842a297228bfde6cd6510dd6ee2430f3dc0af",
+      "review_frames": 700,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-syringe-colour-cpu/full/full"
+    },
+    {
+      "mode": "horizontal",
+      "result": {
+        "mode": "horizontal",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 652,
+        "seconds": 32.6,
+        "script_ended_at_step": 612,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 10.36,
+        "script_s": 2.72,
+        "sim_s": 56.54,
+        "wall_s": 62.91,
+        "slowest_30_steps_s": 3.12,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-syringe-colour-cpu/horizontal/horizontal/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 653,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "distance": 1.5106072349767685,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 652,
+          "t": 32.6,
+          "air_ml": 1.5106,
+          "sample_loss_ml": 1.65,
+          "aspirated_ml": 0.0237,
+          "piston_mm": 9.277,
+          "upward": -0.0,
+          "lifted": true,
+          "parked": true,
+          "released": true,
+          "failed": true,
+          "score": 0.0,
+          "pos": [
+            0.2484,
+            0.0002,
+            0.8868
+          ]
+        }
+      },
+      "check": {
+        "mode": "horizontal",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+          "test_sample_visuals.py": "9ec6af9505cc87d4742a6552349ac74733caf4edf566bf77fcbf8f5dc686b0e3",
+          "task.py": "c882a9703df13277cc7d67a28ef5da3b2f97b338530831b7e4fe057da70b93cb",
+          "VALIDATION.md": "0e667facd3c598ca39d213f1ef5249c9c2ed14bf77d331dec30347d5800df406",
+          "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+          "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+          "PHYSICAL_PROTOCOL.md": "df88798a624cfe9c68c7904283b3175077f2f35be7c31b50d81490fb245a110e",
+          "sample_visuals.py": "6126f16a877e00c033bddb866f40d26c866a106350df808faef24257d1385998",
+          "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+          "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "bdc2a815d1d1582bfedac842c50a5c1d159d2e5618466b1f92a539375186328d",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "1ce0458eb1d82bf37f647907f29460e43dc439440fcc44e7ee0a07135f965a35",
+          "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+          "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+          "task.json": "508bb12af15236562cfe94f03caa17dd6c940a01eac1f22ae66099b0df98fc3e",
+          "SCENARIOS.md": "2714b61d1866208e615c2588be8cf398fee1d75c67a8c4033fbe2c0f5d64a734",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.py": "602bbf5e5c0463d565f2a959f3e4b649dec779ea475b5a10d7a6fd4ddcc1fa6a",
+          "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+          "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+        }
+      },
+      "review_video": "syringe-horizontal-three-views.mp4",
+      "review_video_sha256": "7f060cc22f8a6afe6c4bbba3b33888671dff0c26cef786999b85bb05a5c360a8",
+      "review_frames": 653,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-syringe-colour-cpu/horizontal/horizontal"
+    },
+    {
+      "mode": "retract_repurge",
+      "result": {
+        "mode": "retract_repurge",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 907,
+        "seconds": 45.35,
+        "script_ended_at_step": 867,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 10.23,
+        "script_s": 3.64,
+        "sim_s": 79.93,
+        "wall_s": 88.69,
+        "slowest_30_steps_s": 3.19,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-syringe-colour-cpu/retract_repurge/retract_repurge/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 908,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "distance": 0.01762600505100217,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 907,
+          "t": 45.35,
+          "air_ml": 0.0176,
+          "sample_loss_ml": 0.2039,
+          "aspirated_ml": 0.6502,
+          "piston_mm": 9.542,
+          "upward": -0.0,
+          "lifted": true,
+          "parked": true,
+          "released": true,
+          "failed": true,
+          "score": 0.0,
+          "pos": [
+            0.2484,
+            -0.0001,
+            0.8867
+          ]
+        }
+      },
+      "check": {
+        "mode": "retract_repurge",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+          "test_sample_visuals.py": "9ec6af9505cc87d4742a6552349ac74733caf4edf566bf77fcbf8f5dc686b0e3",
+          "task.py": "c882a9703df13277cc7d67a28ef5da3b2f97b338530831b7e4fe057da70b93cb",
+          "VALIDATION.md": "0e667facd3c598ca39d213f1ef5249c9c2ed14bf77d331dec30347d5800df406",
+          "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+          "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+          "PHYSICAL_PROTOCOL.md": "df88798a624cfe9c68c7904283b3175077f2f35be7c31b50d81490fb245a110e",
+          "sample_visuals.py": "6126f16a877e00c033bddb866f40d26c866a106350df808faef24257d1385998",
+          "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+          "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "bdc2a815d1d1582bfedac842c50a5c1d159d2e5618466b1f92a539375186328d",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "1ce0458eb1d82bf37f647907f29460e43dc439440fcc44e7ee0a07135f965a35",
+          "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+          "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+          "task.json": "508bb12af15236562cfe94f03caa17dd6c940a01eac1f22ae66099b0df98fc3e",
+          "SCENARIOS.md": "2714b61d1866208e615c2588be8cf398fee1d75c67a8c4033fbe2c0f5d64a734",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.py": "602bbf5e5c0463d565f2a959f3e4b649dec779ea475b5a10d7a6fd4ddcc1fa6a",
+          "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+          "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+        }
+      },
+      "review_video": "syringe-retract_repurge-three-views.mp4",
+      "review_video_sha256": "cd0dd43e80d95cc7fc4c01d2cfc22e4ad7ac93d084dcabe19eecd145cd8cd10e",
+      "review_frames": 908,
+      "camera_pixels": [
+        640,
+        360
+      ],
+      "fps": 20,
+      "recordings": "recorded-syringe-colour-cpu/retract_repurge/retract_repurge"
+    }
+  ]
+}

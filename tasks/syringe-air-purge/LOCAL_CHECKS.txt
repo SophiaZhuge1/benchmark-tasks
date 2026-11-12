@@ -1,0 +1,25 @@
+Revision checks — 12 November 2026
+Unit tests passed: 15 (including two phase-display tests)
+Reduced-order model scenario comparisons passed: 10
+Fresh recorded robot controls: 3; all expected outcomes and intended causes verified.
+Three cameras per run; steps+1 frames each; no individual-camera blank frames.
+Complete trace/result agreement, snapshot hashes and composite-video decode: PASS.
+Initial/intermediate/final and 10–12 sampled video frames inspected per run; no continuous-playback claim.
+JSON/instruction/fidelity/Python/shell/local links/diff checks: PASS.
+Fidelity: 398 / 500 characters.
+Scope: only this task folder. Collision geometry, fluid/seal models and scoring unchanged; sample/barrel/collar rendering updated.
+Demo controllers expanded; recording checks strengthened; dental diagnostic fields added.
+New Dream-1 run pending; official media references remain historical.
+Hardware protocol specified but not built or calibrated.
+No GitHub push or reviewer comment sent.
+
+Current executable source SHA-256:
+c882a9703df13277cc7d67a28ef5da3b2f97b338530831b7e4fe057da70b93cb  task.py
+6126f16a877e00c033bddb866f40d26c866a106350df808faef24257d1385998  sample_visuals.py
+9ec6af9505cc87d4742a6552349ac74733caf4edf566bf77fcbf8f5dc686b0e3  test_sample_visuals.py
+ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da  fluid.py
+9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878  seal.py
+381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896  demokit.py
+bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6  verify_scenarios.py
+
+Current coloured version: three CPU-physics trials; scores 1, 0, 0. Three-view exports verified at 20 fps and 1280x760 with native 640x360 camera tiles. Original GPU launch failed before simulation due to memory pressure.

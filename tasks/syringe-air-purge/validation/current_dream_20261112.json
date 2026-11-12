@@ -1,0 +1,316 @@
+{
+  "eval": {
+    "eval": {
+      "benchmark": null,
+      "created": "2026-11-12T22:14:25.487224+00:00",
+      "embodiment": "yam_arena",
+      "embodiment_info": {
+        "capabilities": [
+          "privileged_success",
+          "resettable",
+          "seedable"
+        ],
+        "control_hz": 20.0,
+        "evaluation_interface": [],
+        "is_simulated": true,
+        "morphology": null
+      },
+      "environment_id": "isaaclab-arena-0.3.1-yam-bimanual-station-calibrated-task-task",
+      "environment_revision": "3d3e690bb47d",
+      "git_commit": null,
+      "grader": null,
+      "grader_config": {},
+      "inspect_robots_version": "1.0.0",
+      "max_seconds": null,
+      "max_steps": 1800,
+      "policy": "dream",
+      "policy_checkpoint": "dreamlabs/dream-1-beta",
+      "policy_config": {
+        "action_horizon": 1,
+        "replan_interval": null,
+        "temperature": null
+      },
+      "reducer": "mean",
+      "rubrics": [
+        {
+          "kind": "capability",
+          "metadata": {},
+          "name": "task_score",
+          "scorer": "task_score",
+          "text": ""
+        }
+      ],
+      "seed": 1,
+      "task": "adhoc"
+    },
+    "stats": {
+      "completed_at": "2026-11-12T22:18:25.690940+00:00",
+      "duration_s": 240.20087162195705,
+      "frames_dir": "/home/sophia/robocurve/review-iteration2-20261112/dream-results/syringe-air-purge/eval/frames/20261112_221425_9fb2c413",
+      "mean_inference_latency_s": 0.5632936922399056,
+      "records_dir": "/home/sophia/robocurve/review-iteration2-20261112/dream-results/syringe-air-purge/eval/records/20261112_221425_9fb2c413",
+      "started_at": "2026-11-12T22:14:25.490081+00:00",
+      "total_steps": 1800
+    },
+    "status": "success",
+    "error": null,
+    "results": {
+      "abstentions": {},
+      "errored_trials": 0,
+      "metrics": {
+        "task_score": 0.0
+      },
+      "total_scenes": 1,
+      "total_trials": 1
+    }
+  },
+  "run_config": {
+    "command": [
+      "/home/sophia/robocurve/consent-env/bin/inspect-robots",
+      "run",
+      "--embodiment",
+      "yam_arena",
+      "--policy",
+      "dream",
+      "-E",
+      "task=/home/sophia/robocurve/review-iteration2-20261112/dream-results/syringe-air-purge/source/task.py",
+      "-E",
+      "device=cpu",
+      "-E",
+      "object_jitter=0",
+      "-E",
+      "control_hz=20",
+      "-E",
+      "cam_width=640",
+      "-E",
+      "cam_height=360",
+      "-P",
+      "rows_per_request=20",
+      "--instruction",
+      "Remove the air from the syringe while preserving the sample, then return it to its rack and let go.",
+      "--scorer",
+      "task_score",
+      "--max-steps",
+      "1800",
+      "--seed",
+      "1",
+      "--store-frames",
+      "--no-prompt",
+      "--log-dir",
+      "/home/sophia/robocurve/review-iteration2-20261112/dream-results/syringe-air-purge/eval"
+    ],
+    "instruction": "Remove the air from the syringe while preserving the sample, then return it to its rack and let go.",
+    "source_sha256": {
+      "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+      "test_sample_visuals.py": "9ec6af9505cc87d4742a6552349ac74733caf4edf566bf77fcbf8f5dc686b0e3",
+      "test_endpoint_hold.py": "dd800cf4b1cb1e2e918ae13ab301ea3a4cac2c4c2927f4c872038f7097898ad8",
+      "task.py": "3d3e690bb47d58b83dd262c57ff6fbbc99b0aa555fe3b2777909482a916c05aa",
+      "VALIDATION.md": "49057dfbff8ecfbcf9208ef767ac6b7542e34440c21f61e51f8df1e4db0aff45",
+      "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+      "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+      "PHYSICAL_PROTOCOL.md": "9a62db1db70fbbf2d7a8d072d4d86eba637378089cfbc79947063be4a308dab7",
+      "sample_visuals.py": "6126f16a877e00c033bddb866f40d26c866a106350df808faef24257d1385998",
+      "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+      "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+      "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+      "REVISION_NOTES.md": "0bc36d60ebdc5e9e5f8095c6df6d851e0f3455efe5ab5470903f16b8a3c78be4",
+      "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+      "MEASUREMENT_SHEET.csv": "d07c2e25e8570ff7030c064f2138e126e3b974109a708cc5ff13d3c881fec3e3",
+      "README.md": "d5fdbcd1d106aa9b46333242c331c9c606780ef88b69910bb1aba877aed4ad74",
+      "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+      "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+      "endpoint_hold.py": "a9b41b3b580d86426ef2728add332a98a539f92ff770fa2536c09636575825a7",
+      "task.json": "cb94b3106af88a61e4aa55693ef79ccf67d486be26844fd1939f01c5dd5803c3",
+      "SCENARIOS.md": "43986080f442a9b094571888b2afd67eed403fa6315c9b55381af09e517a2f1a",
+      "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+      "run_dream.py": "5d641c49d99243deccb22f4b89f05e04456c78e7f18475ec485485b5f46c9546",
+      "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+      "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+    },
+    "physics": "CPU PhysX",
+    "render": "RTX GPU0",
+    "kind": "dream"
+  },
+  "source_hashes_verified": true,
+  "demo_python_hashes_match": true,
+  "record": {
+    "record_id": "947ea50abaaa4efeb8d822063229a47d",
+    "steps": 1800,
+    "status": "success",
+    "error": null,
+    "termination": {
+      "reason": "max_steps",
+      "detail": null,
+      "terminated": false,
+      "truncated": true
+    }
+  },
+  "videos": [
+    {
+      "name": "~f1~scene-0-e0~left_cam.mp4",
+      "bytes": 2412737,
+      "sha256": "b5029f015e81246514220fe1001cc7d25f88742163fd3b42f6092dae91b8a789",
+      "full_decode": "pass"
+    },
+    {
+      "name": "~f1~scene-0-e0~right_cam.mp4",
+      "bytes": 2441830,
+      "sha256": "65183d4996c3c0d0a4568706eb9d18d5688e863527006011a72d645e1009e6e4",
+      "full_decode": "pass"
+    },
+    {
+      "name": "~f1~scene-0-e0~top_cam.mp4",
+      "bytes": 2028160,
+      "sha256": "740fbbcd153dc2b0f72c5cc5d7b369e884ae4b3b41349014571cc39bb39f1457",
+      "full_decode": "pass"
+    }
+  ],
+  "model_frames_per_camera": 1801,
+  "model_sample_indices": [
+    0,
+    360,
+    720,
+    1080,
+    1440,
+    1800
+  ],
+  "demo_sample_indices": [
+    0,
+    140,
+    280,
+    420,
+    560,
+    700
+  ],
+  "demo_result": {
+    "mode": "full",
+    "task_score": 1.0,
+    "success": true,
+    "termination": "success",
+    "steps": 700,
+    "seconds": 35.0,
+    "script_ended_at_step": null,
+    "size": [
+      640,
+      360
+    ],
+    "steps_per_s": 9.93,
+    "script_s": 3.9,
+    "sim_s": 62.01,
+    "wall_s": 70.51,
+    "slowest_30_steps_s": 3.3,
+    "blank_frames": 0,
+    "video": "/home/sophia/robocurve/review-iteration2-20261112/demo-results/syringe-air-purge/full/demo.mp4",
+    "blank_frames_by_camera": {
+      "top_cam": 0,
+      "left_cam": 0,
+      "right_cam": 0
+    },
+    "recorded_frames_per_camera": 701,
+    "ik_worst": {
+      "left": [
+        0.1,
+        0.0
+      ],
+      "right": [
+        0.1,
+        0.0
+      ]
+    },
+    "final_info": {
+      "success": true,
+      "distance": 0.010611514012152221,
+      "score": 1.0
+    },
+    "task_metrics": {
+      "step": 700,
+      "t": 35.0,
+      "air_ml": 0.0106,
+      "sample_loss_ml": 0.2059,
+      "aspirated_ml": 0.0604,
+      "piston_mm": 9.593,
+      "upward": 0.002,
+      "lifted": true,
+      "parked": true,
+      "released": true,
+      "failed": false,
+      "endpoint_hold_s": 1.0,
+      "score": 1.0,
+      "pos": [
+        0.2517,
+        0.0004,
+        0.8866
+      ],
+      "robot": {
+        "left": {
+          "tcp": [
+            0.2512372080557023,
+            0.1149867681888555,
+            0.9269584315740346
+          ],
+          "command": [
+            0.2499977651849721,
+            0.11498795039585791,
+            0.9268096852317302
+          ],
+          "trim": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "grip": [
+            [
+              -0.9910605071942032,
+              -0.13286318383319465,
+              0.012101462918830642
+            ],
+            [
+              -0.010574065158107458,
+              -0.012195612849272338,
+              -0.9998697195997336
+            ],
+            [
+              0.1329934591214986,
+              -0.9910593530924653,
+              0.010681686288144638
+            ]
+          ]
+        },
+        "right": {
+          "tcp": [
+            0.25004534260812755,
+            -0.19948909061511538,
+            0.9497002155903592
+          ],
+          "command": [
+            0.2499915264100908,
+            -0.20000635008145606,
+            0.9499863225954146
+          ],
+          "trim": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "grip": [
+            [
+              -2.220446049250313e-16,
+              -1.0000000000000002,
+              0.0
+            ],
+            [
+              -1.0000000000000002,
+              -4.440892098500626e-16,
+              0.0
+            ],
+            [
+              -0.0,
+              0.0,
+              -1.0000000000000009
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

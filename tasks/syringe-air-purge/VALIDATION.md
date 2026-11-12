@@ -1,5 +1,7 @@
 # Validation — 8 November 2026
 
+> **Revision — 12 November 2026.** Physical reconstruction and measurement details are in [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md); comment-by-comment changes and evidence status are in [REVISION_NOTES.md](REVISION_NOTES.md). Historical trials and fresh scripted controls are explicitly separated below. Dream-1 beta ran the current instruction and held-endpoint scorer on12 November2026 and scored0.0. No hardware validation is claimed.
+
 The full scripted return-to-rack task passed with score **1.0** in the fixed-layout Brev run `syringe-seal-v16/full` (seed 1, object jitter 0).
 
 | Measure | Result |
@@ -40,3 +42,37 @@ On 8 November 2026, `dreamlabs/dream-1-beta` completed one independent trial usi
 The arms moved around the syringe, but the logged state never achieved the required lift or air removal. Initial, midpoint and final camera frames were inspected. The final logged syringe position remained (0.25, 0, 0.8868) m. A three-camera H.264 model video was assembled from the recorded trial frames; no scripted actions were substituted. The existing full-score scripted demo remains separate.
 
 The automatic video export initially could not find FFmpeg on PATH. Export succeeded using the installed `imageio_ffmpeg` binary; this did not rerun or change the model trial. The runner now resolves that binary automatically. The three required media files were uploaded successfully as **M-SEEP5V**. The model video is H.264, 1280 × 480, 20 fps, 90.05 s (7,475,578 bytes); the full-score demo is H.264, 1280 × 480, 20 fps, 33.8 s (2,797,164 bytes); the setup screenshot is 48,065 bytes. The official Python upload request returned Cloudflare error 1010; curl succeeded with the same documented endpoint, bearer authentication and multipart fields.
+
+## Additional scenario checks — 12 November 2026
+
+See [SCENARIOS.md](SCENARIOS.md) and [machine-readable results](validation/scenario_results.json). These are newly executed reduced-order-model checks, separate from the historical recorded rigid-body trials above. Fresh recorded controller rollouts are reported below. No model-only result is represented as robot or hardware evidence.
+
+## Earlier recorded controls before the colour update — 12 November 2026
+
+| Recorded approach | Score | Air remaining (mL) | Sample loss (mL) | Cumulative aspiration (mL) | Steps |
+|---|---:|---:|---:|---:|---:|
+| `full` | 1.0 | 0.0106 | 0.0444 | 0.0412 | 675 |
+| `horizontal` | 0.0 | 1.5106 | 1.5764 | 0.0257 | 657 |
+| `retract_repurge` | 0.0 | 0.0106 | 0.1017 | 0.5419 | 887 |
+
+All three runs lifted, parked and released the syringe. Horizontal pushing fails through excess sample loss; retract/repurge ends within the full-score air/loss limits but remains failed because aspiration exceeded 0.20 mL. Neither negative is explained by a missed grasp or omitted return.
+
+Fresh processes, seed 1, zero jitter, identical scene/scoring and 20 Hz control. Each trial has a complete trace, exact source snapshot, initial image and three nonblank camera streams. Automated evidence checks and full composite-video decoding passed. These are **scripted rigid-body simulations with reduced-order fluid models**, not Dream-1 or hardware trials. [Recorded results and source/media hashes](validation/recorded_results_20261112.json). The earlier review used downsampled overhead-only copies. The current review below provides all three native-resolution views.
+
+The exact physics/controller sources are frozen in each run. This documentation and the score-summary metadata were updated afterward; the recorded manifest correctly preserves the earlier document versions.
+
+## Coloured-sample update
+
+The current sample is blue 0.01% w/v aqueous Brilliant Blue FCF tracer; see PHYSICAL_PROTOCOL.md for its preparation and density calibration. The barrel/collar are translucent and non-overlapping blue liquid/white air bands follow the phase volumes. This changes visual evidence, not collision geometry, fluid rules or score thresholds. Earlier recorded results retain their original source/visuals; fresh recordings of the coloured version are reported below.
+
+## Current coloured-sample recordings and three-view review
+
+| Approach | Score | Air (mL) | Sample lost (mL) | Aspiration (mL) | Steps |
+|---|---:|---:|---:|---:|---:|
+| full | 1.0 | 0.0106 | 0.2059 | 0.0604 | 699 |
+| horizontal | 0.0 | 1.5106 | 1.65 | 0.0237 | 652 |
+| retract_repurge | 0.0 | 0.0176 | 0.2039 | 0.6502 | 907 |
+
+All three trials use the same current blue-sample visuals, CPU PhysX, RTX-rendered cameras, seed 1 and zero jitter. The attempted GPU-physics launch failed at startup due to memory pressure; its log is retained separately and is not a scored trial. These CPU outcomes supersede the earlier GPU numbers for the current coloured visual version; differences must not be attributed solely to colour. No controller, collision, seal or fluid/scoring thresholds changed for this visual update. The two new phase-display tests and the 13 existing physics/seal tests pass.
+
+[Exact results, source hashes and review-video hashes](validation/recorded_colour_results_20261112.json). Each video shows overhead, left wrist and right wrist at native 640x360 and 20 fps, with current volumes/score in a separate panel. Whole composite videos decode successfully and contain exactly steps+1 frames. Source snapshots preserve the documentation as it was when each trial began.

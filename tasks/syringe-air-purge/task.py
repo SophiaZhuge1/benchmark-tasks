@@ -1,4 +1,4 @@
-"""Bimanual needle-free laboratory syringe air purge. Contact-driven rigid mechanics,
+"""Bimanual needle-free nursing-preparation air-management practice. Contact-driven rigid mechanics,
 with an explicitly reduced-order two-phase volume model (fluid.py)."""
 from __future__ import annotations
 import dataclasses
@@ -11,12 +11,14 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import mechkit as m
 from fluid import Fluid, AREA, CAPACITY
 from seal import Seal, SEAL_STIFFNESS, SEAL_FORCE
+from sample_visuals import phase_segments
+from endpoint_hold import EndpointHold
 from yam_arena.task_file import TABLE_TOP
 
 SCENE='station'
 TOP=TABLE_TOP[SCENE]
 SCORE_OVER='end'
-SUCCESS_HOLD_S=1.0
+SUCCESS_HOLD_S=0.05  # one confirmation step; raw scorer enforces the full 1 s hold
 INSTRUCTION='Remove the air from the syringe while preserving the sample, then return it to its rack and let go.'
 ORIGIN=np.array([.25, .0, TOP+.140])
 GRASP=np.array([0., .025, 0.])
@@ -24,10 +26,12 @@ NOZZLE_Y=.050
 PISTON_Y=NOZZLE_Y-CAPACITY/AREA
 PAD_Y=PISTON_Y-.085
 LOOKS={
- 'glass':m.Look(glass=(.91,.96,.99)),
+ # Alpha transparency keeps the phase contents visible in all three RTX cameras.
+ 'glass':m.Look(color=m.rgb(.85,.93,.97),opacity=.12,roughness=.15),
  'white':m.Look(color=m.rgb(.91,.94,.96),roughness=.35),
  'blue':m.Look(color=m.rgb(.07,.44,.74),roughness=.35),
- 'sample':m.Look(color=m.rgb(.13,.62,.79),opacity=.5,emissive=(.02,.12,.16)),
+ # 0.01% w/v Brilliant Blue FCF in distilled water: blue/green-blue tracer.
+ 'sample':m.Look(color=m.rgb(.01,.52,.92),roughness=.25),
  'air':m.Look(color=m.rgb(.99,.99,.99),emissive=(.3,.3,.3)),
  'black':m.Look(color=m.rgb(.09,.13,.18)),
  'steel':m.Look(color=m.rgb(.53,.58,.64),metallic=.6),
@@ -41,9 +45,11 @@ def syringe():
     nozzle=m.cylinder(.0035,.019,(0,.0595,0),axis='y')
     ticks=[m.box((.001,.0008,.007 if i%5 else .012),(-.0095,NOZZLE_Y-i/AREA,0)) for i in range(13)]
     # The sample and bubble visuals are updated from volume state. They do not collide.
-    parts=[('barrel',barrel,'glass'),('flange',flange,'white'),('collar',collar,'white'),('nozzle',nozzle,'white'),
-           ('scale',m.join(*ticks),'black'),('sample',m.cylinder(.0071,.060,(0,.015,0),axis='y'),'sample'),
-           ('bubble',m.sphere(.0065),'air')]
+    parts=[('barrel',barrel,'glass'),('flange',flange,'white'),('collar',collar,'glass'),('nozzle',nozzle,'white'),
+           ('scale',m.join(*ticks),'black')]
+    for name in ['sample_front','sample_rear','bubble','air_front']:
+        parts.append((name,m.cylinder(.0071,.010,axis='y'),
+                      'sample' if name.startswith('sample') else 'air'))
     cols=[m.col_hull('barrel_c',m.cylinder(.0093,.088,(0,.006,0),axis='y')),
           m.col_hull('flange_c',flange),m.col_hull('collar_c',collar),m.col_hull('nozzle_c',nozzle)]
     stem=m.cylinder(.003,.085,(0,(PISTON_Y+PAD_Y)/2,0),axis='y')
@@ -78,6 +84,7 @@ class Trial:
     def reset(self,env=None):
         self.fluid=Fluid(); self.lifted=False; self.dropped=False; self.released=False; self.parked=False; self.steps=0; self.report={}
         self.last_q=0.
+        self.endpoint=EndpointHold(.6); self.value=0.
         self.seal=Seal()
         if env is not None:m.set_target(env,"syringe","plunger",0.)
         if env is not None: self.show(env)
@@ -86,18 +93,12 @@ class Trial:
         from pxr import Gf,UsdGeom,Sdf
         stage=sim_utils.get_current_stage()
         root=f'{m.ENV_PATH}/syringe/frame/visual'
-        b=stage.GetPrimAtPath(root+'/bubble')
-        if not b.IsValid(): return
-        xf=UsdGeom.Xformable(b); ops=xf.GetOrderedXformOps()
-        if not ops: ops=[xf.AddTranslateOp(),xf.AddScaleOp()]
-        radius=(max(self.fluid.air,1e-9)*1e-6*3/(4*math.pi))**(1/3)
-        ops[0].Set(Gf.Vec3d(0,NOZZLE_Y-self.fluid.pocket-radius,0))
-        ops[1].Set(Gf.Vec3f(*([radius/.0065]*3)))
-        m.set_visible(root+'/bubble',self.fluid.air>.005)
-        sample=stage.GetPrimAtPath(root+'/sample'); xf=UsdGeom.Xformable(sample); ops=xf.GetOrderedXformOps()
-        if not ops: ops=[xf.AddTranslateOp(),xf.AddScaleOp()]
-        length=max(self.fluid.sample/AREA,.00001); center=PISTON_Y+self.fluid.last_q+length/2
-        ops[0].Set(Gf.Vec3d(0,center-.015*length/.060,0));ops[1].Set(Gf.Vec3f(1,length/.060,1))
+        if not stage.GetPrimAtPath(root+'/bubble').IsValid(): return
+        for name,(center,length) in phase_segments(self.fluid,NOZZLE_Y).items():
+            xf=UsdGeom.Xformable(stage.GetPrimAtPath(root+'/'+name));ops=xf.GetOrderedXformOps()
+            if not ops:ops=[xf.AddTranslateOp(),xf.AddScaleOp()]
+            ops[0].Set(Gf.Vec3d(0,center,0));ops[1].Set(Gf.Vec3f(1,max(length,.000001)/.010,1))
+            m.set_visible(root+'/'+name,length*AREA>.005)
         UsdGeom.PrimvarsAPI(stage.GetPrimAtPath(root+'/barrel')).CreatePrimvar('doNotCastShadows',Sdf.ValueTypeNames.Bool).Set(True)
     def step(self,env):
         self.steps+=1
@@ -117,13 +118,14 @@ class Trial:
         self.parked=bool(np.linalg.norm(s.pos[:2]-ORIGIN[:2])<.025 and abs(R[2,1])<.15 and R[1,1]>.985 and
                          TOP+.125<s.pos[2]<TOP+.155 and np.linalg.norm(s.lin_vel)<.025)
         if self.dropped: self.fluid.failed=True
+        self.value=self.endpoint.step(float(env.unwrapped.step_dt), self.fluid.score(self.released,self.parked,self.lifted))
         self.show(env)
         self.report=dict(air_ml=round(self.fluid.air,4),sample_loss_ml=round(self.fluid.lost_sample,4),
              aspirated_ml=round(self.fluid.aspirated,4),piston_mm=round(q*1000,3),upward=round(float(R[2,1]),3),
              lifted=self.lifted,parked=self.parked,released=self.released,failed=self.fluid.failed,
-             score=self.score(),pos=np.round(s.pos,4).tolist())
+             endpoint_hold_s=round(self.endpoint.elapsed,3),score=self.score(),pos=np.round(s.pos,4).tolist())
         if self.steps%60==0: print('[syringe]',self.report,flush=True)
-    def score(self): return self.fluid.score(self.released,self.parked,self.lifted)
+    def score(self): return self.value
 TRIAL=Trial();TRIAL.reset();m.on_reset(TRIAL.reset);m.on_step(TRIAL.step)
 def score(objects): return TRIAL.score()
 def success(objects): return score(objects)==1.
@@ -131,9 +133,13 @@ def distance(objects): return TRIAL.fluid.air
 
 def demo_script(ctx):
     import demokit as d
+    modes={'full','none','grasp','horizontal','overpush','partial','retract_repurge',
+           'no_return','no_release','unsupported'}
+    if ctx.mode not in modes:
+        raise ValueError(f'Unknown demo mode {ctx.mode!r}; choose {sorted(modes)}')
     L,R=ctx.left,ctx.right
     if ctx.mode=='none':
-        yield from L.wait(4);return
+        yield from L.wait(90);return
     p=ctx.state('syringe').to_world(GRASP)[0]
     yield from L.move(p+[0,.08,.045],grip=d.level(-90),t=1.5)
     yield from L.move(p+[0,.003,0],t=1.2)
@@ -154,16 +160,34 @@ def demo_script(ctx):
     yield from R.move(pad,t=1.3,label='grasp thumb plate')
     yield from R.servo(pad,timeout=1.5)
     yield from R.close(width=.034,force=25)
-    goal=(1.55 if ctx.mode!='overpush' else 4.)/AREA
-    for k in range(100):
-        s=ctx.state('syringe');error=goal-s.joint('plunger')
-        if error<.0001: break
-        delta=float(np.clip(error,0,.0005))
-        yield from R.move(R.at()+delta*s.rotation()[:,1],t=.25,label='advance plunger')
+    if ctx.mode=='unsupported':
+        yield from L.open()
+        yield from L.move(L.at()+[-.08,0,.06],t=1.,label='remove barrel support')
+    def advance_to(volume_ml):
+        # Contact actions only: never set the joint, fluid state or score.
+        goal=volume_ml/AREA
+        for _ in range(100):
+            s=ctx.state('syringe');error=goal-s.joint('plunger')
+            if error<.0001:break
+            delta=float(np.clip(error,0,.0005))
+            yield from R.move(R.at()+delta*s.rotation()[:,1],t=.25,label='advance plunger')
+    yield from advance_to(4. if ctx.mode=='overpush' else 1.0 if ctx.mode=='partial' else 1.55)
+    if ctx.mode=='retract_repurge':
+        # Retract 0.40 mL, then restore the successful endpoint. A final-state-only
+        # scorer would miss this excessive aspiration; the failure must persist.
+        goal=max(0.,ctx.state('syringe').joint('plunger')-.40/AREA)
+        for _ in range(100):
+            s=ctx.state('syringe');error=s.joint('plunger')-goal
+            if error<.0001:break
+            yield from R.move(R.at()-min(error,.0005)*s.rotation()[:,1],t=.25,label='retract before repurge')
+        yield from advance_to(1.55)
     print('[before release]',TRIAL.report,'trim',L.trim,R.trim,flush=True)
     yield from R.open()
     yield from R.move(R.at()+[0,-.08,.08],t=1.)
     yield from R.move((.25,-.20,.95),grip=d.down(0),t=1.5,label='clear the return path')
+    if ctx.mode in {'no_return','unsupported'}:
+        yield from L.wait(2.)
+        return
     if ctx.mode!='horizontal':
         yield from L.turn(-50,axis=(1,0,0),t=2.,label='return horizontal')
     yield from L.wait(.4)
@@ -175,7 +199,8 @@ def demo_script(ctx):
         off=ORIGIN-ctx.state('syringe').pos
         if np.linalg.norm(off)<.004:break
         yield from L.move(L.at()+off,t=.5,label='align with rack')
-    yield from L.open()
-    yield from L.move(p+[0,.09,.04],t=1.)
+    if ctx.mode!='no_release':
+        yield from L.open()
+        yield from L.move(p+[0,.09,.04],t=1.)
     yield from L.wait(2.)
     print('[syringe final]',TRIAL.report,flush=True)

@@ -1,0 +1,19 @@
+{
+  "remote_directory": "/home/sophia/robocurve/review-iteration2-20261112/submission-media/syringe-air-purge",
+  "publication": "uploaded",
+  "files": {
+    "model_run.mp4": {
+      "bytes": 6688957,
+      "sha256": "bca286edaff97068368f886f694f7594c82daf93b49e2d178bc350d57a772013"
+    },
+    "demo.mp4": {
+      "bytes": 2947696,
+      "sha256": "5312ece974c2fbacffe30aeeb54be9b8d0ddaf90f7c3e4784f8b91103ea18155"
+    },
+    "setup.png": {
+      "bytes": 152760,
+      "sha256": "090d3692755a52fe255b85cb690fe8bfc7d5477c740a7433bf371fe7f9ff36a2"
+    }
+  },
+  "media_id": "M-QDEBV2"
+}

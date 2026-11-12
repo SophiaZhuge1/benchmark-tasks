@@ -351,12 +351,16 @@ class Recorder:
         self.pipes = {c: subprocess.Popen([_ffmpeg(), "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{size[0]}x{size[1]}", "-r", str(CONTROL_HZ), "-i", "-",
                                            "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", str(out / f"{c}.mp4")], stdin=subprocess.PIPE) for c in self.CAMS}
         self.frames, self.blank, self.setup = 0, 0, False
+        self.blank_by_camera = {c: 0 for c in self.CAMS}
 
     def add(self, images: dict) -> None:
         self.frames += 1
-        if max(images[c].std() for c in self.CAMS) < BLANK_STD:
+        blank_cameras = [c for c in self.CAMS if images[c].std() < BLANK_STD]
+        for c in blank_cameras:
+            self.blank_by_camera[c] += 1
+        if blank_cameras:
             self.blank += 1
-        elif not self.setup:
+        elif self.frames == 1:
             _save_png(images["top_cam"], self.out / "setup.png")
             self.setup = True
         for c in self.CAMS:
@@ -365,7 +369,8 @@ class Recorder:
     def finish(self) -> Path:
         for p in self.pipes.values():
             p.stdin.close()
-            p.wait()
+            if p.wait() != 0:
+                raise RuntimeError("Camera video encoding failed")
         path = self.out / "demo.mp4"
         graph = "[0:v]scale=854:480:flags=lanczos[t];[1:v]scale=426:240:flags=lanczos[l];[2:v]scale=426:240:flags=lanczos[r];[l][r]vstack[s];[t][s]hstack[v]"
         subprocess.run([_ffmpeg(), "-loglevel", "error", "-y", *sum((["-i", str(self.out / f"{c}.mp4")] for c in self.CAMS), []), "-filter_complex", graph, "-map", "[v]",
@@ -501,6 +506,8 @@ def play(emb, module, mode: str, out: Path, size: tuple[int, int], max_steps: in
     res = {"mode": mode, "task_score": 1.0 if success else float(info.get("score") or 0.0), "success": success, "termination": reason, "steps": steps, "seconds": round(steps * DT, 2), "script_ended_at_step": ended,
            "size": list(size), "steps_per_s": round(steps / wall, 2), "script_s": round(script_s, 2), "sim_s": round(sim_s, 2), "wall_s": round(wall, 2), "slowest_30_steps_s": round(worst_30, 2),
            "blank_frames": rec.blank if rec else None, "video": video,
+           "blank_frames_by_camera": rec.blank_by_camera if rec else None,
+           "recorded_frames_per_camera": rec.frames if rec else None,
            "ik_worst": {a.side: [round(a.worst[0], 1), round(a.worst[1], 1)] for a in (ctx.left, ctx.right)},
            "final_info": {k: v for k, v in info.items() if isinstance(v, (int, float, bool))}}
     if trace:

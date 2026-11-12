@@ -1,0 +1,426 @@
+{
+  "recorded_on": "2026-11-12",
+  "evidence_level": "scripted_rigid_body_simulation_with_reduced_order_fluid_model",
+  "seed": 1,
+  "jitter": 0,
+  "runtime": {
+    "arena_commit": "c7edf3a",
+    "IsaacLab_submodule": "91a0906",
+    "python_environment": "consent-env",
+    "device": "cuda:0",
+    "source_selection": "Arena checkout plus every directory under submodules/IsaacLab/source on PYTHONPATH"
+  },
+  "trials": [
+    {
+      "mode": "full",
+      "result": {
+        "mode": "full",
+        "task_score": 1.0,
+        "success": true,
+        "termination": "success",
+        "steps": 675,
+        "seconds": 33.75,
+        "script_ended_at_step": null,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.19,
+        "script_s": 3.88,
+        "sim_s": 152.91,
+        "wall_s": 161.05,
+        "slowest_30_steps_s": 8.78,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-syringe/full/full/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 676,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": true,
+          "distance": 0.010601968471685007,
+          "score": 1.0
+        },
+        "task_metrics": {
+          "step": 675,
+          "t": 33.75,
+          "air_ml": 0.0106,
+          "sample_loss_ml": 0.0444,
+          "aspirated_ml": 0.0412,
+          "piston_mm": 8.68,
+          "upward": -0.0,
+          "lifted": true,
+          "parked": true,
+          "released": true,
+          "failed": false,
+          "score": 1.0,
+          "pos": [
+            0.2482,
+            0.0002,
+            0.8867
+          ]
+        }
+      },
+      "automated_evidence_check": {
+        "mode": "full",
+        "score": 1.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "video_decode": "pass",
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+          "task.py": "84ba22475f856c6491c795ac1848b00f624edbe06c78ea8fb9fa1e4fb4b59239",
+          "VALIDATION.md": "4189fc0b916015529f31c2037aa7ba309f8e3c6af9977cf2e61416270b18924c",
+          "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+          "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+          "PHYSICAL_PROTOCOL.md": "40154617cffcf761f0a04e8469cf6651aebc1a9ce49e53e285000eba6e1ee3a1",
+          "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+          "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "42ca8d143227af460b99777ff990bfa0fa15c4788ed502554019d16efc2f7afe",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "c9a9af3b845a520800a480c87e28891bc871503a105874358e4e23fde38294a6",
+          "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+          "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+          "task.json": "8f91d5c2478a28bcde116dca46cf2920c41054aef95d773b6ad4de7ede3771db",
+          "SCENARIOS.md": "6ee620f9a4989868e004398d96c6f852ac1cb4b2c0dc49a789dd501414e33fba",
+          "verify_scenarios.py": "9e3e984fd8ca54697714c9f39154dea12cd5b2d080efb12cef11f20aeae67a25",
+          "run_dream.py": "602bbf5e5c0463d565f2a959f3e4b649dec779ea475b5a10d7a6fd4ddcc1fa6a",
+          "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+          "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+        }
+      },
+      "evidence_files": {
+        "demo.mp4": {
+          "sha256": "898b2d5af74635c2809b14f7d0049e60d10ad3ce4fe9d361cac6f4968b547259",
+          "bytes": 2797138
+        },
+        "top_cam.mp4": {
+          "sha256": "bca16b14c0fd6e0b4ad933770778548dc3e92ed158450d8e189626266e5cdc27",
+          "bytes": 1825621
+        },
+        "left_cam.mp4": {
+          "sha256": "cba120956b0cd19e2403e6238de55dafcb0f654a8fe80a6e5e003eb7100377cc",
+          "bytes": 2410952
+        },
+        "right_cam.mp4": {
+          "sha256": "ee2e27b617c4aa9eca9724be92ec3653c2a0ea28c8feeb8b02773e4e1b565a58",
+          "bytes": 1503487
+        },
+        "setup.png": {
+          "sha256": "f6fee0e54ee97ab1bdfa19262057478bf19f82e066315f8a5692eff4748b60af",
+          "bytes": 154617
+        },
+        "trace.json": {
+          "sha256": "168a97592d1902b38a254afa961903d84630320b8baa135d4f873ea1ed1a29a5",
+          "bytes": 191700
+        },
+        "result.json": {
+          "sha256": "dec799ccbb7a83a05e9a3796464b02012584082457067a37aa2b54458bb3d588",
+          "bytes": 993
+        },
+        "syringe-full.mp4": {
+          "sha256": "56df92854ff98aba34d8f6d32cd78ba2834f7b22a6db039b07deb45fd7ea7bb6",
+          "bytes": 108402,
+          "description": "Full-duration top-camera review copy, 400x224 at 8 fps; original cameras retained remotely."
+        }
+      },
+      "recording_directory": "recorded-syringe/full/full",
+      "visual_review": {
+        "method": "initial/intermediate/final contact sheets plus 10\u201312 timestamped top-camera frames per trial",
+        "status": "consistent with intended broad scene/actions",
+        "limits": "Not a continuous manual playback or independent measurement of sub-millimetre tool clearances; numeric criteria verified from traces."
+      }
+    },
+    {
+      "mode": "horizontal",
+      "result": {
+        "mode": "horizontal",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 657,
+        "seconds": 32.85,
+        "script_ended_at_step": 617,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.63,
+        "script_s": 3.06,
+        "sim_s": 134.85,
+        "wall_s": 141.98,
+        "slowest_30_steps_s": 8.44,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-syringe/horizontal/horizontal/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 658,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "distance": 1.5106072349767699,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 657,
+          "t": 32.85,
+          "air_ml": 1.5106,
+          "sample_loss_ml": 1.5764,
+          "aspirated_ml": 0.0257,
+          "piston_mm": 8.861,
+          "upward": -0.0,
+          "lifted": true,
+          "parked": true,
+          "released": true,
+          "failed": true,
+          "score": 0.0,
+          "pos": [
+            0.2483,
+            -0.0001,
+            0.8867
+          ]
+        }
+      },
+      "automated_evidence_check": {
+        "mode": "horizontal",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "video_decode": "pass",
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+          "task.py": "84ba22475f856c6491c795ac1848b00f624edbe06c78ea8fb9fa1e4fb4b59239",
+          "VALIDATION.md": "4189fc0b916015529f31c2037aa7ba309f8e3c6af9977cf2e61416270b18924c",
+          "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+          "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+          "PHYSICAL_PROTOCOL.md": "40154617cffcf761f0a04e8469cf6651aebc1a9ce49e53e285000eba6e1ee3a1",
+          "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+          "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "42ca8d143227af460b99777ff990bfa0fa15c4788ed502554019d16efc2f7afe",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "c9a9af3b845a520800a480c87e28891bc871503a105874358e4e23fde38294a6",
+          "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+          "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+          "task.json": "8f91d5c2478a28bcde116dca46cf2920c41054aef95d773b6ad4de7ede3771db",
+          "SCENARIOS.md": "6ee620f9a4989868e004398d96c6f852ac1cb4b2c0dc49a789dd501414e33fba",
+          "verify_scenarios.py": "9e3e984fd8ca54697714c9f39154dea12cd5b2d080efb12cef11f20aeae67a25",
+          "run_dream.py": "602bbf5e5c0463d565f2a959f3e4b649dec779ea475b5a10d7a6fd4ddcc1fa6a",
+          "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+          "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+        }
+      },
+      "evidence_files": {
+        "demo.mp4": {
+          "sha256": "1ebe28bc48bc3642412ce2de7d21950d4bf7e91ce822c2f1dc3a9c44460e1395",
+          "bytes": 2494888
+        },
+        "top_cam.mp4": {
+          "sha256": "48cb99da942c57aaf0fa65c759ec59c5027172ccc0f7ed286a3b4153755e3e23",
+          "bytes": 1631597
+        },
+        "left_cam.mp4": {
+          "sha256": "7cf0e0e2eada676957363ddaeb58e8b9f7773980dfd073c86f2737a924356b51",
+          "bytes": 2089386
+        },
+        "right_cam.mp4": {
+          "sha256": "bf09181f496b5e71e5f3788931e6758663ba993db23c944969fe7dea0e342257",
+          "bytes": 1483324
+        },
+        "setup.png": {
+          "sha256": "f6fee0e54ee97ab1bdfa19262057478bf19f82e066315f8a5692eff4748b60af",
+          "bytes": 154617
+        },
+        "trace.json": {
+          "sha256": "eb7e623a51541452ffed89b5d3c6544497fa0959964ae7d47ba7b141bff91734",
+          "bytes": 186242
+        },
+        "result.json": {
+          "sha256": "fe0f9135b861026d903042bc70a9bd8930919836dbbd26a3018889d01288e2c8",
+          "bytes": 1006
+        },
+        "syringe-horizontal.mp4": {
+          "sha256": "beba52db5d7cf8b5a541e161aba27da3ea3c2f8720b37c1a4f6984f1cf6b4177",
+          "bytes": 94447,
+          "description": "Full-duration top-camera review copy, 400x224 at 8 fps; original cameras retained remotely."
+        }
+      },
+      "recording_directory": "recorded-syringe/horizontal/horizontal",
+      "visual_review": {
+        "method": "initial/intermediate/final contact sheets plus 10\u201312 timestamped top-camera frames per trial",
+        "status": "consistent with intended broad scene/actions",
+        "limits": "Not a continuous manual playback or independent measurement of sub-millimetre tool clearances; numeric criteria verified from traces."
+      }
+    },
+    {
+      "mode": "retract_repurge",
+      "result": {
+        "mode": "retract_repurge",
+        "task_score": 0.0,
+        "success": false,
+        "termination": null,
+        "steps": 887,
+        "seconds": 44.35,
+        "script_ended_at_step": 847,
+        "size": [
+          640,
+          360
+        ],
+        "steps_per_s": 4.46,
+        "script_s": 3.8,
+        "sim_s": 189.69,
+        "wall_s": 198.68,
+        "slowest_30_steps_s": 8.45,
+        "blank_frames": 0,
+        "video": "/home/sophia/robocurve/revision-ab-20261112/recorded-syringe/retract_repurge/retract_repurge/demo.mp4",
+        "blank_frames_by_camera": {
+          "top_cam": 0,
+          "left_cam": 0,
+          "right_cam": 0
+        },
+        "recorded_frames_per_camera": 888,
+        "ik_worst": {
+          "left": [
+            0.1,
+            0.0
+          ],
+          "right": [
+            0.1,
+            0.0
+          ]
+        },
+        "final_info": {
+          "success": false,
+          "distance": 0.010606412085350785,
+          "score": 0.0
+        },
+        "task_metrics": {
+          "step": 887,
+          "t": 44.35,
+          "air_ml": 0.0106,
+          "sample_loss_ml": 0.1017,
+          "aspirated_ml": 0.5419,
+          "piston_mm": 9.004,
+          "upward": -0.0,
+          "lifted": true,
+          "parked": true,
+          "released": true,
+          "failed": true,
+          "score": 0.0,
+          "pos": [
+            0.2483,
+            -0.0001,
+            0.8868
+          ]
+        }
+      },
+      "automated_evidence_check": {
+        "mode": "retract_repurge",
+        "score": 0.0,
+        "evidence_level": "recorded_rigid_body_simulation",
+        "automated_checks": "pass",
+        "visual_inspection": "required"
+      },
+      "video_decode": "pass",
+      "source_manifest": {
+        "entrypoint": "task.py",
+        "sha256": {
+          "run_brev.sh": "04a442d78cb24ce8636f837efca7f813239e10c145d4e135f2a03e334e7865f3",
+          "task.py": "84ba22475f856c6491c795ac1848b00f624edbe06c78ea8fb9fa1e4fb4b59239",
+          "VALIDATION.md": "4189fc0b916015529f31c2037aa7ba309f8e3c6af9977cf2e61416270b18924c",
+          "scenario_checks.py": "5195552bb3146a94693efc041993078a39084a2bb75b59a581f62a629a513440",
+          "check_physics_model.py": "eaf659247654726ea74006295bbb734f91908243dbb46f212f3133a21aec8c39",
+          "PHYSICAL_PROTOCOL.md": "40154617cffcf761f0a04e8469cf6651aebc1a9ce49e53e285000eba6e1ee3a1",
+          "fluid.py": "ab37583abd97d7817ed82d963c41e4901e7e833d5d4106d0208d3b5f554014da",
+          "run_scenarios.sh": "9c580e8958172f77b80f52fdfeb08560486db16fce07292da385c42ee137e5f7",
+          "demokit.py": "381d6696923569cdcb1539a0f1cf3f7d44ac21146c5eeb2617ad0e2ecf59b896",
+          "REVISION_NOTES.md": "42ca8d143227af460b99777ff990bfa0fa15c4788ed502554019d16efc2f7afe",
+          "mechkit.py": "b1684e4544b452a0baf0299cffb77194bf74906d718291fc016355fbe6449cde",
+          "README.md": "c9a9af3b845a520800a480c87e28891bc871503a105874358e4e23fde38294a6",
+          "check_seal.py": "92ced2b455fefeb35b996b40d43da43e9f88b57552cb0994813e86cf040abade",
+          "seal.py": "9c7ab45d29ebc37468c6219b3ed983e179ef1dbd7e34c21c5262b20a502ef878",
+          "task.json": "8f91d5c2478a28bcde116dca46cf2920c41054aef95d773b6ad4de7ede3771db",
+          "SCENARIOS.md": "6ee620f9a4989868e004398d96c6f852ac1cb4b2c0dc49a789dd501414e33fba",
+          "verify_scenarios.py": "bd3683f0a95b062852f63da09f718c70e373658a4b5aa3fa3c997017e1e327a6",
+          "run_dream.py": "602bbf5e5c0463d565f2a959f3e4b649dec779ea475b5a10d7a6fd4ddcc1fa6a",
+          "ATTRIBUTION.md": "c1f4f51ecc995caf79df0c0f9f72b997f0dcbde24ba5a4c8a0c54c0d75de4ffc",
+          "dream_result.json": "2e486c0ac377a9c2ed5378cd97687bb1a1e657bbee5691aed729f7fa00d0cf2f"
+        }
+      },
+      "evidence_files": {
+        "demo.mp4": {
+          "sha256": "6815d29fdfb31fb10b9d933d60eadfa3c253f8eb90d7de1dedd2cfb1dd9b7c5c",
+          "bytes": 3329162
+        },
+        "top_cam.mp4": {
+          "sha256": "fde837d5df4b01e05763ae2dc2f6353833d0c5db90491be739bad6af798e0a25",
+          "bytes": 2176295
+        },
+        "left_cam.mp4": {
+          "sha256": "2e028cf177ab4bf6e593fcf10b5a71c9e3768847d9e8687d9d57be9345da7bfa",
+          "bytes": 2840677
+        },
+        "right_cam.mp4": {
+          "sha256": "356a4017eb9166c7bef1ed059814b722b1f83dc93f0abe06564fb87ff1fa3920",
+          "bytes": 1865230
+        },
+        "setup.png": {
+          "sha256": "f6fee0e54ee97ab1bdfa19262057478bf19f82e066315f8a5692eff4748b60af",
+          "bytes": 154617
+        },
+        "trace.json": {
+          "sha256": "4de73bb3c18538e683c0f674e7df38b233f2beb704a0fb8452662fd47cb19c9b",
+          "bytes": 252990
+        },
+        "result.json": {
+          "sha256": "612f39e86a93cc75db478d837b3474a53f872a7a806947446e5a5af8f315ba08",
+          "bytes": 1022
+        },
+        "syringe-retract_repurge.mp4": {
+          "sha256": "ec34c2a7f8379b50e222e554ba8594bf545315fb8a3b6be488c2310629594e2e",
+          "bytes": 118428,
+          "description": "Full-duration top-camera review copy, 400x224 at 8 fps; original cameras retained remotely."
+        }
+      },
+      "recording_directory": "recorded-syringe/retract_repurge/retract_repurge",
+      "visual_review": {
+        "method": "initial/intermediate/final contact sheets plus 10\u201312 timestamped top-camera frames per trial",
+        "status": "consistent with intended broad scene/actions",
+        "limits": "Not a continuous manual playback or independent measurement of sub-millimetre tool clearances; numeric criteria verified from traces."
+      }
+    }
+  ]
+}
