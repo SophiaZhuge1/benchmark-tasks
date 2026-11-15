@@ -1,3 +1,19 @@
+# 15 November 2026 — affordable equipment and jobs category
+
+Response to review TK-9JD4EJ on PR #1160 (15 November, 05:28 UTC).
+
+- Category changed to `Impact on jobs`, with dental hygiene/chairside-assistance scope and O*NET references.
+- Replaced specialist syringe/vacuum equipment with named standard 12 V peristaltic pumps, ordinary silicone tubing, open cups, Nano Every timing, pocket balance and existing phone cameras.
+- Added `EQUIPMENT.md`: quantity/cost/source table (GBP 180–240 bench allowance, excluding robot/computer/existing cameras; outsourced printing additional), build steps, commissioning, uncertainty checks and substitution rules.
+- Added renderable OpenSCAD geometry for the enlarged fixture, stands and ballastable handles, plus fixed-window example pump-control code. No precision machining is required. Fixture is an inert training surrogate, not clinical anatomy.
+- Updated setup/fidelity/README/physical protocol consistently; old specialist-pump procurement and exact pump pulse tolerances are superseded. Scored water limits and instruction remain unchanged.
+
+Validation: all 51 existing offline tests pass. All 15 recorded Python source hashes and the model instruction still match the current Dream-1 evidence. Fixture, stand and handle CAD export successfully as watertight single-component meshes. Example Arduino code is supplied with PWM disabled until bench calibration; it has not been tested on hardware. The recorded simulation remains demo1.0 at1008/1200 steps, Dream-1 beta0.0 at1200/1200, media M-XPKWYY. No new model run or hardware success is claimed. Physical pump pulsation, near-dry recovery, wetting, hose drag and peak-water metrology still require commissioning.
+
+The entries below document earlier revisions and do not override this current equipment specification.
+
+---
+
 # PR1160: post-rinse clearance and equipment return
 
 Revised submission, 12 November 2026. The owner's requested final sequence is now part of the controller and full-score definition:
