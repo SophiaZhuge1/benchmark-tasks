@@ -1,0 +1,30 @@
+{
+  "demo.mp4": {
+    "bytes": 467634,
+    "sha256": "65eb53a66e30685a4834d47150aedfadacb6ebc3801e2b6d4a911d8d0ecdebc9",
+    "probe": {
+      "codec_name": "h264",
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "5/1",
+      "duration": "46.800000",
+      "nb_frames": "234"
+    }
+  },
+  "model_run.mp4": {
+    "bytes": 5173723,
+    "sha256": "d89df30afa396cf77627e92f40f6708b07fecb78fa0571f39977a100c403ad9d",
+    "probe": {
+      "codec_name": "h264",
+      "width": 640,
+      "height": 576,
+      "r_frame_rate": "20/1",
+      "duration": "200.050000",
+      "nb_frames": "4001"
+    }
+  },
+  "setup.png": {
+    "bytes": 621778,
+    "sha256": "e846ccd328e6ed06b09f540926b798f1debff1dd9d6cd80e497aedcaa8a460c7"
+  }
+}

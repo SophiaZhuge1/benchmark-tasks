@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#1b6b77"/></marker></defs>
+<rect width="1200" height="900" fill="#f5f7fa"/>
+<g font-family="DejaVu Sans,Arial,sans-serif" fill="#173042">
+<text x="50" y="54" font-size="30" font-weight="bold">Drawcord liner • proposed assembly</text>
+<text x="50" y="86" font-size="17">Topology and tether locations only · not to scale · physical build has not been validated</text>
+<rect x="40" y="110" width="1120" height="430" rx="16" fill="white" stroke="#d9e1e8"/>
+<text x="65" y="145" font-size="21" font-weight="bold">1   Top view: one continuous loop, two external bights</text>
+<ellipse cx="600" cy="335" rx="270" ry="135" fill="#e8edf1" stroke="#778a99" stroke-width="18"/>
+<path d="M180 335 L330 325 C335 165 865 165 870 325 L1020 335 L870 345 C865 505 335 505 330 345 Z" fill="none" stroke="#d89119" stroke-width="7" stroke-linejoin="round"/>
+<rect x="315" y="305" width="30" height="60" rx="5" fill="#394b59"/>
+<rect x="855" y="305" width="30" height="60" rx="5" fill="#394b59"/>
+<rect x="155" y="315" width="50" height="40" rx="9" fill="#e1ae30" stroke="#84620a" stroke-width="2"/>
+<rect x="995" y="315" width="50" height="40" rx="9" fill="#e1ae30" stroke="#84620a" stroke-width="2"/>
+<path d="M345 355L375 375M855 355L825 375" stroke="#1b6b77" stroke-width="6"/>
+<rect x="365" y="365" width="30" height="26" rx="3" fill="#7db8b9"/>
+<rect x="805" y="365" width="30" height="26" rx="3" fill="#7db8b9"/>
+<path d="M145 335H85M1055 335H1115" stroke="#1b6b77" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="98" y="293" font-size="18">Handle A</text><text x="992" y="293" font-size="18">Handle B</text>
+<text x="270" y="278" font-size="17">Lock A</text><text x="847" y="278" font-size="17">Lock B</text>
+<text x="432" y="325" font-size="21">Open liner mouth</text>
+<text x="451" y="355" font-size="17">Nominal diameter: 180 mm</text>
+<text x="478" y="405" font-size="16">Upper and lower paths run in the hem</text>
+<text x="485" y="185" font-size="16" fill="#8a5d11">Continuous nominal 2 mm cord</text>
+<path d="M400 455L385 395" stroke="#1b6b77" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="175" y="482" font-size="17">Short tether to reinforced hem patch</text>
+<text x="175" y="508" font-size="16">Housing stays with liner; neither lock attaches to the bin.</text>
+<rect x="40" y="560" width="550" height="255" rx="16" fill="white" stroke="#d9e1e8"/>
+<rect x="610" y="560" width="550" height="255" rx="16" fill="white" stroke="#d9e1e8"/>
+<text x="65" y="598" font-size="21" font-weight="bold">2   Required hardware operation</text>
+<text x="65" y="632" font-size="17">Pull handle → cord feeds out → mouth gathers.</text>
+<text x="65" y="665" font-size="17">Release handle → lock resists reverse feeding.</text>
+<text x="65" y="700" font-size="17">Use supplier-approved threading for both strands.</text>
+<text x="65" y="730" font-size="17">Internal lock geometry is deliberately not drawn.</text>
+<text x="65" y="772" font-size="16" fill="#637685">Candidate: tethered Cyberian CL Small or equivalent.</text>
+<text x="635" y="598" font-size="21" font-weight="bold">3   Build and check before hardware trials</text>
+<text x="635" y="632" font-size="17">Reinforce exits; thread loop; tether both housings.</text>
+<text x="635" y="665" font-size="17">Confirm open start, compatible cord and lock fit.</text>
+<text x="635" y="700" font-size="17">Close, extract, release and inventory six blocks.</text>
+<text x="635" y="730" font-size="17">Record failures, dimensions and closure retention.</text>
+<text x="635" y="772" font-size="16" fill="#637685">Assembly steps and blank checks: ASSEMBLY_GUIDE.md</text>
+<text x="50" y="855" font-size="17">Simulation: routed tension + combined back-feed resistance. No explicit internal cam or cord/hem sliding contact.</text>
+<text x="50" y="882" font-size="15" fill="#637685">Original schematic. Manufacturer artwork is not reproduced. No knot, adhesive grip or hidden bin attachment is required.</text>
+</g></svg>

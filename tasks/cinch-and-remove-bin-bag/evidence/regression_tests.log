@@ -1,0 +1,43 @@
+test_contact_tolerance_has_a_numeric_boundary (test_containment.NonConvexContainmentTests.test_contact_tolerance_has_a_numeric_boundary) ... ok
+test_interior_and_above_mouth (test_containment.NonConvexContainmentTests.test_interior_and_above_mouth) ... ok
+test_outside_fold_is_rejected_despite_inside_convex_hull (test_containment.NonConvexContainmentTests.test_outside_fold_is_rejected_despite_inside_convex_hull) ... ok
+test_rigid_transform_invariance (test_containment.NonConvexContainmentTests.test_rigid_transform_invariance) ... ok
+test_480hz_force_conservation (test_drawcord_physics.CordMechanicsTests.test_480hz_force_conservation) ... ok
+test_length_gradient_matches_small_displacement (test_drawcord_physics.CordMechanicsTests.test_length_gradient_matches_small_displacement) ... ok
+test_opposed_bights_pull_both_hands_inward_without_net_force (test_drawcord_physics.CordMechanicsTests.test_opposed_bights_pull_both_hands_inward_without_net_force) ... ok
+test_slack_cord_has_no_force (test_drawcord_physics.CordMechanicsTests.test_slack_cord_has_no_force) ... ok
+test_tension_conserves_net_force (test_drawcord_physics.CordMechanicsTests.test_tension_conserves_net_force) ... ok
+test_world_translation_changes_no_force (test_drawcord_physics.CordMechanicsTests.test_world_translation_changes_no_force) ... ok
+test_bag_clears_but_contents_do_not_is_not_full (test_removal_scoring.RemovalScoringTests.test_bag_clears_but_contents_do_not_is_not_full) ... ok
+test_cinch_only_is_partial (test_removal_scoring.RemovalScoringTests.test_cinch_only_is_partial) ... ok
+test_film_overstretch_is_zero (test_removal_scoring.RemovalScoringTests.test_film_overstretch_is_zero) ... ok
+test_full_completion (test_removal_scoring.RemovalScoringTests.test_full_completion) ... ok
+test_gap_in_evidence_is_zero (test_removal_scoring.RemovalScoringTests.test_gap_in_evidence_is_zero) ... ok
+test_harmless_early_lift_then_recovery (test_removal_scoring.RemovalScoringTests.test_harmless_early_lift_then_recovery) ... ok
+test_insufficient_hold_is_not_full (test_removal_scoring.RemovalScoringTests.test_insufficient_hold_is_not_full) ... ok
+test_invented_closure_measurement_is_zero (test_removal_scoring.RemovalScoringTests.test_invented_closure_measurement_is_zero) ... ok
+test_lowered_back_inside_bin_is_not_full (test_removal_scoring.RemovalScoringTests.test_lowered_back_inside_bin_is_not_full) ... ok
+test_missing_waste_is_zero (test_removal_scoring.RemovalScoringTests.test_missing_waste_is_zero) ... ok
+test_open_bag_is_zero (test_removal_scoring.RemovalScoringTests.test_open_bag_is_zero) ... ok
+test_preclosed_initial_bag_is_zero (test_removal_scoring.RemovalScoringTests.test_preclosed_initial_bag_is_zero) ... ok
+test_run_limit_is_enforced (test_removal_scoring.RemovalScoringTests.test_run_limit_is_enforced) ... ok
+test_set_down_beside_bin_is_full (test_removal_scoring.RemovalScoringTests.test_set_down_beside_bin_is_full) ... ok
+test_spill_then_recovery_is_zero (test_removal_scoring.RemovalScoringTests.test_spill_then_recovery_is_zero) ... ok
+test_brief_spill_between_ten_step_samples_is_rejected (test_streaming_score.StreamingScoringTests.test_brief_spill_between_ten_step_samples_is_rejected) ... ok
+test_streaming_matches_batch_at_each_recorded_state (test_streaming_score.StreamingScoringTests.test_streaming_matches_batch_at_each_recorded_state) ... ok
+test_back_in_bin_not_full (test_table_deposit.TableTests.test_back_in_bin_not_full) ... ok
+test_floor_not_table (test_table_deposit.TableTests.test_floor_not_table) ... ok
+test_harmless_floor_lowering_then_table_recovery (test_table_deposit.TableTests.test_harmless_floor_lowering_then_table_recovery) ... ok
+test_harmless_internal_settling_is_allowed (test_table_deposit.TableTests.test_harmless_internal_settling_is_allowed) ... ok
+test_held_clear_is_partial (test_table_deposit.TableTests.test_held_clear_is_partial) ... ok
+test_landed_released_full (test_table_deposit.TableTests.test_landed_released_full) ... ok
+test_overhanging_table_edge_not_full (test_table_deposit.TableTests.test_overhanging_table_edge_not_full) ... ok
+test_short_table_hold_not_full (test_table_deposit.TableTests.test_short_table_hold_not_full) ... ok
+test_still_bouncing_not_full (test_table_deposit.TableTests.test_still_bouncing_not_full) ... ok
+test_supported_by_gripper_not_full (test_table_deposit.TableTests.test_supported_by_gripper_not_full) ... ok
+test_table_with_spill_is_zero (test_table_deposit.TableTests.test_table_with_spill_is_zero) ... ok
+
+----------------------------------------------------------------------
+Ran 38 tests in 40.320s
+
+OK
