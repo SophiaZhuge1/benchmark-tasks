@@ -1,0 +1,20 @@
+{
+  "title": "Pull, tuck and cut: wrap a watermelon half in cling film",
+  "category": "Impact on jobs",
+  "keywords": [
+    "bimanual",
+    "YAM",
+    "food retail",
+    "flexible film",
+    "sliding cutter"
+  ],
+  "instruction": "Use both arms to pull cling film from the dispenser, cover the watermelon half and tuck the film underneath, then slide the cutter across and release the wrapped fruit.",
+  "context": "Food Preparation Workers routinely portion and wrap food (O*NET 35-2021.00). This task tests drawing a continuous sheet, preserving coverage while tucking under rounded produce, and cutting the supply while retaining the wrap; it represents preparation for storage or display.",
+  "setup": "Two YAM arms on the standard calibrated station; 800 × 1000 × 2.5 mm silicone mat with work plane z=750 mm. A 180 mm diameter, 90 mm high, 0.8 kg watermelon half sits cut-face-up at (350,0,840) mm on four 12 × 12 × 38 mm HDPE rests. A fixed 130 × 460 × 75 mm HDPE dispenser supplies 400 mm-wide, nominal 10 micrometre LDPE film with 75 mm exposed. Guarded 450 mm cutter rail, 24 × 24 × 28 mm carriage and 430 mm travel. EQUIPMENT.md specifies all materials, poses, fixtures, cameras and reset tolerances.",
+  "scoring": "Cumulative final-state levels: 0.2 for simultaneous opposite-edge grasp by both arms and 300–650 mm payout; 0.5 also requires >=95% face coverage; 0.75 also requires one connected underside patch per side, each >=200 mm² and >=15 mm wide; 1.0 also requires full cut, no film grasp, >=20 mm robot clearance and all conditions retained >=1 s. Premature cut, torn/nonfinite film or dropped/excessively displaced/tipped fruit latches 0. Exact masks and thresholds: SCORING.md.",
+  "run_limit": "3,600 actions at 20 Hz (180 seconds)",
+  "reset_notes": "Fresh intact film, 75 mm exposed, cutter at y=+215 mm, half cut-face-up in the four supports, arms at standard reset. Real trials use non-consumed produce and fresh film; no setup or material claim has hardware validation.",
+  "fidelity": "Native YAM, rigid fruit and passive cutter; reduced position-based film with contact-triggered edge pinches, feed drag and local tack. No film self-collision or force feedback to robot/fruit. V2 scores connected projected tuck area. Hardware/film forces uncalibrated; defined physical dispenser assembly is unbuilt.",
+  "scores": "Dream-1 beta: 0.0 at 3,600 actions, seed 0, max_steps termination, no execution error; scripted demo: 1.0 at 1,335 actions. Standard evaluator action guards enabled.",
+  "media": "M-F3H2EF"
+}
