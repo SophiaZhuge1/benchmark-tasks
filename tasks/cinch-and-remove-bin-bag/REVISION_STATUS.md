@@ -22,6 +22,8 @@ Outstanding work:
 5. Perform the physical preflight in PHYSICAL_PROTOCOL.md, then record a new full-score demo and Dream-1 run in the exact same final scene. Neither exists yet.
 6. Upload new media and update the existing PR only after these checks pass. The old media ID M-C8X8HT demonstrates the rejected custom liner and cannot support this candidate.
 
+A fresh demo attempt using the current candidate failed during reset with `CUBLAS_STATUS_ALLOC_FAILED` before any arm actions. It is not a zero-score completed demo and is not submission evidence.
+
 Offline tests: 41 passed (evidence/revision-unit-tests.log); these are code checks, not feasibility evidence.
 
 No physical equipment trial, successful knot, new 1.0 demo, or completed revised-scene Dream-1 run is claimed.

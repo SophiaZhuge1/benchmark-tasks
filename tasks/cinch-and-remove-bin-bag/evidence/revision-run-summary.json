@@ -1,0 +1,24 @@
+{
+  "setup": {
+    "mode": "setup",
+    "control_steps": 20,
+    "device": "CUDA_VISIBLE_DEVICES=1; logical cuda:0",
+    "mouth_diameter_m": 0.13978178799152374,
+    "observed_issue": "Both initially tagged bight segments settled inside the bin. Full tape inspection and a controller that locates the actual exposed bights are needed.",
+    "not_task_success": true,
+    "exit_code": 0,
+    "wall_seconds": 35.44,
+    "maximum_sleeve_gap_m": 0.0024606867227703333
+  },
+  "demo_attempt": {
+    "outcome": "initialization_failed",
+    "exit_code": 1,
+    "wall_seconds": 20.18,
+    "error": "CUBLAS_STATUS_ALLOC_FAILED when calling cublasCreate(handle)",
+    "control_steps": 0,
+    "task_score": null,
+    "is_completed_policy_or_demo_run": false
+  },
+  "dream1": "not_run_on_this_candidate",
+  "physical_preflight": "not_performed"
+}

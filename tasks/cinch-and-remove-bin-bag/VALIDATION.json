@@ -23,5 +23,14 @@
     "exit_code": 0,
     "wall_seconds": 35.44,
     "maximum_sleeve_gap_m": 0.0024606867227703333
+  },
+  "demo_attempt": {
+    "outcome": "initialization_failed",
+    "exit_code": 1,
+    "wall_seconds": 20.18,
+    "error": "CUBLAS_STATUS_ALLOC_FAILED when calling cublasCreate(handle)",
+    "control_steps": 0,
+    "task_score": null,
+    "is_completed_policy_or_demo_run": false
   }
 }
