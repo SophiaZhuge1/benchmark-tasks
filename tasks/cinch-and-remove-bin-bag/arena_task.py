@@ -1,24 +1,18 @@
-"""Cinch and remove a loaded drawstring bag from a small countertop bin.
-
-The dark film bag starts open with six inert waste blocks inside. Orange toggles
-mark two opposed bights of one continuous drawstring. Pulling these bights
-gathers the neck through a passive cord-lock approximation. Hold or place the
-closed bag entirely clear of the bin without spilling. No new liner is needed.
-The film and cord model are uncalibrated approximations; no knot is modelled.
-"""
+"""Ordinary factory drawtape liner development scene; closure not yet validated."""
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import numpy as np
 import mechkit as m
 from yam_arena.task_file import Box
-from table_deposit import TableDepositJudge as RemovalJudge
+from ordinary_closure import OrdinaryLinerJudge as RemovalJudge
 
 SCENE='station'
-INSTRUCTION='Pull both drawstrings to close the full bag, lift it out of the bin, and release it onto the table beside the bin without spilling any contents.'
+STANDARD_LINER=True
+from standard_liner import INSTRUCTION
 SUCCESS_HOLD_S=0.
 SCORE_OVER='end'
-OBJECTS=[Box(name=f'rubbish_{i}',pos=(.22+(.03 if i%2 else -.03),0,.786+.041*(i//2)),size=(.058,.10,.040),mass=.025) for i in range(6)]
+OBJECTS=[Box(name=f'rubbish_{i}',pos=(.22+(.025 if i%2 else -.025),0,.786+.036*(i//2)),size=(.048,.080,.035),mass=.025) for i in range(6)]
 ANCHORS={}
 
 original_patch=m._patch_scene
@@ -96,7 +90,7 @@ class Tracker:
         if self.runtime is not None:self.runtime.detach()
         self.runtime=DrawstringRuntime(env);self.count=0;self.trace=[];self.snapshots={};self.result={'score':0.}
         import os,json,hashlib
-        parameters={'bin_top_z':.918,'bin_center_xy':[.22,0.],'sample_interval_steps':1,'require_table_deposit':True,'control_hz':20}
+        parameters={'bin_top_z':.918,'bin_center_xy':[.22,0.],'sample_interval_steps':1,'require_table_deposit':True,'require_ordinary_closure':True,'control_hz':20}
         self.judge=RemovalJudge(parameters)
         if os.environ.get('BIN_EVIDENCE_DIR'):
             self.episode+=1;self.save_dir=Path(os.environ['BIN_EVIDENCE_DIR'])/f'episode_{self.episode:03d}'

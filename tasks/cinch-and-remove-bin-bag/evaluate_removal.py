@@ -13,7 +13,7 @@ def contents_retained(s, vertices):
     centres=np.asarray(s['rubbish'],float)
     quats=np.asarray(s['rubbish_quaternions'],float)
     if centres.shape!=(6,3) or quats.shape!=(6,4):return False,None
-    offsets=np.array([[x*.029,y*.05,z*.02] for x in [-1,1] for y in [-1,1] for z in [-1,1]])
+    offsets=np.array([[x*.024,y*.04,z*.0175] for x in [-1,1] for y in [-1,1] for z in [-1,1]])
     corners=np.concatenate([c+Rotation.from_quat(q).apply(offsets) for c,q in zip(centres,quats)])
     from containment import closed_triangles, contains_points
     from realistic_meshes_v32 import dirty_mesh
@@ -21,7 +21,7 @@ def contents_retained(s, vertices):
     triangles=closed_triangles(vertices,faces,mouth_ids)
     # Corners, face centres and the centre of each waste block are checked.
     # Face/centre samples also catch a rigid block bridging an exterior fold.
-    face_offsets=np.array([[.029,0,0],[-.029,0,0],[0,.05,0],[0,-.05,0],[0,0,.02],[0,0,-.02],[0,0,0]])
+    face_offsets=np.array([[.024,0,0],[-.024,0,0],[0,.04,0],[0,-.04,0],[0,0,.0175],[0,0,-.0175],[0,0,0]])
     other=np.concatenate([c+Rotation.from_quat(q).apply(face_offsets) for c,q in zip(centres,quats)])
     points=np.concatenate([corners,other])
     return bool(np.all(contains_points(points,triangles,tolerance=.005))),corners
@@ -92,7 +92,10 @@ class RemovalJudge:
 
 def evaluate(trace,snapshots,parameters):
     try:
-        if parameters.get('require_table_deposit',False):
+        if parameters.get('require_ordinary_closure',False):
+            from ordinary_closure import OrdinaryLinerJudge
+            judge=OrdinaryLinerJudge(parameters)
+        elif parameters.get('require_table_deposit',False):
             from table_deposit import TableDepositJudge
             judge=TableDepositJudge(parameters)
         else:

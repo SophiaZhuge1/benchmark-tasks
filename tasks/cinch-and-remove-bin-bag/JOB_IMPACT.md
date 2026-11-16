@@ -6,7 +6,7 @@ Taking out trash includes repetitive manual handling: gather a liner's mouth, cl
 
 The evaluation starts with six clean, lightweight mock-waste pieces already in an open liner. The robot must use the two drawstrings, retain closure and all contents through extraction, and release the bag on the adjacent table. Success requires a stable, released result. The table is the local service surface for this bounded handling test.
 
-The tested load is 150 g and the bin is 186 mm internally. The custom liner uses specified tethered cord locks. This evidence covers that small-bin setup; it does not establish heavy refuse handling, mixed wet/sharp waste, a complete cleaning shift, mobile transport to an outdoor container, or replacement-liner installation. Physical assembly remains unvalidated. These limits prevent the occupational rationale from overstating the demonstrated capability.
+The proposed load is 150 g. The revised task specifies a commercially available factory drawtape liner and its matching small bin; no cord-lock accessory or added rigid handle is proposed. The revised ordinary closure, hardware preflight and robot completion remain unvalidated. This targets small-bin handling only, not heavy refuse, wet/sharp waste, outdoor transport or liner replacement. See REVISION_STATUS.md for the implementation gaps.
 
 ## Sources checked 15 November 2026
 

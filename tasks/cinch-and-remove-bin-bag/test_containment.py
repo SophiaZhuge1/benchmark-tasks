@@ -22,7 +22,7 @@ class NonConvexContainmentTests(unittest.TestCase):
         np.testing.assert_array_equal(contains_points([[0,0,.1],[0,0,.27]],tri),[True,False])
     def test_contact_tolerance_has_a_numeric_boundary(self):
         v,f,m=dirty_mesh();tri=closed_triangles(v,f,m)
-        np.testing.assert_array_equal(contains_points([[.089,0,.08],[.093,0,.08]],tri),[True,False])
+        np.testing.assert_array_equal(contains_points([[.078,0,.08],[.082,0,.08]],tri),[True,False])
     def test_rigid_transform_invariance(self):
         from scipy.spatial.transform import Rotation
         v,f,m=dirty_mesh();p=np.array([[0,0,.1],[.2,0,.1]])

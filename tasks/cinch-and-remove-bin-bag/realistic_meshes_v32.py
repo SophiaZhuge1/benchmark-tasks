@@ -3,14 +3,15 @@
 Mesh positions are authored only at reset. Dimensions are metres; the extended neck supplies film length needed for closure.
 """
 import numpy as np
+from standard_liner import BAG_RADIUS, BAG_HEIGHT
 
 SUBDIVISION=0
 
 def dirty_mesh():
     n=80
-    rings=[(.086*t/4,0.) for t in range(1,5)]
-    rings += [(.086,.135*t/9) for t in range(1,10)]
-    rings += [(float(r),float(z)) for r,z in zip(np.linspace(.086,.090,12)[1:],np.linspace(.135,.250,12)[1:])]
+    rings=[(BAG_RADIUS*t/4,0.) for t in range(1,5)]
+    rings += [(BAG_RADIUS,.135*t/9) for t in range(1,10)]
+    rings += [(float(r),float(z)) for r,z in zip(np.linspace(BAG_RADIUS,BAG_RADIUS,12)[1:],np.linspace(.135,BAG_HEIGHT,12)[1:])]
     v=[[0.,0.,0.]]
     for r,z in rings:
         v.extend([[r*np.cos(j*2*np.pi/n),r*np.sin(j*2*np.pi/n),z] for j in range(n)])

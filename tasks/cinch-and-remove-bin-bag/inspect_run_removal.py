@@ -10,7 +10,7 @@ sys.path.insert(0,os.environ.get('YAM_COMPAT_ROOT',str(HERE)))
 sys.path.insert(0,str(HERE))
 HERE=HERE/args.run
 HERE.mkdir(parents=True,exist_ok=False)
-for n in [Path(__file__).name,'realistic_meshes_v32.py','drawcord_physics_v37.py','removal_assets.py','evaluate_removal.py','containment.py','table_deposit.py','plan_table_transfer.py','arena_task.py','removal_runtime.py']:(HERE/('source_'+n)).write_text((Path(__file__).resolve().parent/n).read_text())
+for n in [Path(__file__).name,'realistic_meshes_v32.py','standard_liner.py','sliding_hem.py','ordinary_closure.py','removal_assets.py','evaluate_removal.py','containment.py','table_deposit.py','plan_table_transfer.py','arena_task.py','removal_runtime.py']:(HERE/('source_'+n)).write_text((Path(__file__).resolve().parent/n).read_text())
 app=None
 
 def main():
@@ -78,6 +78,8 @@ def main():
         result['rubbish']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_pos_w)[0].tolist() for i in range(6)]
         result['fasteners']={key:{'pos':arr(base.scene.rigid_objects[key].data.root_pos_w)[0].tolist(),'quat':arr(base.scene.rigid_objects[key].data.root_quat_w)[0].tolist()} for key in ['cord_end_0','cord_end_1']}
         result['drawcord']=dict(cable.last)
+        from removal_runtime import tape_names
+        result['drawtape_positions']=[body_pos(n).tolist() for n in tape_names()]
         result['loaded_mouth_indices']=anchors['loaded_bag']
         result['rubbish_velocities']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_lin_vel_w)[0].tolist() for i in range(6)]
         result['hem_marker_positions']=[body_pos('hem_%02d'%j).tolist() for j in range(bead_count)]
@@ -237,7 +239,7 @@ def main():
                     (HERE/'command_result.json').write_text(json.dumps({'label':request['label'],'step':count,'score':inspect.task.module.TRACKER.result}))
                 except Exception as exc:
                     state(request['label']+'_failed');(HERE/'command_error.json').write_text(json.dumps({'label':request['label'],'failure':str(exc)}))
-    (HERE/'task_parameters.json').write_text(json.dumps({'bin_center_xy':[.22,0.],'bin_top_z':.918,'control_hz':20.,'clear_hold_seconds':2.,'sample_interval_steps':1,'mode':args.mode,'require_table_deposit':True}))
+    (HERE/'task_parameters.json').write_text(json.dumps({'bin_center_xy':[.22,0.],'bin_top_z':.918,'control_hz':20.,'clear_hold_seconds':2.,'sample_interval_steps':1,'mode':args.mode,'require_table_deposit':True,'require_ordinary_closure':True}))
     state('initial')
     try:
         tick(20);state('settled')

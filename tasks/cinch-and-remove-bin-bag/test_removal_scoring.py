@@ -11,10 +11,10 @@ def fixture(early_lift=False):
     closed=vertices.copy()
     n=len(mouth)
     # Unfold/gather the spare cuff while retaining the loaded lower bag volume.
-    rings=[(.086*t/4,0.) for t in range(1,5)]
-    rings += [(.086,.135*t/9) for t in range(1,10)]
-    rings += [(.080,.145),(.075,.155)]
-    rings += [(float(r),float(z)) for r,z in zip(np.linspace(.075,.020,10)[1:],np.linspace(.155,.220,10)[1:])]
+    from standard_liner import BAG_RADIUS, BAG_HEIGHT
+    rings=[(BAG_RADIUS*t/4,0.) for t in range(1,5)]
+    rings += [(BAG_RADIUS,.135*t/9) for t in range(1,10)]
+    rings += [(float(r),float(z)) for r,z in zip(np.linspace(BAG_RADIUS,.020,12)[1:],np.linspace(.135,BAG_HEIGHT,12)[1:])]
     for k,(radius,z) in enumerate(rings):
         angle=np.arange(n)*2*np.pi/n
         closed[1+k*n:1+(k+1)*n]=np.c_[radius*np.cos(angle),radius*np.sin(angle),np.full(n,z)]
@@ -27,7 +27,7 @@ def fixture(early_lift=False):
         if early_lift and 0<step<30:lift=.195
         v=initial*(1-cinch)+gathered*cinch+[.22,0,.768+lift]
         neck=v[mouth];diameter=float(np.linalg.norm(neck[:,None,:]-neck[None,:,:],axis=2).max())
-        centres=[[.22+(.03 if i%2 else -.03),0,.786+.041*(i//2)+lift] for i in range(6)]
+        centres=[[.22+(.025 if i%2 else -.025),0,.786+.036*(i//2)+lift] for i in range(6)]
         trace.append({'step':step,'mouth_diameter':diameter,'rubbish':centres,'rubbish_quaternions':[[0,0,0,1] for _ in range(6)]})
         snapshots[step]=v
     return trace,snapshots,{'bin_top_z':.918,'bin_center_xy':[.22,0.]}

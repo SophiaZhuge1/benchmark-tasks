@@ -19,10 +19,19 @@ def prepare(adapter,root=None):
     file=dest/'scene.py';text=file.read_text();old='        GroundPlane(),'
     if old not in text:raise RuntimeError('Pinned floor compatibility patch no longer applies')
     file.write_text(text.replace(old,'        _box("floor", (20.,20.,0.1), (0.,0.,-0.05), (0.2,0.2,0.2)),',1))
+    file=dest/'inspect_embodiment.py';text=file.read_text()
+    old='        for _ in range(max(1, round(SETTLE_S / base.step_dt))):'
+    if old not in text:raise RuntimeError('Pinned pre-settle drawtape hook no longer applies')
+    hook=('        if getattr(getattr(self, "task", None), "module", None) is not None:\n'
+          '            module = self.task.module\n'
+          '            if getattr(module, "STANDARD_LINER", False):\n'
+          '                from removal_runtime import DrawstringRuntime\n'
+          '                module.TRACKER.runtime = DrawstringRuntime(self._env)\n')
+    file.write_text(text.replace(old,hook+old,1))
     link=dest/'assets'
     if not link.exists():link.symlink_to(source/'assets',target_is_directory=True)
     elif link.resolve()!=(source/'assets').resolve():raise RuntimeError('Overlay assets point to a different adapter')
-    (root/'runtime_manifest.json').write_text(json.dumps({'adapter_commit':revision,'compatibility_patches':['Embodiment registry_name','rigid tabletop-scene floor'],'source_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.py')}},indent=2))
+    (root/'runtime_manifest.json').write_text(json.dumps({'adapter_commit':revision,'compatibility_patches':['Embodiment registry_name','rigid tabletop-scene floor','ordinary drawtape forces before reset settling'],'source_hashes':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.py')}},indent=2))
     return root.resolve()
 
 if __name__=='__main__':

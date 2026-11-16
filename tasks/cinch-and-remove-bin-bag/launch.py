@@ -3,7 +3,7 @@ import argparse,json,os,subprocess,sys,time
 from pathlib import Path
 from prepare_runtime import prepare
 ROOT=Path(__file__).resolve().parent
-INSTRUCTION='Pull both drawstrings to close the full bag, lift it out of the bin, and release it onto the table beside the bin without spilling any contents.'
+from standard_liner import INSTRUCTION
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('mode',choices=['setup','demo','model']);p.add_argument('--adapter',type=Path,required=True);p.add_argument('--arena-root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--python',default=sys.executable);p.add_argument('--device',default='cuda:0');a=p.parse_args()
