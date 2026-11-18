@@ -1,24 +1,28 @@
-"""Cinch and remove a loaded drawstring bag from a small countertop bin.
+"""Cinch and remove a loaded drawstring liner from a small countertop bin.
 
-The dark film bag starts open with six inert waste blocks inside. Orange toggles
-mark two opposed bights of one continuous drawstring. Pulling these bights
-gathers the neck through a passive cord-lock approximation. Hold or place the
-closed bag entirely clear of the bin without spilling. No new liner is needed.
-The film and cord model are uncalibrated approximations; no knot is modelled.
+An ordinary white drawstring liner (one string in the mouth hem, exposed as a
+short loop at a cut-out on each side) holds three inert waste blocks. Pinch the
+two loops, pull them so the string slides out of the hem and gathers the
+mouth, lift the bag out by the strings and set it down upright on the table
+beside the bin, then let go. There is no cord lock, handle or knot: the mouth
+stays gathered only through string tension while carried and film contact
+after release. Film and string forces are uncalibrated approximations.
 """
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import numpy as np
+from removal_assets import WALL_H
 import mechkit as m
 from yam_arena.task_file import Box
-from table_deposit import TableDepositJudge as RemovalJudge
+from drawstring_score import DrawstringJudge
 
 SCENE='station'
-INSTRUCTION='Pull both drawstrings to close the full bag, lift it out of the bin, and release it onto the table beside the bin without spilling any contents.'
+INSTRUCTION='Pull both drawstrings to close the full bag, lift it out of the bin by the drawstrings, and set it down upright on the table beside the bin without spilling any contents.'
 SUCCESS_HOLD_S=0.
 SCORE_OVER='end'
-OBJECTS=[Box(name=f'rubbish_{i}',pos=(.22+(.03 if i%2 else -.03),0,.786+.041*(i//2)),size=(.058,.10,.040),mass=.025) for i in range(6)]
+from removal_assets import BLOCK_SIZES,BLOCK_MASS,BLOCK_COUNT,block_positions,RIM_Z
+OBJECTS=[Box(name=f'rubbish_{i}',pos=block_positions()[i],size=BLOCK_SIZES[i],mass=BLOCK_MASS) for i in range(BLOCK_COUNT)]
 ANCHORS={}
 
 original_patch=m._patch_scene
@@ -37,13 +41,13 @@ def patch_scene(scene):
         TRACKER.anchors=anchors
         cameras=BimanualYamEmbodiment(rig=embodiment.rig,enable_cameras=True,overview_cam=True,cam_width=640,cam_height=360)
         embodiment.camera_config=cameras.camera_config
-        eye=np.array([1.15,2.0,1.85]);forward=np.array([.20,.30,.72])-eye;forward/=np.linalg.norm(forward)
+        eye=np.array([1.25,1.25,1.55]);forward=np.array([.12,0.,1.0])-eye;forward/=np.linalg.norm(forward)
         left=np.cross([0.,0.,1.],forward);left/=np.linalg.norm(left);up=np.cross(forward,left)
         embodiment.camera_config.overview_cam.offset.pos=tuple(eye)
         embodiment.camera_config.overview_cam.offset.rot=tuple(Rotation.from_matrix(np.stack([forward,left,up],axis=1)).as_quat())
         for side in ['left','right']:
             robot=getattr(embodiment.scene_config,side+'_robot')
-            robot.actuators['gripper'].joint_effort_limit=8.
+            pass  # standard adapter gripper
             from isaaclab_physx.sim.schemas import PhysxCollisionPropertiesCfg
             robot.spawn.collision_props=PhysxCollisionPropertiesCfg(contact_offset=.001,rest_offset=0.)
         def configure(cfg):
@@ -66,7 +70,8 @@ def patch_embodiment(module):
     if getattr(cls,'_bin_reset_hook',False):return
     original_reset=cls.reset
     def reset(self,*a,**kw):
-        if getattr(getattr(self,'task',None),'module',None) is not None and getattr(self.task.module,'INSTRUCTION',None)==INSTRUCTION and TRACKER.runtime is not None:
+        ours=getattr(getattr(self,'task',None),'module',None) is not None and getattr(self.task.module,'INSTRUCTION',None)==INSTRUCTION
+        if ours and TRACKER.runtime is not None:
             TRACKER.runtime.detach();TRACKER.runtime=None
         return original_reset(self,*a,**kw)
     original_close=cls.close
@@ -93,11 +98,13 @@ class Tracker:
             (self.save_dir/'live_result.json').write_text(json.dumps(self.result,indent=2))
     def reset(self,env):
         from removal_runtime import DrawstringRuntime
+        # The string's rest length is taken from the settled reset scene.
         if self.runtime is not None:self.runtime.detach()
-        self.runtime=DrawstringRuntime(env);self.count=0;self.trace=[];self.snapshots={};self.result={'score':0.}
+        self.runtime=DrawstringRuntime(env)
+        self.count=0;self.trace=[];self.snapshots={};self.result={'score':0.}
         import os,json,hashlib
-        parameters={'bin_top_z':.918,'bin_center_xy':[.22,0.],'sample_interval_steps':1,'require_table_deposit':True,'control_hz':20}
-        self.judge=RemovalJudge(parameters)
+        parameters={'bin_top_z':RIM_Z,'bin_center_xy':[.22,0.],'bin_outer_radius_m':.0855,'sample_interval_steps':1,'require_table_deposit':True,'control_hz':20}
+        self.judge=DrawstringJudge(parameters)
         if os.environ.get('BIN_EVIDENCE_DIR'):
             self.episode+=1;self.save_dir=Path(os.environ['BIN_EVIDENCE_DIR'])/f'episode_{self.episode:03d}'
             self.save_dir.mkdir(parents=True,exist_ok=False)
@@ -119,3 +126,4 @@ m.on_reset(TRACKER.reset)
 m.on_step(TRACKER.step)
 def score(objects):return float(TRACKER.result.get('score',0.))
 def success(objects):return score(objects)==1.
+

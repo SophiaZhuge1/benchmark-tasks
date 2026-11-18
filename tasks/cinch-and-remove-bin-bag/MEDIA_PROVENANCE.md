@@ -1,12 +1,7 @@
-# Uploaded evidence
+# Media provenance
 
-The official upload returned **M-C8X8HT**, recorded in task.json. It contains the final tabletop task's original demo.mp4, model_run.mp4 and setup.png. They are served by the task board and are not committed as binaries in this source directory. SHA-256 hashes, sizes, frame counts and codec information are in [evidence/MEDIA_PROVENANCE.json](evidence/MEDIA_PROVENANCE.json).
+Media ID in `task.json.media`: M-K63S4Z. All three files come from runs of this source on the official Isaac Lab-Arena release/0.3.1 environment.
 
-| Recording | Recorded result | Video |
-|---|---|---|
-| Scripted demo_002 | 1.0 at step 939 / 46.95 simulated seconds | H.264 640 × 360, 5 fps, 234 frames, 46.8 s; sampled every four control steps. |
-| Dream-1 dream_002 | 0.0; normal completion at 4,000 steps / 200 simulated seconds | H.264 640 × 576, 20 fps, 4,001 frames, 200.05 s; original camera montage. |
-
-The demo video ends at its last sampled frame; the full control trace contains states 0–939 and the final two-second acceptance interval. Independent full-geometry replays returned 1.0 and 0.0. These are recorded outcomes, not a newly executed trial for this metadata change.
-
-The submitted instruction, physics, controller and scorer are unchanged. Requested CLI seed 0 maps to effective adapter environment seed 42, with zero object jitter. Multi-seed performance is not established. The cord-routing.svg drawing is an original topology schematic, not a hardware photograph or evidence of physical assembly validation.
+- `demo.mp4`: encoded from the frames of the scripted run `FB_ol1` named in [VALIDATION.json](VALIDATION.json) (every fourth control step, 5 fps, the `ffmpeg` command in README.md). Score 1.0, independent replay 1.0.
+- `setup.png`: that run's start-state image (top, left, right and overview cameras).
+- `model_run.mp4`: the Dream-1 run listed in VALIDATION.json (320 x 176 cameras), encoded from its recorded camera streams with `inspect-robots video`; the run errored at step 1,427, and the video shows those steps.

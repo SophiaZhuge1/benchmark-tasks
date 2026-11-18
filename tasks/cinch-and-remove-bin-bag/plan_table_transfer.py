@@ -8,12 +8,13 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 from scipy.spatial.transform import Rotation
 
-def plan(state, steps=160):
+def plan(state, steps=160, final_z=1.38, final_x=-.03):
     from yam_arena.ik import solve,tcp_pose
     from yam_arena import station
     q=np.array(state['commanded_joints'],float)
     start=np.array(state['tcp'],float)
-    centres=np.array([[.14,0.,1.52],[.01,0.,1.47],[-.03,0.,1.38]])
+    top=float(np.mean(np.array(state['tcp'])[:,2]))
+    centres=np.array([[.14,0.,max(top,final_z)],[.01,0.,max(final_z,min(top,1.47))],[final_x,0.,final_z]])
     targets=np.array([start,*[np.array([c+[0,.06,0],c+[0,-.06,0]]) for c in centres]])
     curve=CubicSpline(np.linspace(0,1,len(targets)),targets,axis=0,bc_type='clamped')
     operations=[];maximum_error=0.;maximum_joint_step=0.

@@ -10,7 +10,7 @@ sys.path.insert(0,os.environ.get('YAM_COMPAT_ROOT',str(HERE)))
 sys.path.insert(0,str(HERE))
 HERE=HERE/args.run
 HERE.mkdir(parents=True,exist_ok=False)
-for n in [Path(__file__).name,'realistic_meshes_v32.py','drawcord_physics_v37.py','removal_assets.py','evaluate_removal.py','containment.py','table_deposit.py','plan_table_transfer.py','arena_task.py','removal_runtime.py']:(HERE/('source_'+n)).write_text((Path(__file__).resolve().parent/n).read_text())
+for n in [Path(__file__).name,'realistic_meshes_v32.py','drawstring_physics.py','drawstring_score.py','removal_assets.py','evaluate_removal.py','containment.py','plan_table_transfer.py','arena_task.py','removal_runtime.py']:(HERE/('source_'+n)).write_text((Path(__file__).resolve().parent/n).read_text())
 app=None
 
 def main():
@@ -42,7 +42,7 @@ def main():
     from yam_arena.runtime import tcp_world, arm_q, link_poses
     from yam_arena.ik import solve
     from PIL import Image
-    from removal_assets import build_assets
+    from removal_assets import build_assets,WALL_H,RIM_Z,BLOCK_COUNT
     from yam_arena import station
     from station_setup import rig as standard_rig, setup_manifest, save_views, setup_result
     env=inspect._env;base=env.unwrapped
@@ -60,7 +60,7 @@ def main():
     # Match Inspect Robots' 0.5-second physical settling before episode reset.
     # The cord's rest length belongs to that reset scene, not the authored pose.
     frames=HERE/'frames';frames.mkdir(exist_ok=True)
-
+    
     for robot in robots:
         robot.write_joint_effort_limit_to_sim_index(limits=8.,joint_ids=robot.find_joints(['joint7','joint8'],preserve_order=True)[0])
     q=q_ready; grip=[1.,1.];count=0; logs=[]
@@ -75,14 +75,15 @@ def main():
             p=arr(obj.data.nodal_pos_w)[0]
             result[key]={'low':p.min(0).tolist(),'high':p.max(0).tolist(),'mean':p.mean(0).tolist()}
         np.savez_compressed(HERE/('state_%04d.npz'%count),loaded_bag=arr(bags['loaded_bag'].data.nodal_pos_w))
-        result['rubbish']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_pos_w)[0].tolist() for i in range(6)]
+        result['rubbish']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_pos_w)[0].tolist() for i in range(BLOCK_COUNT)]
         result['fasteners']={key:{'pos':arr(base.scene.rigid_objects[key].data.root_pos_w)[0].tolist(),'quat':arr(base.scene.rigid_objects[key].data.root_quat_w)[0].tolist()} for key in ['cord_end_0','cord_end_1']}
         result['drawcord']=dict(cable.last)
+        result['loop_points']=[[v['pos']] for v in result['fasteners'].values()]
         result['loaded_mouth_indices']=anchors['loaded_bag']
-        result['rubbish_velocities']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_lin_vel_w)[0].tolist() for i in range(6)]
+        result['rubbish_velocities']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_lin_vel_w)[0].tolist() for i in range(BLOCK_COUNT)]
         result['hem_marker_positions']=[body_pos('hem_%02d'%j).tolist() for j in range(bead_count)]
         result['gripper_poses']=[link_poses(r)['gripper'].tolist() for r in robots]
-        result['rubbish_quaternions']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_quat_w)[0].tolist() for i in range(6)]
+        result['rubbish_quaternions']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_quat_w)[0].tolist() for i in range(BLOCK_COUNT)]
         hem=arr(bags['loaded_bag'].data.nodal_pos_w)[0][anchors['loaded_bag']]
         result['mouth_diameter']=float(np.max(np.linalg.norm(hem[:,None,:]-hem[None,:,:],axis=2)))
         logs.append(result)
@@ -137,7 +138,8 @@ def main():
         v=nodes('loaded_bag')[anchors['loaded_bag']]
         return float(np.max(np.linalg.norm(v[:,None,:]-v[None,:,:],axis=2)))
     def cinch_loaded(release=True):
-        orientations[:]=[[1.,0,0,0],[1.,0,0,0]]
+        yaw=30.  # wrist yaw at the loops; keeps both pinches inside the arms' reach
+        orientations[:]=[(Rotation.from_euler('z',s*yaw,degrees=True)*Rotation.from_quat([1.,0,0,0])).as_quat().tolist() for s in (-1,1)]
         direction=[np.array([0,0,-1.]),np.array([0,0,-1.])]
         # Put the thin cord toggle near the distal pads. The TCP sits 13 mm
         # behind their tips, so centring the TCP on a table-level toggle drives
@@ -161,13 +163,13 @@ def main():
         before=np.array([body_pos(n).copy() for n in ['cord_end_0','cord_end_1']])
         move([t+[0,0,.05] for t in current_targets()],20);state('cord_grasp_probe')
         after=np.array([body_pos(n).copy() for n in ['cord_end_0','cord_end_1']])
-        if np.min(after[:,2]-before[:,2])<.025:raise RuntimeError('Cord or lock slipped during measured grasp probe')
+        if np.min(after[:,2]-before[:,2])<.025:raise RuntimeError('Drawstring loop slipped during measured grasp probe')
         # Peel the folded cuff outward and above the rim before rotating the
         # wrists; rotating while under the brim can trap the tab between a
         # finger and the bin and strip it out of the grasp.
         peel=current_targets()
         peel[0]+=np.array([0,.02,.12]);peel[1]+=np.array([0,-.02,.12])
-        move(peel,48);state('cuff_peeled_above_rim')
+        move(peel,96);state('cuff_peeled_above_rim')
         for k,n in enumerate(['cord_end_0','cord_end_1']):
             if np.linalg.norm(body_pos(n)-tcp_world(robots[k]))>.03:raise RuntimeError('Grasp lost during cuff peel on arm %d'%k)
         orientations[:]=[(Rotation.from_euler('y',-60,degrees=True)*Rotation.from_quat(r)).as_quat().tolist() for r in orientations]
@@ -177,8 +179,9 @@ def main():
         # The original ten collinear 20-mm pulls become one continuous sweep.
         # Acceleration and velocity are zero at both ends; no repeated pauses.
         for j,(delta,angle,steps) in enumerate([
-            ([[.070,-.150,.200],[.070,.150,.200]],100.,112),
-            ([[0,0,.105],[0,0,.105]],110.,70)]):
+            ([[.070,-.090,.200],[.070,.090,.200]],100.,112),
+            ([[0,-.030,0],[0,.030,0]],100.,50),
+            ([[0,0,.105],[0,0,.105]],110.,160)]):
             orientations[:]=[(Rotation.from_euler('y',-angle,degrees=True)*Rotation.from_quat([1.,0,0,0])).as_quat().tolist() for _ in range(2)]
             held_targets=[t+np.asarray(d) for t,d in zip(held_targets,delta)]
             move(held_targets,steps)
@@ -194,7 +197,7 @@ def main():
             orientations[:]=[(Rotation.from_euler('z',yaw,degrees=True)*Rotation.from_euler('y',-pitch,degrees=True)*Rotation.from_quat([1.,0,0,0])).as_quat().tolist() for yaw in yaws]
         wrist(110)
         now=current_targets()
-        move([now[0]+[0,-.02,.02],now[1]+[0,.02,.02]],30);state('converge_020')
+        move([now[0]+[0,0,.02],now[1]+[0,0,.02]],30);state('converge_020')
         move([[.3226,.0458,1.3777],[.3226,-.0458,1.3777]],50);state('converged_lift')
         wrist(110,(-20.,20.))
         move(current_targets(),30);state('wrist_yaw_clearance')
@@ -203,41 +206,38 @@ def main():
         wrist(145,(-20.,20.))
         move([[.24,.06,1.54],[.24,-.06,1.54]],40);tick(45);state('full_clearance_hold')
         result=inspect.task.module.TRACKER.result
-        if not result.get('cinch_verified') or result.get('score',0)==0:
-            raise RuntimeError('Physical episode did not preserve the closed load: '+str(result))
-        if os.environ.get('BIN_MOTION_CONTINUE')!='1':
-            from plan_table_transfer import plan
-            command,report=plan(logs[-1])
-            (HERE/'table_transfer_plan.json').write_text(json.dumps(command))
-            (HERE/'table_transfer_preflight.json').write_text(json.dumps(report,indent=2))
-            for op in command['operations']:
-                orientations[:]=op['orientations'];move(op['targets'],op['steps'])
-            state('two_arm_table_release')
-            for n in range(1,9):
-                u=n/8;u=u*u*u*(10+u*(-15+6*u));grip[:]=[u,u];tick()
-            state('released_above_table');tick(100);state('table_landing_settled')
-            if inspect.task.module.TRACKER.result.get('score')!=1.:
-                raise RuntimeError('Table deposit not verified: '+str(inspect.task.module.TRACKER.result))
-        # Development continuation keeps the actual simulated state alive while
-        # a floor-transfer path is verified. It accepts only robot commands.
-        if os.environ.get('BIN_MOTION_CONTINUE')=='1':
-            import time
-            while True:
-                command=HERE/'command.json'
-                if not command.exists():time.sleep(.1);continue
-                request=json.loads(command.read_text());command.unlink()
-                if request.get('quit'):break
-                try:
-                    for op in request.get('operations',[]):
-                        if 'orientations' in op:orientations[:]=op['orientations']
-                        if 'grip' in op:grip[:]=op['grip']
-                        if 'targets' in op:move(op['targets'],op.get('steps',50))
-                        if 'tick' in op:tick(op['tick'])
-                    state(request['label'])
-                    (HERE/'command_result.json').write_text(json.dumps({'label':request['label'],'step':count,'score':inspect.task.module.TRACKER.result}))
-                except Exception as exc:
-                    state(request['label']+'_failed');(HERE/'command_error.json').write_text(json.dumps({'label':request['label'],'failure':str(exc)}))
-    (HERE/'task_parameters.json').write_text(json.dumps({'bin_center_xy':[.22,0.],'bin_top_z':.918,'control_hz':20.,'clear_hold_seconds':2.,'sample_interval_steps':1,'mode':args.mode,'require_table_deposit':True}))
+        if result.get('first_carry_step') is None:
+            raise RuntimeError('Closed load was not carried clear of the bin: '+str(result))
+        from plan_table_transfer import plan
+        # Closed loop on measured state: lower the hands until the hanging
+        # bag's bottom is just above the tabletop, beside the bin.
+        bag=nodes('loaded_bag');hang=float(np.mean([x[2] for x in current_targets()])-bag[:,2].min())
+        command,report=plan(logs[-1],final_z=.7475+.012+hang,final_x=-.03)
+        report['hang_depth_m']=hang
+        (HERE/'table_transfer_plan.json').write_text(json.dumps(command))
+        (HERE/'table_transfer_preflight.json').write_text(json.dumps(report,indent=2))
+        for op in command['operations']:
+            orientations[:]=op['orientations'];move(op['targets'],op['steps'])
+        state('set_down_on_table');tick(10)
+        # The bag now stands on the table and the strings are slack. Lower the
+        # loops onto the gathered neck before opening, as a person would, so
+        # they are not dropped from carrying height.
+        top=float(nodes('loaded_bag')[:,2].max())
+        move([np.r_[x[:2],max(x[2]-.25,top+.06)] for x in current_targets()],40);state('loops_lowered')
+        for n in range(1,9):
+            u=n/8;u=u*u*u*(10+u*(-15+6*u));grip[:]=[u,u];tick()
+        state('loops_released');tick(10)
+        # Retreat straight up; if the arm cannot reach the full height from this
+        # pose (checked before any motion), retreat less.
+        for rise in (.15,.10,.06,.03):
+            try:move([x+[0,0,rise] for x in current_targets()],30);break
+            except RuntimeError as exc:
+                if 'Path rejected before movement' not in str(exc):raise
+        state('hands_retreated')
+        tick(80);state('table_landing_settled')
+        if inspect.task.module.TRACKER.result.get('score')!=1.:
+            raise RuntimeError('Table deposit not verified: '+str(inspect.task.module.TRACKER.result))
+    (HERE/'task_parameters.json').write_text(json.dumps({'bin_center_xy':[.22,0.],'bin_top_z':RIM_Z,'bin_outer_radius_m':.0855,'control_hz':20.,'clear_hold_seconds':2.,'sample_interval_steps':1,'mode':args.mode,'require_table_deposit':True}))
     state('initial')
     try:
         tick(20);state('settled')
@@ -280,3 +280,5 @@ except Exception:
     (HERE/'trial_error.txt').write_text(traceback.format_exc());traceback.print_exc();raise
 finally:
     if app is not None:app.close()
+
+

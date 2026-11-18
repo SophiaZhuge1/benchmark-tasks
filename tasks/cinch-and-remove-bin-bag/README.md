@@ -1,109 +1,76 @@
-# Take out the trash: cinch and remove a loaded bin liner
+# Take out the trash: cinch and remove a loaded drawstring liner
 
-Pull both drawstrings to close the full bag, lift it out of the bin, and release it onto the table beside the bin without spilling any contents.
+> Pull both drawstrings to close the full bag, lift it out of the bin by the drawstrings, and set it down upright on the table beside the bin without spilling any contents.
 
-**Category: Impact on jobs.** This task targets the repetitive close-and-remove step in janitorial trash collection. O*NET lists gathering and emptying trash as a core duty for SOC 37-2011; BLS reports 2,432,600 US jobs in 2025. The task demonstrates a small countertop-bin handling step, with a 150 g load and a specified cord-lock liner. See [JOB_IMPACT.md](JOB_IMPACT.md) for the occupational evidence and scope.
+**Category:** Societal relatability. Taking out a small kitchen or bathroom bin by pulling its drawstring liner shut and lifting it out is something almost everyone does at home and recognises in a 10-second clip.
 
-**Proposed distinction:** maintain closure and all contents while extracting the preloaded flexible liner from a surrounding rigid bin, then release it in a stable state. TRI already demonstrates loaded drawstring-bag closure; [NOVELTY.md](NOVELTY.md) compares the actual outcomes and acknowledges that extraction may be judged insufficiently distinct. No novelty clearance or official acceptance is claimed.
+A small round bin (an IKEA NYPON 15 cm pot) holds an ordinary, unmodified **simplehuman Code A drawstring liner**, its surplus folded over the rim the usual way, loaded with three light mock-waste blocks (70 x 100 x 45 mm, 50 g each). The two arms pinch the liner's two drawstring loops where they lie on the mat beside the bin, pull them so the folded surplus slides up over the rim and the string slides out of the hem and gathers the mouth, lift the loaded bag out by the strings, set it down upright on the table beside the bin and let go. This is the closure the liner is sold with: pull the drawstrings, then carry by the drawstrings. There is no knot, cord lock, clip or added handle.
 
-**Recorded evidence:** scripted demo 1.0 in 939/4,000 steps; Dream-1 0.0 after normal 4,000-step completion. Original videos and setup image are uploaded as **M-C8X8HT** in `task.json`. Physics and scoring are unchanged by this occupational/novelty documentation update.
+## What changed in this revision (review of PR #2134)
 
-## Physical specification and scoring
-
-See [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md) for every task object, measured placement, reset and ruler/video scoring. [ASSEMBLY_GUIDE.md](ASSEMBLY_GUIDE.md) adds the continuous cord route, tether locations, construction steps and an explicitly unperformed physical preflight. The [routing diagram](cord-routing.svg) is schematic, not a hardware-validation claim. There is no fresh liner or retaining-ring replacement. The actual test load is six clean 25 g blocks, 150 g total; this task makes no claim about lifting a full-sized heavy refuse sack.
-
-| Primary score | Outcome |
+| Review point | Change |
 |---|---|
-| 0.0 | No successful cinch; final opening exceeds 60 mm; any content escaped during the trial; or the bag was destroyed to bypass handling. |
-| 0.4 | Opening reached at most 50 mm and ends at most 60 mm, with all six contents retained. |
-| 0.7 | The same closed load is also wholly clear of the bin by at least 20 mm for the final two seconds. |
-| 1.0 | The same closed load is released and supported on the table beside the bin for the final two seconds, with the whole bag and contents at least 20 mm inside the table edges, bottom within 25 mm of the table top, visible bag bounds moving no more than 10 mm over those two seconds, and both grippers at least 60 mm from film/handles. |
+| Custom cord-lock liner and added handles were not an established method | Replaced by a standard commercially available drawstring liner (simplehuman Code A) used exactly as supplied, with its ordinary closure. Cord-lock housings, their one-way holding force and the polymer handles are gone from scene, physics and protocol. |
+| Locks and handles removed the normal difficulty of securing an ordinary liner | **Partly addressed.** The cord locks and their one-way force are gone; closure now depends only on keeping string tension (`drawstring_physics.py`, `test_drawstring_physics.py`), and the real trial uses the liner's unmodified loop with no handle. In simulation each loop's pinch point is still a 2 g rigid body, because a stable simulated string is not available; this makes the simulated grasp easier than the real one (listed under Fidelity). |
+| Threading, cord pairing and assembly unverified | Nothing is assembled. The bin is chosen so the liner verifiably fits: the NYPON pot's 53.7 cm rim is smaller than the liner's 58 cm mouth, so the surplus folds over the rim as people normally fit a liner. The simulation starts in that folded state with the loops lying at the cut-outs, matching [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md), which also gives sources, reset, a hand preflight of liner and closure, and ruler/video scoring. |
+| Update simulation, scoring and fidelity note | Folded-cuff liner mesh, thin pot, a load of three 70 x 100 x 45 mm blocks, tiered scorer (`drawstring_score.py`, `test_drawstring_score.py`) with a two-cap containment check (`test_containment.py`), rewritten fidelity table. |
+| New full-score demo and Dream-1 run | New scripted demo on the official environment below. Dream-1 was run on the official environment; it errored before the step limit (see Results). |
+| Runtime | The task now runs on the official Isaac Lab-Arena release/0.3.1 environment with the installed YAM adapter as is; the earlier compatibility overlay is only applied if a newer Arena API is detected. |
 
-Highest satisfied level applies. Any clear tabletop landing position is valid. Harmless lowering, regrasping, pauses and corrective pulls are allowed. Closure and clearance are geometric outcomes, not controller phase names or prescribed movement order. Run limit: **4,000 control steps at 20 Hz (200 simulated seconds)**. Requested CLI seed: 0; the installed adapter reports environment seed 42; object jitter: 0. Multi-seed reliability has not been established.
+The closure threshold went from 60 mm to 80 mm together with the larger blocks: a block's smallest face (70 x 45 mm) has an 83 mm diagonal, so no block can pass through an opening at the 80 mm limit.
 
-`TableDepositJudge` is shared by the scripted and Dream-1 interfaces. Every control step checks non-convex film containment, using the actual film triangles plus an evaluator-only mouth cap; it no longer uses a convex hull. Eight corners, six face centres and the centre of every content block are tested, with a 5 mm contact tolerance. This finite sampling and the virtual mouth cap remain disclosed numerical approximations. `test_containment.py` includes an exterior-fold case that the previous convex hull wrongly classified as interior.
+## Scoring
 
-The 1.5 film-edge-stretch bound is a **simulation-validity guard**, not a calibrated tearing threshold or a physical scoring measurement. Such a run returns `trial_valid: false`; investigate/rerun it rather than reporting it as an ordinary valid physical task result. Non-finite or incomplete geometry likewise cannot substantiate a successful demonstration. In a physical trial, count escaped contents and inspect film integrity directly as described in the protocol.
+| Score | Outcome |
+|---|---|
+| 0 | Never cinched to 80 mm or less, any block leaves the bag (latched), bag destroyed, or invalid simulation geometry. |
+| 0.25 | Cinched: opening reached 80 mm or less (smaller than the 83 mm diagonal of a block's 70 x 45 mm smallest face) with all three blocks inside. |
+| 0.5 | Carried: after cinching, the opening is at most 80 mm when the whole bag and its contents first clear the bin rim by 20 mm. |
+| 0.75 | Set down: at the end the bag rests upright on the table (mouth at least 150 mm above it), clear of the bin and table edges by 20 mm, opening at most 80 mm, contents inside. |
+| 1.0 | Released: that state, opening included, holds for the final 2 s with both grippers at least 60 mm from film and loops and the bag still (bounds move at most 10 mm). |
 
-## Run in the installed Isaac / Inspect Robots environment
+Highest satisfied level counts. Containment is checked at every step; the opening is checked at rim clearance and over the final 2 s, so it may widen (to about 107 mm in the demos) while the bag swings in transit. Regrasps and corrections are allowed. Run limit: 4,000 control steps at 20 Hz (200 s); requested CLI seed 0 (the installed adapter reports environment seed 42); no object jitter. `DrawstringJudge` runs live at every control step for both the scripted demo and Dream-1, and `evaluate_removal.py` / `replay_run.py` re-score recorded geometry offline.
 
-Use Python 3.12 and the versions in [runtime_versions.json](runtime_versions.json). The operator must already have the simulator installed and its licences accepted. Keep the existing converted YAM USD assets. No credentials belong in this directory.
+## Running
 
-The adapter dependency is `kairosiann/yam-isaac-lab-arena` at commit `0059d02a1a91bc6834c1d0846022891df0c78730`. `prepare_runtime.py` checks that revision and creates a local `.runtime/` overlay with the two exact compatibility changes used for the demo. Assets stay linked to the operator's installed checkout. There is no dependency on a previous bin-bag experiment directory.
-
-From this task directory, replace the three installation paths below with your installed paths:
-
-```bash
-/path/to/environment/bin/python launch.py demo \
-  --adapter /path/to/yam-adapter \
-  --arena-root /path/to/IsaacLab-Arena \
-  --out runs/demo_001
-```
-
-For a setup-only render, replace `demo` with `setup`. Use a new output directory each time. The demo writes per-step geometry, a trace, source snapshots, setup views and rendered frames, then independently evaluates the result. It succeeds only for an error-free full-score episode.
-
-For Dream-1, make `DREAM_API_KEY` available securely to the process, then use the identical command with `model` and `--out runs/dream_001`. The launcher calls the installed `inspect-robots` Dream policy at 20 Hz with 320 x 176 policy-camera frames, requested CLI seed 0 (effective adapter environment seed 42), zero jitter, 4,000 steps and the same primary scorer. Full geometry is recorded in `geometry/episode_000/`. The overview camera is diagnostic only; the model receives the standard top and wrist cameras. A model score of zero is a legitimate result and must be reported as such.
-
-Independent replay and offline tests:
+The official environment: Python 3.12 with Isaac Lab-Arena release/0.3.1 (`c7edf3a`), Isaac Sim 6.1.0, Isaac Lab 17.0.2 and Inspect Robots, as in [runtime_versions.json](runtime_versions.json); YAM adapter `kairosiann/yam-isaac-lab-arena` at `0059d02a1a91bc6834c1d0846022891df0c78730`, used as installed. `launch.py` puts the adapter on the path directly; only if it detects a newer Arena API (`Embodiment.registry_name`, no `GroundPlane`) does it build the `.runtime/` overlay from `prepare_runtime.py`. From this directory:
 
 ```bash
+/path/to/env/bin/python launch.py setup --adapter /path/to/yam-adapter --arena-root /path/to/IsaacLab-Arena --out runs/setup_001
+/path/to/env/bin/python launch.py demo  --adapter /path/to/yam-adapter --arena-root /path/to/IsaacLab-Arena --out runs/demo_001
+/path/to/env/bin/python launch.py model --adapter /path/to/yam-adapter --arena-root /path/to/IsaacLab-Arena --out runs/dream_001   # needs Dream credentials (~/.dreamlabs/credentials)
 python replay_run.py runs/demo_001 --out runs/demo_001/independent_replay.json
 python -m unittest discover -v
 ```
 
-For model replay, point `replay_run.py` at its geometry episode directory. Replay does not modify physics or source evidence. Full lossless geometry is retained in the development evidence archive; it is not committed in this PR. Reproduce it with the demo/model launch commands above, then replay the newly generated output directory. Compact recorded measurements and source hashes are included in `VALIDATION.json`. Fresh tabletop-run metrics are recorded after physics validation. Wall-clock time depends on hardware and recording/scoring overhead. The current run results, including actual wall time, belong in `VALIDATION.json`; do not substitute offline unit-test results for physical success.
+The scripted demo is a closed-loop controller that reads simulator state (loop positions, bag mesh) to aim its grasps and choose its set-down height, as the rules allow; it never sets object poses. Robot and gripper use the adapter's standard settings. The model run gives Dream-1 the standard top and wrist cameras at 320 x 176; the overview camera is diagnostic only. Encode the scripted recording with `ffmpeg -framerate 5 -pattern_type glob -i 'runs/demo_001/frames/*.png' -c:v libx264 -pix_fmt yuv420p demo.mp4`.
 
-Encode a scripted recording from its every-four-step PNGs at 5 fps:
+## Results
 
-```bash
-ffmpeg -framerate 5 -pattern_type glob -i 'runs/demo_001/frames/*.png' \
-  -c:v libx264 -pix_fmt yuv420p -movflags +faststart demo.mp4
-```
+All runs below are the scripted controller on the same task source; there is no tuning between them.
 
-For the model recording, use `inspect-robots video` on its evaluation JSON. The submission needs `demo.mp4`, `model_run.mp4` and `setup.png` uploaded with the repository's media tool; its returned ID fills `task.json.media`. Never invent a media ID or label a pending model run as completed.
-
-## Reproduction and reviewer evidence
-
-| Parameter | Evidence-backed value |
+| Run | Result |
 |---|---|
-| Launch request | CLI seed 0 in the launch command; keep this value to reproduce the submitted run. |
-| Simulator environment | Installed adapter reports seed 42. Do not describe the run as an environment-seed-0 trial. |
-| Object randomisation | Zero jitter; one fixed setup. |
-| Budget | 4,000 control steps × 0.05 s = 200 simulated seconds. |
-| Scripted demo | 939 steps / 46.95 s; primary score 1.0; complete geometry replay 1.0. |
-| Dream-1 | 4,000 steps / 200 s; primary score 0.0; normal completion; complete geometry replay 0.0. |
-| Reliability | No multi-seed or hardware reliability claim. |
+| Scripted demo, official environment (`FB_ol1`, the media demo) | **task_score 1.0** (tier `released`), 1,197 control steps / 59.85 simulated s, 957 s wall time. Cinched to 80 mm or less at step 372, carried clear of the bin from step 546, set down upright and released; final opening 71.7 mm, mouth 0.253 m above the table, grippers 0.212 m away, bag bounds moved 0.9 mm over the last 2 s, peak film edge stretch 1.284. Independent replay of all recorded states: 1.0. |
+| Repeat, official environment (`FB_ol2`) | 0.5 (`carried`): set down upright beside the bin, but the mouth sprang open to 80.15 mm at release, just above the 80 mm limit. |
+| Earlier runs of the same source on an Arena main build (`3b0f10c`, Isaac Sim 6.2, with the compatibility overlay) | `FB_t3` 1.0 and `FB_t4` 1.0 (both independent replays 1.0); `FB_t1` and `FB_t2` 0.5, the mouth reopening to 96 mm and 81 mm at release. |
+| Summary | **1.0 in 3 of 6 runs across two environments; the failure mode is the mouth springing open to about 80 mm at release.** GPU physics is not bit-for-bit repeatable, and the scripted controller is not a reliability claim. |
+| Opening while carried | In both official-environment runs the opening first met 80 mm with the load clear of the bin, then widened to up to about 107 mm for a few seconds while the bag swung in transit, with all blocks inside. Containment is checked every step; the opening is checked at rim clearance and in the final 2 s. |
+| Dream-1 (official environment, 320 x 176 cameras, one session) | **Errored at step 1,427 of 4,000**: the harness's Dream bridge rejected a model reply whose gripper value (-0.071) was outside 0..1, so the harness recorded no score; the session was not lost. The live judge stood at 0.0 at that point (the opening never reached 80 mm; 194 mm). `model_run.mp4` shows the 1,427 steps played. |
 
-See [MEDIA_PROVENANCE.md](MEDIA_PROVENANCE.md) for hashes and frame counts of the original uploaded recordings. Binary videos and the setup screenshot are served through the media ID, rather than committed to this source folder. See [NOVELTY.md](NOVELTY.md) for the direct TRI loaded-drawstring-bag overlap and the remaining novelty risk.
-
-## Tabletop update
-
-The final goal releases the lifted bag onto the tabletop beside the bin. The fresh demo scored **1.0**, with all 940 recorded states independently replayed. It took 46.95 simulated seconds; the bag was released 46.2 mm above the table. All six contents remain inside, the final mouth is 49.64 mm, and final two-second bag motion is 0.173 mm.
-
-Dream-1: completed 4000 steps; task score 0.0, independently reproduced from geometry (0.0). No refusal or runtime error. Read `VALIDATION.json` for the recorded Inspect status and metrics. The retained development trace and meshes cover every control step; they are not bundled in this source-only PR.
-
-The finalized scorer preserves harmless below-table lowering/recovery; original source snapshots and final-scorer replays explain this scoring-only correction. The physical scene is unchanged. Historical floor runs remain archived in the checkpoint and are not evidence for the new goal. The earlier tabletop development trial scored 0.7 because it overhung the table; its release point was then shifted 60 mm inward.
-
-Original demo/model/setup media uploaded successfully as **M-C8X8HT**, recorded in `task.json.media`. The direct loaded-drawstring-bag closure overlap and proposed distinction are disclosed in `NOVELTY.md`. Official acceptance is not claimed.
+The scripted demo only shows the scene and scorer can be completed; no physical trial has been run. Run records and a summary are in [VALIDATION.json](VALIDATION.json).
 
 ## Fidelity
 
-PhysX surface film, normal robot actuation and contact grasps are used. Routed spring/damping forces approximate the continuous drawcord, with back-feed resistance approximating two tethered cord locks. Small visible housings are original primitive proxies; housing/hem inertia is lumped into the 20 dynamic hem markers. The model does not resolve the locks' internal cam, explicit rope/hem sliding contact, real puncture/tear propagation, dust, liquid or sharp rubbish. Material and lock forces are not hardware-calibrated. No bag/contents poses are scripted after reset, and no robot-object grasp attachments are used. The scripted controller may use simulator state, as permitted by the review prompt.
+PhysX surface-deformable film (not calibrated) authored in the fitted state, folded over the rim, with a slight crease kept at the fold and loose pleats in the hanging surplus; rigid blocks; standard robot actuation (the adapter's own gripper force) and contact grasps; no robot-object attachment and no scripted object poses after reset. Each exposed loop is represented by a small rigid body at its pinch point (14 x 10 x 20 mm, 2 g) joined to the hem by the force-only string; this is the main remaining simplification. The string force is capped at 0.7 N (about twice the static load per strand) as a numerical safeguard; with the rigid loop bodies, higher caps pull a loop body out of the contact grasp. Block containment allows 8 mm on block centres and face centres (film contact offset, film pressed in under load) and 20 mm on block corners, which can protrude through a film triangle (mesh edges up to 20 mm) between its nodes. The string inside the hem is a lumped routed-length spring acting on 20 hem markers and the loop chains' ends; string pulled out beyond the original loops is force-only and drawn as a line, not a collider; there is no explicit string/hem contact model and no lock. Known gaps, listed in [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md#simulation-correspondence-and-limits): 0.10 mm film (product gauge unpublished), the pot modelled as a straight cylinder, the liner's last ~2 cm on the mat omitted. Containment uses the film mesh with force-free virtual caps. The film-stretch guard flags invalid simulation, not tearing. The real trial uses the liner's unmodified loops with no handle, so the 2 g rigid pinch body makes the simulated grasp easier than the real one. No physical trial has been run.
 
 ## Third-party assets and software
 
-| Item | Source / licence / use |
+| Item | Source / licence |
 |---|---|
-| YAM robot meshes, URDF and derived USD, including split-colour cover meshes | I2RT Robotics, MIT; source commit `120c3c81400171174604e503943f8d1ebc891058`; upstream adapter identifies the split meshes as derivatives of these MIT assets. Notice retained in `LICENSES/I2RT-MIT.txt`. |
-| Table, floor, camera-stand primitives and station coordinates | Generated by the operator-installed YAM adapter pinned above; **the adapter declares no source-code licence at that revision**. It is an external dependency, not redistributed or relicensed in this task. Its source and licence status are explicitly disclosed. |
-| Bag film, bin segments, waste blocks, cord curves and lock housing proxies | Procedural geometry in this task/checkpoint; no downloaded product mesh, scan, texture or manufacturer artwork. |
-| Cyberian cord-lock reference | ITW Nexus technical dimensions and operating principle are cited for physical specification only; manufacturer CAD, photographs and documents are not bundled or claimed as MIT. |
-| Simulation/runtime libraries | Installed Isaac Sim, Isaac Lab, Isaac Lab-Arena, Inspect Robots and Dream client retain their own upstream terms; they are not bundled. |
+| YAM robot meshes, URDF, derived USD | I2RT Robotics, MIT, commit `120c3c81400171174604e503943f8d1ebc891058`; notice in `LICENSES/I2RT-MIT.txt`. |
+| Table, floor, camera stand, station coordinates | Operator-installed YAM adapter pinned above; it declares no source licence at that revision and is not redistributed here. |
+| Liner film, pot segments, blocks, loop bodies | Procedural geometry in this directory; no product mesh, scan, texture or artwork. Product names and dimensions are cited for the physical specification only. |
+| Isaac Sim, Isaac Lab, Isaac Lab-Arena, Inspect Robots, Dream client | Installed separately under their own terms; not bundled. |
 
-Adapter licence declaration: https://github.com/kairosiann/yam-isaac-lab-arena/blob/0059d02a1a91bc6834c1d0846022891df0c78730/README.md#license
-
-I2RT: https://github.com/i2rt-robotics/i2rt/tree/120c3c81400171174604e503943f8d1ebc891058
-
-Cord-lock manufacturer: https://eu.itwnexus.com/content/cyberian-cordloc
-
-See [NOVELTY.md](NOVELTY.md) for the evidence and limits of the comparison; no official acceptance or exclusive claim to bag handling is asserted.
+Novelty against TRI's loaded drawstring-bag closure and other prior art is discussed in [NOVELTY.md](NOVELTY.md).

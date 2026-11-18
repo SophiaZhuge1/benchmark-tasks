@@ -6,13 +6,13 @@ This submission evaluates **closure-preserving extraction of a preloaded flexibl
 |---|---|---|
 | Starting state | Open liner already loaded inside a surrounding rigid bin. | Bag and items prepared for a packing task. |
 | Main object interaction | Opposed drawcord tension gathers the film; the loaded liner must leave the surrounding bin with its contents retained. | Opens a bag, prepares and packs a bottle, ball and sunglasses, then grasps/pulls two drawstrings to close it. |
-| Closure criterion | Mouth must reach ≤50 mm and remain ≤60 mm at the end; all contents must stay inside throughout handling. | Published milestones end in drawstring closure of the packed bag. |
-| Removal criterion | Every bag/content point clears the bin by ≥20 mm for the final 2 s. | The listed milestones do not specify extraction from a surrounding bin. |
-| Finished work | Released on the table, load ≥20 mm inside edges, grippers ≥60 mm clear, observed bounds varying ≤10 mm for 2 s. | The listed milestones do not specify that post-extraction release/rest check. |
+| Closure criterion | Mouth must reach ≤80 mm (smaller than the 83 mm diagonal of any block's smallest face), be ≤80 mm when the whole bag first clears the rim by 20 mm and over the final 2 s, with no lock or knot; all contents must stay inside at every step. | Published milestones end in drawstring closure of the packed bag. |
+| Removal criterion | Every bag/content point first clears the rim by ≥20 mm; in the final state the bag rests ≥20 mm clear of the pot and the table edges. | The listed milestones do not specify extraction from a surrounding bin. |
+| Finished work | Set down upright on the table (mouth ≥150 mm above it), ≥20 mm clear of the pot and table edges, opening ≤80 mm, grippers ≥60 mm clear, bag bounds moving ≤10 mm over the final 2 s. | The listed milestones do not specify that post-extraction release/rest check. |
 
-The proposed distinction is maintaining a gathered flexible enclosure and its load through the change from bin support to robot support to table support. Closing the mouth alone earns at most 0.4; a closed bag still held clear earns at most 0.7. Full credit requires the released result. Content escape or final reopening defeats success. These are the implemented task outcomes, not names for controller phases.
+The proposed distinction is maintaining a gathered flexible enclosure and its load through the change from bin support to robot support to table support. The score awards 0.25 for cinching, 0.5 for carrying the closed load clear of the bin, 0.75 for setting it down upright beside the bin and 1.0 for a stable released result. Content escape or final reopening defeats success.
 
-**Overlap is acknowledged:** TRI already demonstrates closing a loaded flexible bag with two drawstrings. The present unclamped-bin extraction may still be judged a routine extension of that hardest skill. Neither occupational framing, a cord-lock accessory, smaller dimensions, different objects, nor adding a placement step establishes novelty by itself. This submission asks reviewers to assess whether the extraction-and-retention requirement is a meaningful distinct evaluation; it does not assert that the overlap has been cleared. No suction-seal breaking, snag recovery, unusually difficult rim contact or knot tying is claimed by the current evidence.
+**Overlap is acknowledged:** TRI `PackItemsIntoStringBag` already closes a loaded flexible bag with two drawstrings; this task adds extracting the closed, loaded liner from a taped bin and setting it down without losing contents.
 
 ## Other relevant comparisons
 
@@ -24,7 +24,7 @@ The proposed distinction is maintaining a gathered flexible enclosure and its lo
 | Global Innovation Challenge 2025, Task 6 Cleaning | Taking out/tying a bin bag, replacement and carrying a 4 kg bag outside, using human-piloted wearable assistance. | Different evaluation and embodiment; this is workflow prior art, and embodiment alone is not a novelty claim. |
 | RoboCurve PR #385 `share-one-trash-can` | Arms deposit separate loose items through a shared bin opening. | Concerns shared-opening coordination, rather than closing and extracting a liner. |
 
-Public keyword searches are incomplete; no claim of exclusive ownership or “no close matches” is made. The organiser's comparison packet and judgment remain authoritative. This document concerns task distinction; the occupational relevance is supported separately in [JOB_IMPACT.md](JOB_IMPACT.md).
+Public keyword searches are incomplete; no claim of exclusive ownership or “no close matches” is made. The organiser's comparison packet and judgment remain authoritative.
 
 ## Sources checked 15 November 2026
 

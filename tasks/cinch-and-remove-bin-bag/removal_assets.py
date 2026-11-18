@@ -3,6 +3,51 @@
 Import and build only after Isaac starts. Object transforms are reset geometry.
 """
 
+# Bin: IKEA NYPON 15 cm plant pot (art. 603.956.16): 171 mm outside / 159 mm
+# inside diameter, 152 mm tall, modelled as a straight cylinder.
+WALL_H=.152                   # m, wall from mat (z 0.750) to rim (z 0.902)
+WALL_R=.0825                  # m, wall mid-surface radius
+WALL_T=.006                   # m
+FLOOR_T=.006                  # m, pot bottom
+RIM_Z=.750+WALL_H             # 0.902
+BAG_BASE_Z=.758               # liner bottom plane, 2 mm above the pot floor
+BLOCK=(.070,.100,.045)        # m, mock-waste block (identical blocks; smallest face 70 x 45 mm, diagonal 83 mm)
+BLOCK_MASS=.050               # kg
+BLOCK_COUNT=3
+# Packing: two blocks standing on a 45 x 100 mm face side by side, one lying
+# flat on top (long side along y). Each block is spawned axis-aligned, so its
+# edge lengths in world x, y, z are listed per block.
+BLOCK_SIZES=[(.045,.100,.070),(.045,.100,.070),(.070,.100,.045)]
+def block_positions():
+    return [(.22-.0235,0.,BAG_BASE_Z+.036),(.22+.0235,0.,BAG_BASE_Z+.036),(.22,0.,BAG_BASE_Z+.0955)]
+LOOP_OUT=.060                 # m, loop bight distance outward from the cut-out
+BAG_COLOR=(.92,.92,.90)       # white liner
+STRING_COLOR=(.80,.80,.78)    # white drawstring, slightly darker for contrast
+FILM_T=.0001                  # m, film thickness (numerical; see fidelity note)
+BEND_SCALE=.1                  # film bending stiffness factor
+LOOP_Y=.160                   # m, loop pinch point, |y| from pot axis
+LOOP_SIZE=(.014,.010,.020)    # m, bunched drawstring loop at the pinch
+LOOP_MASS=.002                # kg
+STRING_RADIUS=.004
+STRING_MASS=.0015             # kg per exposed loop chain
+
+def loop_polylines():
+    """Authored exposed loops: from the two hem cut-outs (outside the bin, at
+    the bottom of the folded-over cuff) each loop lies flat on the mat,
+    pointing straight outward. Strands 10 mm apart."""
+    import numpy as np
+    from realistic_meshes_v32 import HEM_R
+    loops=[]
+    for s in (1,-1):
+        from realistic_meshes_v32 import HEM_Z
+        y0=s*(HEM_R+.004);z0=BAG_BASE_Z+HEM_Z;zm=.750+STRING_RADIUS
+        ya=s*(HEM_R+.030);yb=s*(HEM_R+LOOP_OUT)
+        left=[(.2155,y0,z0),(.2155,ya,zm),(.2155,yb,zm)]
+        right=[(.2245,yb,zm),(.2245,ya,zm),(.2245,y0,z0)]
+        pts=[*left,(.22,yb+s*.008,zm),*right]
+        loops.append(np.array(pts))
+    return loops
+
 def build_assets():
     import numpy as np
     import trimesh
@@ -16,7 +61,8 @@ def build_assets():
     from isaaclab_arena.assets.object_type import ObjectType
     from isaaclab_arena.utils.pose import Pose
     def _box(name,size,pos,color,rot_xyzw=(0.,0.,0.,1.)):
-        return Object(name=name,object_type=ObjectType.BASE,spawner_cfg=sim.CuboidCfg(size=tuple(size),collision_props=PhysxCollisionPropertiesCfg(contact_offset=.0005,rest_offset=0.),visual_material=sim.PreviewSurfaceCfg(diffuse_color=color,roughness=.7)),initial_pose=Pose(position_xyz=tuple(pos),rotation_xyzw=tuple(rot_xyzw)))
+        # Polypropylene pot wall: smooth plastic, friction 0.3 / 0.25.
+        return Object(name=name,object_type=ObjectType.BASE,spawner_cfg=sim.CuboidCfg(size=tuple(size),collision_props=PhysxCollisionPropertiesCfg(contact_offset=.0005,rest_offset=0.),physics_material=sim.RigidBodyMaterialCfg(static_friction=.3,dynamic_friction=.25),visual_material=sim.PreviewSurfaceCfg(diffuse_color=color,roughness=.7)),initial_pose=Pose(position_xyz=tuple(pos),rotation_xyzw=tuple(rot_xyzw)))
 
 
     from realistic_meshes_v32 import dirty_mesh
@@ -27,17 +73,17 @@ def build_assets():
     centroids={k:np.asarray(v.vertices).mean(0) for k,v in models.items()}
     for k,v in models.items():v.apply_translation(-centroids[k]);v.fix_normals()
     bead_count=20
-    bead_positions=np.array([[.22+.090*np.cos(j*2*np.pi/bead_count),.090*np.sin(j*2*np.pi/bead_count),1.018] for j in range(bead_count)])
-    cord_end_positions=np.array([[.22,.22,.762],[.22,-.22,.762]])
+    from realistic_meshes_v32 import HEM_R,HEM_Z
+    bead_positions=np.array([[.22+HEM_R*np.cos(j*2*np.pi/bead_count),HEM_R*np.sin(j*2*np.pi/bead_count),BAG_BASE_Z+HEM_Z] for j in range(bead_count)])
     anchors={}
     from pxr import UsdGeom,UsdPhysics,Gf,Vt
     import omni.usd
     @clone
     def spawn_bag(prim_path,cfg,translation=None,orientation=None,**kwargs):
         name=prim_path.rsplit('/',1)[-1];model=models[name]
-        root=_spawn_mesh_geom_from_mesh(prim_path,cfg,model,translation,orientation)
+        root=_spawn_mesh_geom_from_mesh(prim_path,cfg,model,translation,orientation) or omni.usd.get_context().get_stage().GetPrimAtPath(prim_path)
         stage=omni.usd.get_context().get_stage();v=np.asarray(model.vertices)+centroids[name]
-        hem=np.where(np.abs(v[:,2]-.250)<1e-5)[0]
+        hem=np.asarray(dirty_mouth)
         theta=np.arctan2(v[hem,1],v[hem,0])%(2*np.pi)
         assignments=np.round(theta*bead_count/(2*np.pi)).astype(int)%bead_count
         for j in range(bead_count):
@@ -60,8 +106,8 @@ def build_assets():
         cfg=sim.MeshRectangleCfg(size=(.172,.172),edge_refinement=1.,func=spawn_bag,
             deformable_props=PhysxDeformableBodyPropertiesCfg(self_collision=True,solver_position_iteration_count=64,linear_damping=.5,sleep_threshold=0.,settling_threshold=0.,settling_damping=0.),
             collision_props=[PhysxCollisionCfg(rest_offset=.00005,contact_offset=.0005)],
-            physics_material=PhysxSurfaceDeformableBodyMaterialCfg(density=900.,surface_thickness=.0001,
-                youngs_modulus=2.5e7,poissons_ratio=.3,surface_bend_stiffness=2.5e7/(12.*(1.-.3**2)),
+            physics_material=PhysxSurfaceDeformableBodyMaterialCfg(density=900.,surface_thickness=FILM_T,
+                youngs_modulus=2.5e7,poissons_ratio=.3,surface_bend_stiffness=BEND_SCALE*2.5e7/(12.*(1.-.3**2)),
                 elasticity_damping=.05,bend_damping=.05,static_friction=.3,dynamic_friction=.25),
             visual_material=sim.PreviewSurfaceCfg(diffuse_color=color,roughness=.65))
         return DeformableObject(name=name,spawner_cfg=cfg,initial_pose=Pose(position_xyz=tuple(float(v) for v in np.array(pos)+centroids[name])))
@@ -69,27 +115,33 @@ def build_assets():
     from yam_arena import station
     from station_setup import rig as standard_rig, scene_assets as station_assets, setup_manifest, save_views, setup_result
     assets=station_assets()
-    centre=np.array([.22,0.,.768])
-    # Separate static wall colliders preserve the hollow interior.
-    for j in range(32):
-        a=2*np.pi*j/32; wall_h=.15
-        pos=centre+np.array([.099*np.cos(a),.099*np.sin(a),wall_h/2])
-        assets.append(_box('bin_wall_%02d'%j,(.012,.022,wall_h),pos,(.45,.5,.53),rot_xyzw=(0,0,np.sin(a/2),np.cos(a/2))))
-    assets.append(_box('bin_floor',(.19,.19,.012),(.22,0,.756),(.35,.4,.43)))
-    assets.append(bag('loaded_bag',centre,(.025,.045,.06)))
-    def marker(name,pos,size,mass,color):
+    centre=np.array([.22,0.,BAG_BASE_Z])
+    # Thin static wall segments preserve the hollow interior; round floor.
+    for j in range(40):
+        a=2*np.pi*j/40
+        pos=np.array([.22+WALL_R*np.cos(a),WALL_R*np.sin(a),.750+WALL_H/2])
+        assets.append(_box('bin_wall_%02d'%j,(WALL_T,2*np.pi*(WALL_R+WALL_T/2)/40+.001,WALL_H),pos,(.80,.82,.83),rot_xyzw=(0,0,np.sin(a/2),np.cos(a/2))))
+    assets.append(Object(name='bin_floor',object_type=ObjectType.BASE,spawner_cfg=sim.CylinderCfg(radius=WALL_R,height=FLOOR_T,axis='Z',
+        collision_props=PhysxCollisionPropertiesCfg(contact_offset=.0005,rest_offset=0.),visual_material=sim.PreviewSurfaceCfg(diffuse_color=(.75,.77,.78),roughness=.7)),
+        initial_pose=Pose(position_xyz=(.22,0.,.750+FLOOR_T/2))))
+    assets.append(bag('loaded_bag',centre,BAG_COLOR))
+    def marker(name,pos,size,mass,color,collide=True):
         return Object(name=name,object_type=ObjectType.RIGID,spawner_cfg=sim.CuboidCfg(size=size,
-            rigid_props=PhysxRigidBodyPropertiesCfg(sleep_threshold=0.),collision_props=PhysxCollisionPropertiesCfg(contact_offset=.0005,rest_offset=0.),
+            rigid_props=PhysxRigidBodyPropertiesCfg(sleep_threshold=0.),collision_props=PhysxCollisionPropertiesCfg(collision_enabled=collide,contact_offset=.0005,rest_offset=0.),
             mass_props=sim.MassPropertiesCfg(mass=mass),physics_material=sim.RigidBodyMaterialCfg(static_friction=1.,dynamic_friction=.8),
             visual_material=sim.PreviewSurfaceCfg(diffuse_color=color)),initial_pose=Pose(position_xyz=tuple(map(float,pos))))
-    for j,pos in enumerate(bead_positions):assets.append(marker('hem_%02d'%j,pos,(.003,.003,.003),.001,(.025,.045,.06)))
-    for j,pos in enumerate(cord_end_positions):assets.append(marker('cord_end_%d'%j,pos,(.018,.014,.024),.006,(.8,.45,.06)))
-    for i in range(6):
+    for j,pos in enumerate(bead_positions):assets.append(marker('hem_%02d'%j,pos,(.003,.003,.003),.001,BAG_COLOR,collide=False))  # seam force points, no collider
+    # Each pulled-out drawstring loop is represented by a small rigid body at
+    # its pinch point (the bunched loop), lying on the mat outside the pot.
+    for j,s in enumerate((1,-1)):
+        assets.append(marker('cord_end_%d'%j,(.22,s*LOOP_Y,.760),LOOP_SIZE,LOOP_MASS,STRING_COLOR))
+    for i in range(BLOCK_COUNT):
         assets.append(Object(name='rubbish_%d'%i,object_type=ObjectType.RIGID,
-            spawner_cfg=sim.CuboidCfg(size=(.058,.10,.040),rigid_props=PhysxRigidBodyPropertiesCfg(sleep_threshold=0.),
+            spawner_cfg=sim.CuboidCfg(size=BLOCK_SIZES[i],rigid_props=PhysxRigidBodyPropertiesCfg(sleep_threshold=0.),
                 collision_props=PhysxCollisionPropertiesCfg(contact_offset=.001,rest_offset=0.),
-                mass_props=sim.MassPropertiesCfg(mass=.025),
+                mass_props=sim.MassPropertiesCfg(mass=BLOCK_MASS),
                 physics_material=sim.RigidBodyMaterialCfg(static_friction=.8,dynamic_friction=.7),
                 visual_material=sim.PreviewSurfaceCfg(diffuse_color=[(.6,.35,.16),(.8,.8,.5),(.2,.65,.3)][i%3])),
-            initial_pose=Pose(position_xyz=(.22+(.03 if i%2 else -.03),0.,.786+.041*(i//2)))))
+            initial_pose=Pose(position_xyz=block_positions()[i])))
     return assets, anchors, bead_count
+

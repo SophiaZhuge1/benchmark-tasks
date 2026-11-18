@@ -7,6 +7,13 @@ import argparse,hashlib,json,shutil,subprocess
 from pathlib import Path
 ADAPTER_COMMIT='0059d02a1a91bc6834c1d0846022891df0c78730'
 
+def needs_overlay(arena_root):
+    """True only for Arena builds whose API differs from release/0.3.1 (Embodiment.registry_name, no GroundPlane)."""
+    arena=Path(arena_root).resolve()/'isaaclab_arena'
+    base=(arena/'embodiments'/'embodiment_base.py').read_text()
+    library=(arena/'assets'/'object_library.py').read_text()
+    return 'registry_name' in base or 'class GroundPlane' not in library
+
 def prepare(adapter,root=None):
     adapter=Path(adapter).resolve();root=Path(root or Path(__file__).parent/'.runtime')
     revision=subprocess.check_output(['git','-C',str(adapter),'rev-parse','HEAD'],text=True).strip()

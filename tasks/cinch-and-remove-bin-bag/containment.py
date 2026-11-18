@@ -31,8 +31,12 @@ def surface_distance(points, triangles):
         distance2 = np.minimum(distance2, ((p-start-t[...,None]*edge)**2).sum(-1))
     return np.sqrt(np.maximum(0, distance2.min(axis=1)))
 
-def contains_points(points, triangles, tolerance=.005):
-    """Return per-point containment; never substitute the convex hull."""
+def contains_points(points, triangles, tolerance=.005, signed=False):
+    """Return per-point containment; never substitute the convex hull.
+
+    signed=True counts only positive winding (the bag interior side of the
+    film), so the gap between the liner and its folded-back cuff is outside.
+    """
     points = np.asarray(points, dtype=float)
     if not np.isfinite(points).all() or not np.isfinite(triangles).all():
         return np.zeros(len(points), dtype=bool)
@@ -41,7 +45,7 @@ def contains_points(points, triangles, tolerance=.005):
     numerator=np.einsum('pti,pti->pt',a,np.cross(b,c))
     denominator=la*lb*lc+(a*b).sum(-1)*lc+(b*c).sum(-1)*la+(c*a).sum(-1)*lb
     winding=(2*np.arctan2(numerator,denominator)).sum(axis=1)/(4*np.pi)
-    inside=np.abs(winding)>.5
+    inside=(winding>.5) if signed else (np.abs(winding)>.5)
     outside=np.flatnonzero(~inside)
     if len(outside):inside[outside]=surface_distance(points[outside],triangles)<=tolerance
     return inside

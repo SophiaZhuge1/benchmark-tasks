@@ -1,54 +1,55 @@
-# Physical setup, closure and scoring
+# Physical setup, ordinary closure, reset and scoring
 
-## Objects and fixed layout
+Distances are metres unless marked. Station frame: arm mounts at `(0, +0.305, 0.750)` and `(0, -0.305, 0.750)` facing +x; y lateral, z up; table top z = 0.7475, rubber mat top z = 0.750.
 
-Distances below are metres unless marked otherwise. The station frame has arm mounts at `(0, +0.305, 0.750)` and `(0, -0.305, 0.750)`, facing +x; y is lateral and z is vertical. The floor is z = -0.0125. This is a real small countertop-bin specification, not a scaled claim about large refuse collection.
+## Equipment (all off the shelf; nothing is modified or added to the liner)
 
-| Object | Type, size, material and reset |
+| Item | Specification | Source |
+|---|---|---|
+| Liner | **simplehuman Code A custom fit drawstring liner**, 4.5 L / 1.2 gal, white, about 11.4 x 15.7 in (29 x 40 cm) laid flat, so about 58 cm mouth circumference. A fresh liner from the pack, as supplied. | Target listing (Seal Type: Drawstring; dimensions): https://www.target.com/p/simplehuman-4-5l-code-a-custom-fit-bathroom-trash-bag-liners-dispenser-pack-150ct/-/A-79961061 ; Home Depot product title "Custom Fit Bathroom Drawstring Trash Bag Liners" (CW0160CP): https://homedepot.com/p/simplehuman-4-5-Liter-Code-A-Custom-Fit-Bathroom-Drawstring-Trash-Bag-Liners-150-Ct-Dispenser-Pack-CW0160CP/314702679 |
+| Bin | **IKEA NYPON plant pot 15 cm, art. 603.956.16** (polypropylene, no drainage holes), used as a small rigid open-top bin: 6¾ in (17.1 cm) outside diameter, 6¼ in (15.9 cm) inside diameter, 6 in (15.2 cm) high. Its rim circumference (about 53.7 cm) is smaller than the liner's 58 cm mouth, so the liner folds over the rim with about 4 cm to spare. Fix the pot to the mat with double-sided tape. | IKEA US listing: https://www.ikea.com/us/en/catalog/products/60395616/ |
+| Load | Three clean, closed, rigid mock-waste blocks, 70 x 100 x 45 mm, 50 g each (150 g total), e.g. foam blocks. No food, liquid or sharps. A block's smallest face is 70 x 45 mm (83 mm diagonal), so none can pass an opening of 80 mm or less. | Task specification |
+| Robot station | Two YAM arms with parallel grippers, standard overhead and wrist cameras; 800 x 1000 x 2.5 mm rubber mat centred at (0.35, 0). | Station standard |
+
+**Ordinary closure method.** The liner closes the way drawstring liners are meant to: one drawstring runs in the mouth hem and is exposed as a loop at a cut-out on each side; pulling the two loops slides string out of the hem and gathers the mouth, and the bag is then lifted and carried by the strings. Glad's instructions for its small drawstring bags describe the same everyday method: "Lift the trash bag from the container by pulling the drawstrings on either side of the bag" and "Carry the bag by the drawstring and toss into garbage" (Target, Glad Small Drawstring 4 gal: https://www.target.com/p/glad-small-drawstring-trash-bags-beachside-breeze-4-gallon/-/A-83771022). There is **no knot, cord lock, clip or added handle**. The mouth stays gathered because the bag hangs from the strings while carried and, once set down, because the gathered film and string do not spring back open by themselves.
+
+### Liner/closure preflight (once per liner batch, before robot trials)
+
+Not yet performed by the authors. It takes three fresh liners from one batch, each put through steps 1-3 below; record the results in the build log.
+
+1. Confirm the liner has one drawstring exposed at two cut-outs on opposite faces of the hem. Record the cut-out width and the length of loop that can be hooked out of a fresh liner without gathering the mouth.
+2. Fit the liner as in **Reset** below. By hand, pinch the far end of each loop and pull them up: the folded surplus must slide up over the rim and the mouth gather to an opening of at most 80 mm.
+3. Lift the bag clear by the two loops only, hold 5 s, set it upright on the table and let go. Measure the opening after 2 s. Accept the liner batch only if it is at most 80 mm and all three blocks are inside. Repeat with three liners.
+4. If a batch fails, do not substitute a lock, clip or knot; report the batch as incompatible.
+
+## Reset (start state)
+
+1. Put a fresh liner in the pot, bottom flat on the pot floor, and fold the surplus (the liner is about 25 cm taller than the pot) down over the rim; the hem then hangs around the outside of the pot about 2 cm above the mat.
+2. Turn the liner so the two hem cut-outs face the two arms (+y and -y). Hook each exposed loop out of its cut-out and lay it on the mat pointing straight outward, its far end at y = ±0.16 m (about 70 mm from the cut-out). Do not pull further: the mouth must stay open over the rim.
+3. Place the three blocks inside, long side along y: two standing on a 45 x 100 mm face side by side on the liner bottom, centred at x = 0.1965 and 0.2435, y = 0; the third lying flat (70 x 100 mm face down) on top of them, centred at x = 0.22, y = 0.
+4. Arms at the standard ready pose; clear the tabletop beside the pot (x < 0.10). Start the 4,000-step (200 s) budget from this state.
+
+## Scoring (ruler, overhead/side video, block count)
+
+Use the fixed overhead camera plus a side camera with a ruler or grid in view, frame timestamps, and a block count after the trial. **Opening** is the largest straight-line distance across the bag mouth (the hem), read from two views if the mouth is tilted. Failures latch: once a zero condition happens the trial scores 0 regardless of later recovery.
+
+| Score | Condition (highest satisfied level) |
 |---|---|
-| Robot station | Two standard six-joint YAM arms with parallel grippers; 610 mm base separation; existing overhead and two wrist cameras. Diagnostic overview camera is not a policy input. |
-| Table and mat | Wood table, 1100 x 1300 x 60 mm, top z = 0.7475; centre xy = (0.36, 0); 800 x 1000 x 2.5 mm rubber mat centred at (0.35, 0), top z = 0.750. |
-| Bin | Rigid plastic small open cylinder, approximately 186 mm inside diameter, 212 mm outer envelope, 150 mm wall height; xy centre (0.22, 0); rim z = 0.918. A 190 x 190 x 12 mm plastic bottom plate has centre z = 0.756. Secure the base to the work surface; static segmented walls approximate this secured bin. |
-| Loaded liner | Flexible polyethylene film, nominal 0.10 mm thickness, 172 mm body diameter, 180 mm open mouth and 250 mm authored height; base initially at z = 0.768; xy centre (0.22, 0). The upper 115 mm is spare neck material, initially unfolded. Initial settling is allowed; begin the recorded trial with an open mouth of at least 100 mm and all contents inside. |
-| Drawcord | One continuous approximately 2 mm braided cord routed through the mouth hem with opposed pull-out bights. Reset routed length is set from the initial geometry plus 2 mm slack. For physical construction, thread the actual hem and adjust the free bights to the specified toggle starting positions, without pre-cinching. |
-| Two pull handles | Polymer grips, 18 x 14 x 24 mm, 6 g each; centres (0.22, +0.22, 0.762) and (0.22, -0.22, 0.762), resting free on the mat. Each grips a bight, not a preclosed neck. |
-| Two tethered cord locks | Pull-to-tighten, separately released cord-lock design: ITW Nexus Cyberian CL Small 350-8200 or an equivalent with the same operation, approximately 23.8 x 16.0 x 7.4 mm; acetal body with steel internal element. Attach to reinforced hem exits at opposite sides. Thread bight strands so outward handle pull tightens the hem and reverse feed is resisted after release. The simulation depicts housings at hem markers 5 and 15 and models their combined holding action. |
-| Six inert contents | Six clean closed rigid polypropylene mock-waste blocks, each 58 x 100 x 40 mm and 25 g. Two columns at x = 0.19 and 0.25, y = 0, three rows with centre z = 0.786, 0.827, 0.868; identity rotation at reset. Use clean lightweight material, not biological waste, sharps or liquids. |
-| Camera stand | Fixed standard station mast, foot and crosspiece generated from the calibrated overhead-camera pose; retain the station placement and do not add a hidden support for the bag. |
+| 0 | Opening never reaches 80 mm or less; **or** any block leaves the bag at any time; **or** the bag is torn/cut to bypass the closure; **or** (simulation) invalid geometry. |
+| 0.25 | **Cinched:** the opening reached 80 mm or less with all three blocks inside. (A block's smallest face is 70 x 45 mm, diagonal 83 mm, so no block fits through an 80 mm opening.) |
+| 0.5 | **Carried:** after cinching, the whole bag and contents were at least 20 mm above the pot rim at the same time, with the opening at most 80 mm. |
+| 0.75 | **Set down:** at the end the bag rests on the tabletop, upright (gathered mouth at least 150 mm above the table top), bottom within 25 mm of the table top, every part at least 20 mm clear of the pot's outer wall and at least 20 mm inside the table edges, opening at most 80 mm, all blocks inside. |
+| 1.0 | **Released:** the set-down state holds for the final 2 s with both grippers at least 60 mm from the film and the drawstring loops, and the bag's visible extents moving no more than 10 mm. |
 
-The simulated hem's 20 small markers are numerical seam mass/tension points, not 20 additional physical accessories. Twenty 1 g marker masses lump hem/lock inertia; the actual manufacturer's individual lock inertia is not resolved. Their film attachments represent sewn/reinforced hem connections, not robot grasps.
+Regrasps, pauses and corrective pulls are allowed. Any landing spot on the table that satisfies the margins is valid.
 
-For the cord topology, proposed assembly sequence and unperformed physical preflight, see [ASSEMBLY_GUIDE.md](ASSEMBLY_GUIDE.md) and [cord-routing.svg](cord-routing.svg).
+## Simulation correspondence and limits
 
-## Why closure holds without a knot
+| Real setup | Simulation |
+|---|---|
+| Code A liner: 58 cm mouth, 40 cm tall, film gauge not published | PhysX surface-deformable film authored in the fitted state: 152 mm body diameter inside the pot, an arc over the rim and the surplus folded down outside to a hem of 58.4 cm circumference 23 mm above the mat; 377 mm profile length (the real liner's last ~2 cm, which would rest on the mat, is omitted); 0.10 mm film. The fold is part of the film's rest shape, so the unfolded film keeps a slight crease there. Material constants are not calibrated. |
+| Drawstring and its two exposed loops | **Main simplification:** each exposed loop is represented only by a small rigid body at its pinch point (14 x 10 x 20 mm, 2 g, the size of a pinched, bunched loop), lying on the mat 70 mm out from its cut-out. It is not a separate handle on the real liner; it stands in for the loop's string, which is not otherwise simulated. The string in the hem and between cut-out and pinch point is a routed-length spring through 20 hem markers and the two bodies: pulling a body away from its cut-out slides string out of the hem and gathers the mouth. The string is force-only and drawn as a line, not a collider. No lock or one-way force: with the loops released the string force is zero. Numerical safeguards: the string force is capped at 0.7 N (about twice the 0.4 N each strand carries when the bag hangs from it). The cap keeps the lumped string spring numerically stable during fast pulls; it also limits how hard the string can pull on the small loop body in the simulated contact grasp, since with caps of 1.5 N and more the loop body is pulled out of the fingers. This is a known limit of the rigid-loop simplification, not a property of the real liner and the solve uses an effective inertia of 1.5 g per hem point and 3 g per loop body; the 20 hem points have no colliders. |
+| NYPON pot, 17.1 / 15.9 cm diameter, 15.2 cm high | Static ring of 40 wall segments, 159 mm inside / 171 mm outside diameter, rim at z = 0.902 (152 mm above the mat), 6 mm floor; a straight cylinder (the pot's taper is not modelled). |
+| Three 50 g blocks | Three 50 g rigid boxes, 70 x 100 x 45 mm, placed as in Reset. |
 
-The specified liner has **tethered pull-to-tighten cord locks**. The grippers pull the free handles; the housings stay at the hem. The manufacturer describes tightening by pulling the cord and loosening by pulling the housing/tether, without pushing a small plunger. The task never requires operating the release during execution.
-
-This is a reproducible fixture-assisted drawstring liner, not a claim that every ordinary supermarket liner has self-locking drawstrings. The manufacturer reference establishes a real operating principle and dimensions, not validation of the simulator's force constants or of this bag assembly. Before physical trials, verify that the constructed hem, tethers and selected cord cooperate as described and that the 150 g load stays contained after release. Hardware testing has not been performed by this simulation work.
-
-Source: https://eu.itwnexus.com/content/cyberian-cordloc
-
-## Reset
-
-1. Remove the previous liner and inspect it for damage; replace damaged film. Open both cord locks by their release operation and restore the open neck.
-2. Install the liner base inside the secured bin, with the neck unfolded upward. Place all six blocks at the listed positions; the top row must remain below the mouth.
-3. Lay the two handles at their specified mat positions, route both free bights without tangles and leave the neck open; do not pretie, preclose or attach the bag to a robot.
-4. Return the arms to the standard ready configuration. Capture the setup image, then begin the 4,000-step budget from the recorded initial state; include subsequent settling/actions in that budget.
-5. Clear the tabletop placement area and keep the overhead stand/table fixed. There is no artificial event, label choice or scheduled interruption.
-
-## Ruler/video scoring
-
-Use fixed overhead and side video with a ruler/grid in the bag's plane, a stopwatch or frame timestamps, and a final six-object inventory. Camera calibration uses the known bin and table dimensions. Do not insert measuring tools into the bag during the robot trial.
-
-- **Opening:** measure the greatest straight-line distance across the mouth boundary, not average radius or a convenient projection. For a tilted mouth, use two views or inspect the final state after the trial without changing its closure. Record whether opening ever reached 50 mm or less, and whether the final opening is 60 mm or less.
-- **Retention:** watch for any of the six blocks crossing out of the bag; after scoring, open it manually and count six. Replacing an escaped block does not erase a spill. If video occlusion prevents determining whether a spill occurred, mark the trial unverified and repeat/inspect, rather than guessing a success.
-- **Clearance:** for the final two seconds, the lowest bag/content point is at least 20 mm above the rim, or every part of the load is at least 20 mm beyond one side of the bin's outer bounding envelope. A tabletop deposit may satisfy the side-clearance alternative directly; a prescribed high-lift pause is unnecessary.
-- **Table support:** the bottom must be within 25 mm of the table top (z = 0.7475 m), and the bag must be visibly supported there. The 2.5 mm work mat is part of this support surface. Every film vertex and content-box corner must project at least 20 mm inside all four table edges: x in [-0.170, 0.890] m and y in [-0.630, 0.630] m. The whole load must also clear the bin by 20 mm. Any clear landing position is acceptable.
-- **Release/rest:** during the final two seconds both grippers stay at least 60 mm away from film and handles, and the six extrema of the visible bag (left/right, front/back, bottom/top) each vary by no more than 10 mm over the whole interval. Measure using calibrated overhead and side views. Internal content velocity is diagnostic only and is not a condition for success; harmless internal settling is allowed.
-- **Damage:** score zero if destroying the bag is used to bypass closure/extraction or if contents escape. Do not translate the simulator's strain bound into a purported physical tear measurement.
-
-Award the highest of 0, 0.4, 0.7, 1.0 whose conditions are established. A bag still held above the table can earn 0.7; an open/reopened bag cannot. No condition requires a particular wrist orientation, motion speed, sequence of corrective grasps or exact tabletop landing spot.
-
-## Simulation measurements and limits
-
-The primary simulation scorer uses the same geometric thresholds. It checks all content-box corners and film vertices for removal, and corners/centres/face centres against the **non-convex film mesh** for containment, with a 5 mm contact tolerance. A virtual cap closes the mouth for the inside/outside calculation only; it exerts no force and is not rendered. Highly self-intersecting film and finite sampling remain approximation limits. Non-finite/incomplete evidence or edge stretch over 1.5 invalidates the simulation trial; hardware retention is judged directly. No upper bag-height cap is imposed on an otherwise settled tabletop result.
+The primary simulation scorer (`drawstring_score.py`) applies the same thresholds to the recorded film mesh, block poses, loop links and gripper points at every control step. Containment uses the non-convex film mesh with two force-free virtual caps (across the hem, and across the fold over the rim while the surplus is folded down), signed winding numbers so the gap between liner and folded-back surplus counts as outside, checked on every block's centre and six face centres with an 8 mm tolerance (film contact offset and film pressed in under the carried load) and on its eight corners with a 20 mm tolerance. The film mesh has 9 mm median and up to 20 mm triangle edges, and a sharp box corner can protrude through a film triangle between its nodes (by up to about 15 mm in these runs) while the film still encloses the block; 20 mm is the largest triangle edge and less than half the blocks' smallest edge (45 mm). A block whose centre or any face centre leaves the film fails the trial. A film edge stretch above 1.5 marks the simulation trial invalid; it is not a tear measurement.

@@ -13,3 +13,4 @@ def main():
     f=out/'verified_result.json'
     return int(rc!=0 or not f.exists() or not json.loads(f.read_text()).get('full_task_success',False) or any((out/n).exists() for n in ['error.txt','trial_error.txt']))
 if __name__=='__main__':sys.exit(main())
+

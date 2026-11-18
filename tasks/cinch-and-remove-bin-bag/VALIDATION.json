@@ -1,208 +1,102 @@
 {
-  "date_utc": "2026-11-15",
-  "variant": "tabletop release",
-  "official_review": false,
-  "instruction": "Pull both drawstrings to close the full bag, lift it out of the bin, and release it onto the table beside the bin without spilling any contents.",
-  "demo": {
+  "scripted_demo": {
+    "run": "FB_ol1",
+    "environment": "official: Isaac Lab-Arena release/0.3.1 (c7edf3a), Isaac Sim 6.1.0, Isaac Lab 17.0.2, YAM adapter 0059d02 as installed",
     "score": 1.0,
-    "steps": 939,
-    "simulated_seconds": 46.95,
-    "wall_seconds": 854.77,
-    "all_steps_replayed": true,
-    "source_matches": {
-      "evaluate_removal.py": true,
-      "drawcord_physics_v37.py": true,
-      "removal_runtime.py": true,
-      "removal_assets.py": true,
-      "arena_task.py": true,
-      "inspect_run_removal.py": true,
-      "realistic_meshes_v32.py": true,
-      "table_deposit.py": true,
-      "containment.py": true,
-      "plan_table_transfer.py": true
+    "tier": "released",
+    "steps": 1197,
+    "first_cinch_step": 372,
+    "first_carry_step": 546,
+    "final_mouth_diameter_m": 0.07165839766131023,
+    "mouth_height_above_table_m": 0.2525621445477009,
+    "minimum_gripper_distance_m": 0.2121831317358956,
+    "final_two_second_bag_bounds_motion_m": 0.0008625984191894531,
+    "max_recorded_edge_stretch_ratio": 1.2839403198242634,
+    "execution_error": false,
+    "simulated_seconds": 59.85,
+    "wall_seconds": 957,
+    "max_opening_while_carried_m": 0.1069,
+    "independent_replay": {
+      "score": 1.0,
+      "all_steps_replayed": true
     },
-    "geometry_sha256": "035c4960fcc5bfd5f916fce7343530e7a10c917d031cc2e201dfbb473524b296",
-    "release_bag_bottom_z_m": 0.79373699426651,
-    "final_bag_bottom_z_m": 0.7475500106811523,
-    "release_height_above_table_m": 0.04623699188232422,
-    "final_mouth_diameter_m": 0.04964396730065346,
-    "final_two_second_bag_bounds_motion_m": 0.00017338991165161133,
-    "minimum_gripper_distance_m": 0.41255839309381914
+    "media": "demo.mp4 encoded from this run's frames (every fourth control step, 5 fps); setup.png from this run"
   },
-  "demo_final_scorer": {
-    "score": 1.0,
-    "full_task_success": true,
-    "cinch_verified": true,
-    "clear_hold_seconds": 2.0,
-    "final_mouth_diameter_m": 0.04964396730065346,
-    "max_recorded_edge_stretch_ratio": 1.0554666220170736,
-    "steps": 939,
-    "scope": "Cinch, remove, and release the loaded bag onto the table beside the bin.",
-    "table_deposit_verified": true,
-    "table_hold_seconds": 2.0,
-    "final_two_second_bag_bounds_motion_m": 0.00017338991165161133,
-    "table_settled": true,
-    "whole_load_on_table": true,
-    "bag_bottom_z_m": 0.7475500106811523,
-    "bag_centre_xy_m": [
-      -0.018743607559655442,
-      -0.0003978344646139111
-    ],
-    "maximum_contents_speed_m_s": 0.002248164409182238,
-    "minimum_gripper_distance_m": 0.41255839309381914,
-    "last_replayed_step": 939,
-    "expected_final_step": 939,
-    "all_steps_replayed": true,
-    "geometry_sha256": "035c4960fcc5bfd5f916fce7343530e7a10c917d031cc2e201dfbb473524b296",
-    "source_sha256": {
-      "evaluate_removal.py": "ceb87279375521e2f78ff3aae86d4cf702cde319b9bb6066da8f25247e5aa628",
-      "table_deposit.py": "720db536d1d0ca0f9411cba291b1695c90a3a5b97469dec037e8ca54f963f68f",
-      "containment.py": "65e5c5cda4dd48e7dbf132b8a40f3bee4726771e05223c3be59edd07dcee76c8",
-      "replay_run.py": "ae20847f47655b235c02e5601fe8e382acf68ca7a0deba0c513a87a5a7757da7"
+  "repeat_official_environment": [
+    {
+      "run": "FB_ol2",
+      "environment": "official (same as FB_ol1)",
+      "score": 0.5,
+      "tier": "carried",
+      "first_cinch_step": 377,
+      "first_carry_step": 576,
+      "final_mouth_diameter_m": 0.08015,
+      "max_opening_while_carried_m": 0.1064,
+      "note": "set down upright beside the bin; the mouth sprang open to 80.15 mm at release, above the 80 mm limit"
     }
-  },
-  "dream1": {
-    "model": "dreamlabs/dream-1-beta",
-    "evaluation_status": "success",
-    "inspect_results": {
-      "abstentions": {},
-      "errored_trials": 0,
-      "metrics": {
-        "task_score": 0.0
-      },
-      "total_scenes": 1,
-      "total_trials": 1
-    },
-    "sample_reduced": {
-      "task_score": 0.0
-    },
-    "control_steps": 4000,
-    "run_limit_steps": 4000,
-    "simulated_seconds": 200.0,
-    "wall_seconds": 2706.98,
-    "instruction": "Pull both drawstrings to close the full bag, lift it out of the bin, and release it onto the table beside the bin without spilling any contents.",
-    "policy_error": null,
-    "inference_responses": 83,
-    "returned_action_rows": 3984,
-    "preroll_steps": 32,
-    "geometry_score": 0.0,
-    "geometry_failure_reason": "Bag was not cinched below 50 mm",
-    "geometry_last_replayed_step": 4000,
-    "geometry_trace_steps": 4000,
-    "final_mouth_diameter_m": 0.15145911276340485,
-    "trace_covers_all_steps": true,
-    "key_saved": false,
-    "normal_completion": true
-  },
-  "dream1_final_scorer": {
-    "score": 0.0,
-    "full_task_success": false,
-    "reason": "Bag was not cinched below 50 mm",
-    "last_replayed_step": 4000,
-    "expected_final_step": 4000,
-    "all_steps_replayed": true,
-    "geometry_sha256": "256aedaf8b67f4dc588b21448bb22f8c1fd84703cb30d43c0db0a5ccd7986284",
-    "source_sha256": {
-      "evaluate_removal.py": "ceb87279375521e2f78ff3aae86d4cf702cde319b9bb6066da8f25247e5aa628",
-      "table_deposit.py": "720db536d1d0ca0f9411cba291b1695c90a3a5b97469dec037e8ca54f963f68f",
-      "containment.py": "65e5c5cda4dd48e7dbf132b8a40f3bee4726771e05223c3be59edd07dcee76c8",
-      "replay_run.py": "ae20847f47655b235c02e5601fe8e382acf68ca7a0deba0c513a87a5a7757da7"
-    }
-  },
-  "offline_tests": {
-    "passed": 38,
-    "failures": 0,
-    "errors": 0,
-    "elapsed_seconds": 40.32
-  },
-  "review_prompt_version_used_for_prior_assessment": 22,
-  "limits": [
-    "Single deterministic setup; no multi-seed reliability claim.",
-    "CLI requests seed 0; installed adapter reports environment seed 42.",
-    "Material and cord-lock forces remain uncalibrated approximations.",
-    "The external adapter has no declared source-code licence at the pinned revision and is not bundled in the active task folder."
   ],
-  "scorer_provenance": "The finalized scorer preserves floor-level escape checking to allow harmless below-table recovery. Tabletop support is still required for full credit. Source-at-run snapshots, original scores, final-scorer replays and per-run equivalence checks are preserved.",
-  "media_upload": {
-    "status": "success",
-    "media_id": "M-C8X8HT",
-    "files": [
-      "demo.mp4",
-      "model_run.mp4",
-      "setup.png"
-    ],
-    "official_tool": "robocurve-upload-media/1.2"
+  "earlier_runs_other_environment": {
+    "environment": "Isaac Lab-Arena main (3b0f10c), Isaac Sim 6.2, with the compatibility overlay",
+    "runs": [
+      {
+        "run": "FB_t3",
+        "score": 1.0,
+        "tier": "released",
+        "final_mouth_diameter_m": 0.0606,
+        "independent_replay": {
+          "score": 1.0,
+          "all_steps_replayed": true
+        }
+      },
+      {
+        "run": "FB_t4",
+        "score": 1.0,
+        "tier": "released",
+        "final_mouth_diameter_m": 0.0479,
+        "independent_replay": {
+          "score": 1.0,
+          "all_steps_replayed": true
+        }
+      },
+      {
+        "run": "FB_t1",
+        "score": 0.5,
+        "tier": "carried",
+        "final_mouth_diameter_m": 0.0959,
+        "note": "mouth reopened above the 80 mm limit when the loops were released"
+      },
+      {
+        "run": "FB_t2",
+        "score": 0.5,
+        "tier": "carried",
+        "final_mouth_diameter_m": 0.0813,
+        "note": "mouth reopened above the 80 mm limit when the loops were released"
+      }
+    ]
   },
-  "evidence_location": "Compact run results and hashes are committed. Full traces, action records, source-at-run snapshots, meshes and original media remain in the development checkpoint; reproduce them with launch.py. Videos/setup are uploaded under M-C8X8HT.",
-  "submission_documentation_update": {
-    "category": "Impact on jobs",
-    "physics_scoring_unchanged": true,
-    "instruction_unchanged": true,
-    "fresh_physics_run": false,
-    "source_at_run_sha256": {
-      "evaluate_removal.py": "ceb87279375521e2f78ff3aae86d4cf702cde319b9bb6066da8f25247e5aa628",
-      "station_setup.py": "ff8a1083c4edc965766ccf44016c63f27042a4099490e038ba4a43566cbebfa3",
-      "plan_table_transfer.py": "8a0589cd018cc25a138be61c333b07f15717cb015e84c57884247ec72e27f777",
-      "drawcord_physics_v37.py": "7be0603c57e6f32d571ad43d1d6cd0bca36bdc3dbec14d0a7d7e38b36b9f1064",
-      "removal_assets.py": "d6f73b82e71aa50ff579ebe4671d67de4949bc7d7f47cee6f59b68665eae1cc0",
-      "mechkit.py": "febfbfb9623ad2b2595920f7bcb77013a43c574123a480f94b3750cc75485871",
-      "realistic_meshes_v32.py": "c49a40315d627dbe7a35535c16567c74a464f1110340a62d2470a78381f79d28",
-      "removal_runtime.py": "1436c01f8a502bb72a8324906075ffba6c10fad0b6763b8db3f69cc675ed9e90",
-      "replay_run.py": "ae20847f47655b235c02e5601fe8e382acf68ca7a0deba0c513a87a5a7757da7",
-      "test_streaming_score.py": "722412bdd66034bd95a4dc9f36ab9c2fe4baa15ba4fad0ce6183dae86488e163",
-      "inspect_run_removal.py": "96b3ad1c8d9bfab44e8a2afab03cbae6470c36186a52674a9bb23dd36eadcb67",
-      "prepare_runtime.py": "632ff3fc5873c550cffa7997346a054138496665490d316626e2fa0259a02cc5",
-      "task.py": "81733792d90b355364a38243597917a8cc34eb8e5d9afea6ae9c18fdb0e4263c",
-      "test_removal_scoring.py": "11c27be1469f6317143caf62dd3dbb8faf8de2884a1a9146ed61abfa407e35a8",
-      "containment.py": "65e5c5cda4dd48e7dbf132b8a40f3bee4726771e05223c3be59edd07dcee76c8",
-      "test_table_deposit.py": "965348fd9f16d75b7934dc1bb0fc2d9f994f4ec061bb8dd16db761dbe04c6fd3",
-      "table_deposit.py": "720db536d1d0ca0f9411cba291b1695c90a3a5b97469dec037e8ca54f963f68f",
-      "launch.py": "3c63f885dd561a7b44b20c9542ccbf2cc4dcc3c899542af078df926f6e6516bb",
-      "test_drawcord_physics.py": "fccfe4f34fb389a7a1530f7c89746947710e62fe5ced8e2a77a85d3d3c4a37a9",
-      "inspect_setup.py": "557a85695ea3ae4b4cf78fb26dfaf5425167abe9bb8283520ddb56f981aa7411",
-      "arena_task.py": "6a0da58830e2e3e301950537b5c9f02e23c196492bbfc2db3fe3b0ca3d2ffe08",
-      "test_containment.py": "1bc05616091dfcc8a5afebecbfa690b354ddb75f43b762d7bd1d02bf3f4b63d5"
+  "repeat_summary": "1.0 in 3 of 6 runs across two environments (official: 1 of 2; other: 2 of 4); the failure mode is the mouth springing open to about 80 mm at release.",
+  "dream1": {
+    "summary": "Dream-1: errored at step 1,427 (the bridge rejected an out-of-range gripper reply: q_l_chunk gripper [-0.071, 1.004]); not scored; session not lost",
+    "status": "errored at step 1,427; not scored; session not lost",
+    "steps_played": 1427,
+    "step_limit": 4000,
+    "error": "the Dream bridge rejected a model reply: q_l_chunk gripper leaves 0..1: [-0.071, 1.004]",
+    "session": "one session throughout; no expiry",
+    "live_judge_at_error": {
+      "score": 0.0,
+      "tier": "none",
+      "reason": "Opening never reached 80 mm",
+      "final_mouth_diameter_m": 0.194
     },
-    "submitted_source_sha256": {
-      "inspect_run_removal.py": "31b73e3535aab6af0d89ed8b5694b0a8862dba87fa4e97bb875afab9cfa474f4",
-      "task.py": "ccb31504143ed6ca9c62bafaea17507c1a06b9338a593fc45515bc87c96aff9c",
-      "drawcord_physics_v37.py": "d8dc0bc9be5e1716417934339a9c09c3a42982ea38bf35a9cfdbbd38416404bb",
-      "replay_run.py": "ae20847f47655b235c02e5601fe8e382acf68ca7a0deba0c513a87a5a7757da7",
-      "containment.py": "65e5c5cda4dd48e7dbf132b8a40f3bee4726771e05223c3be59edd07dcee76c8",
-      "removal_assets.py": "f7d9e34aefad08076c416473c7ac2430e251f728dbbc488173110665b23ce01f",
-      "prepare_runtime.py": "632ff3fc5873c550cffa7997346a054138496665490d316626e2fa0259a02cc5",
-      "test_streaming_score.py": "e34256c8644a2cfac6695ee00771f715a0cd12b9fb5ba253068f5d950ade6977",
-      "test_table_deposit.py": "965348fd9f16d75b7934dc1bb0fc2d9f994f4ec061bb8dd16db761dbe04c6fd3",
-      "removal_runtime.py": "5f436b1f171d77374b8071d776948f5a7557d3b5d44764a2738a5a71bde658f4",
-      "plan_table_transfer.py": "8a0589cd018cc25a138be61c333b07f15717cb015e84c57884247ec72e27f777",
-      "evaluate_removal.py": "38752fd848eb22a085a26e7356a33e5589517a876cfcb8b7433d984639edb030",
-      "mechkit.py": "a70e8d39272e5a1e180be9f4ac7a20921cf2e6cdb5f57762688883901ced5afd",
-      "station_setup.py": "e989eb3acdb9276cb9ac42b1815b0f9728ef2e284344c055368b934bbb466eaa",
-      "test_containment.py": "1bc05616091dfcc8a5afebecbfa690b354ddb75f43b762d7bd1d02bf3f4b63d5",
-      "launch.py": "3c63f885dd561a7b44b20c9542ccbf2cc4dcc3c899542af078df926f6e6516bb",
-      "test_drawcord_physics.py": "527a8e09ebde2802e69b68297024862415e1511e976166abd3030b5be4167f9b",
-      "test_removal_scoring.py": "dbf1dfab571ed18d758e4f6b365fde595230cc160d37b863127816aa986905a9",
-      "table_deposit.py": "720db536d1d0ca0f9411cba291b1695c90a3a5b97469dec037e8ca54f963f68f",
-      "arena_task.py": "549d9fa27587a4c43e541b06125e9fc76138dc6bbc9b4df6c0535ebc3915dfbb",
-      "realistic_meshes_v32.py": "737864f1d1d90ae52da4e2bc28553adbf980cdf2d37c02849cf8672d6d08d810",
-      "inspect_setup.py": "7fa229e049764af7c64f5042b316df0a94ae65d2dcd07ba068be2a5cd47a75f8"
-    },
-    "formatting_only_changes": [
-      "inspect_run_removal.py",
-      "task.py",
-      "drawcord_physics_v37.py",
-      "removal_assets.py",
-      "test_streaming_score.py",
-      "removal_runtime.py",
-      "evaluate_removal.py",
-      "mechkit.py",
-      "station_setup.py",
-      "test_drawcord_physics.py",
-      "test_removal_scoring.py",
-      "arena_task.py",
-      "realistic_meshes_v32.py",
-      "inspect_setup.py"
-    ],
-    "all_python_ast_equivalent": true
-  }
+    "environment": "official (same as the scripted demo), 320 x 176 cameras, task.json instruction and step limit",
+    "video": "model_run.mp4 shows the 1,427 steps played"
+  },
+  "seed": {
+    "requested_cli_seed": 0,
+    "adapter_environment_seed": 42,
+    "object_jitter": 0
+  },
+  "containment_rule": "block centres and face centres within 8 mm of the film; corners within 20 mm (largest film triangle edge); checked at every step",
+  "opening_rule": "opening <= 80 mm when the whole bag first clears the rim by 20 mm, and over the final 2 s; it may widen to about 107 mm while the bag swings in transit",
+  "note": "Simulation evidence only; no physical trial has been run."
 }

@@ -72,3 +72,4 @@ def setup_result(out, steps):
         'setup_complete': True, 'steps': steps, 'score': None,
         'full_task_success': False, 'scope': 'station setup and settling only'
     }, indent=2))
+
