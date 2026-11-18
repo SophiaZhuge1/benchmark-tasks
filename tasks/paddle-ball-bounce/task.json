@@ -1,0 +1,22 @@
+{
+  "title": "Ping-pong keep-ups: 10 bounces in a row on the bat",
+  "category": "Societal relatability",
+  "keywords": [
+    "table tennis",
+    "bat",
+    "ball bouncing",
+    "dynamic manipulation",
+    "non-prehensile",
+    "timing",
+    "bimanual"
+  ],
+  "instruction": "Pick up the bat from its block with your right hand and hold it red face up. Take the ball from the egg cup with your other hand and drop it onto the bat, then keep it bouncing on the bat 10 times in a row without it touching anything else. Every bounce must rise above the red line on the board behind, and the bat must be below the blue line when it hits the ball.",
+  "context": "Bouncing the ball on the bat is the first ball-control drill table-tennis beginners learn, and anyone recognises it at a glance. The ball loses about 28% of its height per bounce, so every hit must be timed to add energy and angled to keep the ball centred.",
+  "setup": "Station table, grey 3 mm rubber mat (440 x 700 mm). An ITTF-style recreational bat (e.g. STIGA Apex: blade about 157 x 150 mm, 6 mm thick with 2 mm sponge rubbers, red face up, black face down; flared wooden handle about 100 x 30 x 23 mm with a 36 mm black tape band ending at the blade; 160 g, balance point 35 mm from the blade's centre towards the handle) lies red face up on a 120 x 90 x 60 mm wooden block centred at x 0.30 m, y -0.16 m, handle pointing towards the right arm. A white ITTF 40+ 3-star plastic ball (40 mm, 2.7 g) sits in a white porcelain egg cup (50 mm tall, rim 30 mm inside, 34 mm outside) at x 0.25 m, y 0.20 m. Behind them a white 600 x 400 x 5 mm foam board stands upright across the table at x 0.56 m, centred on y 0, ruled every 1 cm, with a blue line 15 cm and a red line 25 cm above the table.",
+  "scoring": "Phone video, 60 fps, square to the board, camera level with the red line and at least 1.5 m from the bat. A qualifying bounce: the ball hits the red face with the blade's top at or below the blue line, then the ball's bottom rises above the red line before its next contact. Counting starts at the first contact after release and stops at any contact with anything else (table, board, bat edge or handle, a gripper), a contact over 0.1 s, or a bounce that does not qualify. 1.0: 10 consecutive qualifying bounces, the ball released (left fingers at least 3 cm away) before its first contact, the bat held throughout. 0.75: 7-9 such bounces. 0.5: 4-6. 0.25: 1-3. 0 if the ball is not released before its first contact, the left gripper touches it after its first contact with the bat, the bat moves more than 1 cm or 5 degrees in the gripper, or touches anything but the ball and the right gripper, before the count ends, or no bounce qualifies. Only the first drop counts.",
+  "run_limit": "1,200 steps (60 seconds at 20 Hz)",
+  "reset_notes": "Put the ball back in the egg cup; check it for dents (replace if dented or if it fails a 30.5 cm drop onto the table bouncing below 20 cm). Lay the bat red face up on its block, blade centred on the block, handle towards the right arm. Wipe the rubber with a damp cloth every 20 trials.",
+  "fidelity": "Ball: rigid thin-shell sphere, 40 mm, 2.7 g, linear air drag, no spin lift. Bat: rigid blade and handle, 160 g; the sponge rubber is restitution 0.85 and friction 0.9 on the red face. Physics at 500 Hz; GPU PhysX has no continuous collision detection, but the ball's fastest impact in the demo, about 2.2 m/s from a 0.35 m apex, moves it about 4.4 mm a step against a 6 mm blade. Contacts come from PhysX contact forces. Grip friction holds the bat as on real pads; no rubber wear or ball dents.",
+  "scores": "Dream-1 run: 0.0; demo: 1.0",
+  "media": "M-4GB3G4"
+}
