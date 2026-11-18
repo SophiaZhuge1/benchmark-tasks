@@ -16,5 +16,6 @@
   "run_limit": "3,600 steps (180 s at 20 Hz)",
   "reset_notes": "Loaded tips are consumed: eject them into waste with the pipette's ejector. Replace all eight column-4 tips every trial, including any still sitting in their holes: wearing nitrile gloves, restock column 4 with 8 tips from a spare box of the same tips, collar down in each hole; columns 1-3 stay empty. Set the box on its tape marks. Put the pipette back upright in its two-rail stand at (0.31, -0.19), nozzle row along y; both arms at the ready pose, grippers open.",
   "fidelity": "Rigid. A nozzle enters a tip within 0.7 mm, 4 deg of its axis, else jams on the rim; below their roots a fit model acts: a tip slides up the cone at 1.75 N/mm to full seat at 3.5 N (vendor retention data), then the rack gives 1.67 N/mm: a straight push needs 32 N, rocking about 12 N. Over 80 N the insert counts as out. The box is loose; in the simulator it stays put without a hold; the demo steadies it as labs do. At the lift a tip locks on: full seat, or 1.5 mm short below 3.5 N. No liquid.",
-  "scores": "Dream-1 run: 0.0; demo: 1.0"
+  "scores": "Dream-1 run: 0.0; demo: 1.0",
+  "media": "M-3JP3UL"
 }
