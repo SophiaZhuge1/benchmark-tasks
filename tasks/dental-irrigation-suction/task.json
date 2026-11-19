@@ -17,5 +17,5 @@
   "reset_notes": "Refill the bulb with 20.0 g of water (squeeze, draw from a cup, weigh). Dry the mouth, towel and throat cup; empty and weigh the trap. Put a fresh 4 mm blue gel dot on each target tooth (water-based lubricant gel with blue food dye, 0.02 g). Bulb upright in its ring, ejector level in its cradle.",
   "fidelity": "Rigid typodont and shell; the tongue's collider sits 1.5 mm inside its surface (soft TPU). The bulb is rigid with soft contacts; it gives 1.0 mL per mm the finger gap closes past its deepest squeeze. Water is a reduced model, not CFD: a 0.5 m/s ballistic stream; water collects on the floor of the mouth against the throat sill, either side of the tongue (1.24 mL a side, then the throat); the ejector draws 4 mL/s there. A dot needs 0.4 mL within 3.5 mm.",
   "scores": "Dream-1 run: 0.0; demo: 1.0",
-  "media": ""
+  "media": "M-QQPW65"
 }
