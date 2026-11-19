@@ -155,6 +155,8 @@ inspect-robots run --embodiment yam_arena --policy POLICY -E task=task.py -E obj
 ```
 
 One trial takes up to 1,600 control steps (80 s simulated); the demo ends after 1,035 steps (51.8 s), which takes about 4 minutes on one RTX 4090. There is no randomness (object
+
+Model run: Dream-1 on the task's own instruction and 1,600-step limit (320 x 176 cameras, 10 rows per request), one session from the first action to the end: task score 0.0. The video is `model_run.mp4`.
 jitter 0); the demo's score does not depend on the seed.
 
 **What is simulated.** The arms, the tools and the head are rigid bodies on GPU physics. The bulb has soft contacts, so
