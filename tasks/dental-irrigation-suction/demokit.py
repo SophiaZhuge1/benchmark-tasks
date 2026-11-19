@@ -264,6 +264,24 @@ class Arm:
         yield from self.move(self.at() - back * self.approach_axis(), label=f"{label}: back")
 
 
+_LIMIT: list = []
+
+
+def step_limit() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """The action bounds and the largest per-step change of each of the 14 action dimensions, read from the harness's own
+    guards (the bounds clamp and the delta limit that `inspect-robots run` puts on every action) for the YAM action space."""
+    if not _LIMIT:
+        from inspect_robots.guard import DeltaLimitGuard
+        from inspect_robots_yam.config import action_box
+        from inspect_robots_yam.packing import pack
+
+        per_low, per_high = np.append(ik.LOWER, 0.0), np.append(ik.UPPER, 1.0)
+        space = action_box(pack(per_low, per_low), pack(per_high, per_high))
+        step = np.asarray(DeltaLimitGuard(space).config()["max_delta"], dtype=float).reshape(-1)
+        _LIMIT.append((np.asarray(space.low, float).reshape(-1), np.asarray(space.high, float).reshape(-1), step))
+    return _LIMIT[0]
+
+
 # -- a demo's context ------------------------------------------------------------------------
 
 
@@ -274,6 +292,7 @@ class Ctx:
         self.emb, self.obs, self.mode = emb, obs, mode
         self.left, self.right = Arm(self, "left"), Arm(self, "right")
         self.t = 0.0
+        self.sent = None  # the last command sent, which the next one may differ from by at most `step_limit()`
 
     def arm(self, side: str) -> Arm:
         return self.left if side == "left" else self.right
@@ -322,11 +341,22 @@ class Ctx:
         print(f"[demokit] '{label}': not true after {timeout} s", flush=True)
         return False
 
-    def action(self):
-        from inspect_robots.types import Action
+    def command(self) -> np.ndarray:
+        """Both arms' commands as one 14-D target, kept within the bounds and the per-step change that the harness's guards
+        allow (`inspect-robots run` clamps anything beyond them, so that a demo run through it sends exactly this)."""
         from inspect_robots_yam.packing import pack
 
-        return Action(data=pack(self.left.cmd, self.right.cmd))
+        low, high, step = step_limit()
+        data = np.clip(pack(self.left.cmd, self.right.cmd), low, high)
+        if self.sent is not None:
+            data = np.clip(data, self.sent - step, self.sent + step)
+        self.sent = data
+        return data.copy()
+
+    def action(self):
+        from inspect_robots.types import Action
+
+        return Action(data=self.command())
 
 
 # -- video -----------------------------------------------------------------------------------

@@ -16,6 +16,8 @@ import parts as P
 from yam_arena.constants import FINGER_OPEN
 
 GRIP_N = float(__import__('os').environ.get('DENTAL_GRIP_N', 30.0))  # N a finger on the bulb to hold it
+EJ_READY = 0.35  # the ejector's fingers come down closed to this fraction of fully open
+EJ_GRASP_DZ = -0.003  # m, the ejector grasp height from the handle's centre
 CHIN_SIDE = np.array([0.32, 0.03, 0.81])  # in front of the opening, past the chin, clear of the face
 STANDOFF = 0.018  # m from the nozzle's end to the dot, along the nozzle (the nozzle is held a little higher, for the stream's fall)
 APPROACH = 0.025  # m back along the nozzle, where the nozzle waits before going in
@@ -71,15 +73,25 @@ def script(ctx):
     perp = np.cross(M.BULB_AXIS, [0.0, 0.0, 1.0])
     lean = d.axis_angle_matrix(perp / np.linalg.norm(perp), math.radians(SETTLE_DEG)) @ M.BULB_AXIS
     pick_grip = d._as_grip(_rotation_onto([0, 0, -1], lean).T @ rinse_grip.rot)
-    def take(arm, name, lift, **kw):
-        """Grip, wait for the fingers to finish closing (they close at a limited speed), then lift."""
-        yield from arm.pick(name, 0.0, lift=0.0, **kw)
+    def take(arm, name, lift, ready=None, **kw):
+        """Grip, wait for the fingers to finish closing (they close at a limited speed), then lift. With `ready`, the
+        fingers come down already closed to that opening (a fraction of fully open), so that the last close is short."""
+        if ready is None:
+            yield from arm.pick(name, 0.0, lift=0.0, **kw)
+        else:
+            above = np.array([0.0, 0.0, kw["above"]])
+            yield from arm.move(ctx.pos(name) + above, grip=kw["grip"], finger=FINGER_OPEN, label=f"{name}: approach")
+            yield from arm.servo(ctx.pos(name) + above, timeout=1.0, label=f"{name}: approach")
+            dz = np.array([0.0, 0.0, EJ_GRASP_DZ])
+            yield from arm.move(ctx.pos(name) + dz, finger=ready * FINGER_OPEN, label=f"{name}: in")
+            yield from arm.servo(ctx.pos(name) + dz, timeout=1.0, label=f"{name}: in")
+            yield from arm.close(kw["width"], kw["force"], label=f"{name}: close")
         yield from arm.wait(0.8)
         yield from arm.move(arm.at() + [0.0, 0.0, lift], t=0.8, label=f"{name}: lift")
 
     picks = [take(B, "bulb", 0.08, width=M.BULB_D, grip=pick_grip, above=0.02, back=0.06, force=GRIP_N, label="bulb")]
     if mode != "nosuction":
-        picks.append(take(E, "ejector", 0.06, width=0.014, grip=d.down(-90), above=0.06, force=40.0, label="ejector"))
+        picks.append(take(E, "ejector", 0.06, ready=EJ_READY, width=0.014, grip=d.down(-90), above=0.06, force=40.0, label="ejector"))
     yield from ctx.together(*picks)
     # turn the bulb to its rinsing lean while still over the holder's drip cup, and let the grip on it settle there
     yield from B.move(B.at() + [0.0, 0.0, 0.03], grip=rinse_grip, t=1.5, label="bulb turned over its holder")

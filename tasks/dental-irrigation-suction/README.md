@@ -105,14 +105,14 @@ does not count.
 
 ```bash
 python -m unittest -v test_mouth                                    # the water model and the score, on hand-built trials
-python demokit.py task.py OUT                                      # the scripted demo at 640 x 360: OUT/full/demo.mp4
-python demokit.py task.py OUT --no-record --mode skip,nosuction,outside,none   # the failure checks
+python run_demo.py OUT                                             # the scripted demo through inspect-robots run, frames in OUT
+python run_demo.py OUT --no-frames --mode skip                     # a failure check (skip, nosuction, outside, none)
 # a policy (POLICY) on the task, as Dream-1 runs it:
 inspect-robots run --embodiment yam_arena --policy POLICY -E task=task.py -E object_jitter=0 -E control_hz=20 \
   -E cam_width=320 -E cam_height=176 --scorer task_score --max-steps 1600 --instruction "$(python -c 'import json;print(json.load(open("task.json"))["instruction"])')"
 ```
 
-One trial takes up to 1,600 control steps (80 s simulated); the demo ends after about 990 steps (50 s), which takes about 4 minutes on one RTX 4090. There is no randomness (object
+One trial takes up to 1,600 control steps (80 s simulated); the demo ends after 1,028 steps (51.4 s), which takes about 4 minutes on one RTX 4090. There is no randomness (object
 jitter 0); the demo's score does not depend on the seed.
 
 **What is simulated.** The arms, the tools and the head are rigid bodies on GPU physics. The bulb has soft contacts, so
@@ -163,6 +163,7 @@ cradle.
 | `mouth.py` | the head's geometry (real tooth sizes), the water model and the score; no simulator |
 | `parts.py` | meshes and colliders of the head, the tools and the holders |
 | `dentaldemo.py` | the scripted demo and the failure modes |
+| `run_demo.py` | runs the demo as a policy through `inspect-robots run`, with the same guards as any policy |
 | `test_mouth.py` | offline checks of the water model and the score |
 | `mechkit.py`, `demokit.py`, `steptime.py` | helpers: USD props for a task file, closed-loop demos, step timing |
 | `hardware/make_stl.py`, `hardware/stl/` | the printable parts |
