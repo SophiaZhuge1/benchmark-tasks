@@ -79,11 +79,17 @@ def main() -> int:
     ap.add_argument("--height", type=int, default=360)
     ap.add_argument("--mode", default="full")
     ap.add_argument("--no-frames", action="store_true", help="score only, without storing camera frames")
+    ap.add_argument("--mouth-shot", type=Path, help="write a close-up still of the open mouth here (README): on this run only, the overhead camera is moved in front of the mouth; use with --mode none")
     a = ap.parse_args()
     task_json = json.loads((HERE / "task.json").read_text())
     steps = int(re.search(r"[\d,]+", task_json["run_limit"]).group().replace(",", ""))
     a.out.mkdir(parents=True, exist_ok=True)
     os.environ["TASK_DEMO"] = a.mode
+    if a.mouth_shot:
+        os.environ["DENTAL_MOUTH_SHOT"] = str(a.mouth_shot.resolve())
+        import demokit
+
+        demokit._render_at(a.width, a.height)  # the cameras really render at --width x --height on this run
     policy = register(a.mode)
     from inspect_robots.cli import main as cli
 

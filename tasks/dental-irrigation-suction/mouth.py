@@ -86,17 +86,21 @@ SPOT_DOSE = 0.40  # mL that must land there to rinse the dot off (bench-calibrat
 TONGUE = dict(center=(36.0, 0.0, -6.0), semi=(30.0, 13.0, 10.0))  # ellipsoid, mm in mouth axes
 TONGUE_GIVE = 1.5  # mm the soft tongue gives under a light touch: its collider is this much inside its surface
 FLOOR_C = -14.0  # floor of the mouth beside the tongue and under the vestibules
-SUMP = {  # posterior pools, behind M2 on each side: centre (p, l), radius, floor c
-    "left": (58.0, 16.0, 6.0, -14.0),
-    "right": (58.0, -16.0, 6.0, -14.0),
-}
-SUMP_CAP = 1.2  # mL below the throat sill; beyond it, water spills over into the throat
-VESTIBULE_TAU = 2.5  # s for the vestibule's water to run back into the sump on its side
+# Where water collects. The head is reclined, so the floor of the mouth slopes down toward the throat at TILT. Water runs
+# back along it and lies on the floor against the throat sill, either side of the tongue: a wedge as deep as the sill at
+# its foot, whose level surface meets the floor SILL_H / tan(TILT) in front of it. The cheek vestibules drain into it.
+SILL_P = 64.0  # p of the throat sill's front face
+SILL_H = 8.5  # mm the sill stands above the floor
+SILL_REACH = SILL_H / math.tan(TILT)  # 12.1 mm: how far forward of the sill the water reaches when it is full
+SILL_L = (8.0, 32.0)  # |l| of the water against the sill on each side: from the tongue's side to the vestibule
+SILL_CAP = SILL_H * SILL_REACH / 2 * (SILL_L[1] - SILL_L[0]) / 1000  # mL a side holds below the sill's top: about 1.24
+VESTIBULE = dict(p=(12.0, 48.0), l=(30.0, 37.0))  # the cheek vestibule on each side, beside the premolars and molars
+VESTIBULE_TAU = 2.5  # s for the vestibule's water to run back to the sill on its side
 FILM_TAU = 0.4  # s for water on teeth and tongue to run off
-TO_VESTIBULE = 0.35  # share of what lands on a tooth or the cheek side that runs to the vestibule (the rest to the sump)
+TO_VESTIBULE = 0.35  # share of what lands on a tooth or the cheek side that runs to the vestibule (the rest to the sill)
 SUCTION = 4.0  # mL/s a submerged saliva ejector draws
 STREAM_V = 0.5  # m/s, a gently squeezed bulb's stream
-SUCK_BAND = 0.008  # m: the centre of the ejector's 8 mm tip must be within this above the pool's floor
+SUCK_BAND = 0.008  # m: the centre of the ejector's 8 mm tip must be within this above the floor, where the water lies
 
 # The opening between the lips, an ellipse in the lips' plane (world): centre, axes
 LIP_CENTRE = (world(-3.0, 0, -3.0) + upper(-4.0, 0, 3.0)) / 2
@@ -122,6 +126,7 @@ EJ_TIP = 0.0  # the ejector tip is its body point TIP (task.py)
 _b = np.array([-math.sin(math.radians(52)), 0.41, -math.cos(math.radians(52))])
 BULB_AXIS = _b / np.linalg.norm(_b)
 EJ_AXIS = np.array([-math.sin(math.radians(20)), 0.0, -math.cos(math.radians(20))])
+EJ_TARGET = (58.0, 16.0, FLOOR_C + 5.0)  # mouth mm: where the ejector's tip works, on the left, 6 mm in front of the sill, 5 mm above the floor
 EJ_LEG = 0.095  # m, working leg from the bend to the tip
 EJ_REACH = 0.060  # m, from the bend forward (+x) to the handle's front end
 
@@ -186,9 +191,23 @@ def landing(tip, axis) -> tuple[str, np.ndarray]:
     return ("floor" + ("L" if mouth(p)[1] >= 0 else "R")) if inside else "face", p
 
 
+def suction_zone(ejector_tip) -> tuple[str, str] | None:
+    """Which water the ejector's tip is in: ("sill", side) on the floor against the throat sill, ("vestibule", side) in a
+    cheek vestibule, or None. The tip's centre must be within SUCK_BAND above the floor."""
+    p, l, c = mouth(ejector_tip)
+    if not FLOOR_C - 1.0 <= c <= FLOOR_C + SUCK_BAND * 1000:
+        return None
+    side = "left" if l >= 0 else "right"
+    if SILL_P - SILL_REACH <= p <= SILL_P and SILL_L[0] <= abs(l) <= SILL_L[1]:
+        return "sill", side
+    if VESTIBULE["p"][0] <= p <= VESTIBULE["p"][1] and VESTIBULE["l"][0] <= abs(l) <= VESTIBULE["l"][1]:
+        return "vestibule", side
+    return None
+
+
 @dataclass
 class Water:
-    """Every millilitre is somewhere: in the bulb, on surfaces (films), in a vestibule or sump, in the throat cup, on the
+    """Every millilitre is somewhere: in the bulb, on surfaces (films), in a vestibule or against the throat sill, in the throat cup, on the
     towel (spill), or in the suction trap. `step` moves it."""
 
     t: float = 0.0
@@ -196,7 +215,7 @@ class Water:
     dispensed: float = 0.0
     film: dict = field(default_factory=lambda: {"left": 0.0, "right": 0.0})
     vestibule: dict = field(default_factory=lambda: {"left": 0.0, "right": 0.0})
-    sump: dict = field(default_factory=lambda: {"left": 0.0, "right": 0.0})
+    sill: dict = field(default_factory=lambda: {"left": 0.0, "right": 0.0})
     throat: float = 0.0
     spill: float = 0.0
     dripped: float = 0.0  # squeezed out away from the head, into a holder's drip cup
@@ -208,7 +227,7 @@ class Water:
     sucking: str = ""
 
     def in_mouth(self) -> float:
-        return sum(self.film.values()) + sum(self.vestibule.values()) + sum(self.sump.values())
+        return sum(self.film.values()) + sum(self.vestibule.values()) + sum(self.sill.values())
 
     def rinsed(self) -> list[bool]:
         return [d >= SPOT_DOSE - 1e-9 for d in self.dose]
@@ -237,7 +256,7 @@ class Water:
                     if np.linalg.norm(point - SPOTS[i]) <= SPOT_R + 0.002:
                         self.dose[i] += out
                 if where.startswith("floor"):
-                    self.sump[side] += out
+                    self.sill[side] += out
                 else:
                     self.film[side] += out
         else:
@@ -249,24 +268,25 @@ class Water:
             run = self.film[s] * k
             self.film[s] -= run
             self.vestibule[s] += run * TO_VESTIBULE
-            self.sump[s] += run * (1 - TO_VESTIBULE)
+            self.sill[s] += run * (1 - TO_VESTIBULE)
             back = self.vestibule[s] * kv
             self.vestibule[s] -= back
-            self.sump[s] += back
-        # 3. suction
+            self.sill[s] += back
+        # 3. suction: the ejector draws from the water its tip is in, against the sill or in a vestibule
         self.sucking = ""
         if ejector_tip is not None:
-            m = mouth(ejector_tip)
-            for s, (pp, ll, r, fc) in SUMP.items():
-                if math.hypot(m[0] - pp, m[1] - ll) <= r and fc - 1.0 <= m[2] <= fc + SUCK_BAND * 1000:
-                    take = min(self.sump[s], SUCTION * dt)
-                    self.sump[s] -= take
-                    self.trap += take
-                    self.sucking = s
+            where = suction_zone(ejector_tip)
+            if where:
+                part, s = where
+                store = self.sill if part == "sill" else self.vestibule
+                take = min(store[s], SUCTION * dt)
+                store[s] -= take
+                self.trap += take
+                self.sucking = s if part == "sill" else "vestibule_" + s
         # 4. overflow to the throat
         for s in ("left", "right"):
-            over = max(0.0, self.sump[s] - SUMP_CAP)
-            self.sump[s] -= over
+            over = max(0.0, self.sill[s] - SILL_CAP)
+            self.sill[s] -= over
             self.throat += over
 
     def balance(self) -> float:

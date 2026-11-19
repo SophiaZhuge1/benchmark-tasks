@@ -21,6 +21,7 @@ LOOKS = {k: m.Look(color=m.rgb(*v), roughness=r) for k, (v, r) in {
     "bulb": ((0.25, 0.45, 0.80), 0.35), "nozzle": ((0.85, 0.88, 0.92), 0.3), "hole": ((0.05, 0.05, 0.06), 0.8),
     "ejector": ((0.80, 0.90, 0.98), 0.15), "ejtip": ((0.98, 0.98, 0.98), 0.4), "handle": ((0.92, 0.92, 0.90), 0.4),
     "stand": ((0.62, 0.64, 0.66), 0.6), "towel": ((0.55, 0.78, 0.88), 0.9), "cup": ((0.92, 0.94, 0.96), 0.2),
+    "prop": ((0.72, 0.74, 0.70), 0.7),
 }.items()}
 
 HEAD_POS = tuple(float(v) for v in M.O)  # the head part's origin: the lower incisal point
@@ -97,10 +98,15 @@ def head() -> m.Part:
     add("palate", _mm_mesh(palate, "upper"), "mucosa", collide=True)
     throat = blob((4.0, 30.0, 20.0), (72.0, 0.0, 0.0), e=0.3)
     add("throat", _mm_mesh(throat), "throat", collide=True)
-    # the posterior pools: a water surface in each, raised by task.py as it fills
-    for side, (pp, ll, r, fc) in M.SUMP.items():
-        disc = m.cylinder(r / 1000.0, 0.0006, (0, 0, 0.0003), segments=20)
-        add("pool_" + side, disc, "water", hidden=True)
+    # the throat sill across the back of the floor, and the level water lying against it on each side (task.py moves and
+    # stretches it as it fills: its surface is level, so it lies along the world x axis)
+    sill = blob((2.0, 34.0, M.SILL_H / 2), (M.SILL_P + 2.0, 0.0, M.FLOOR_C + M.SILL_H / 2), e=0.3)
+    add("sill", _mm_mesh(sill), "mucosa", collide=True)
+    for side in ("left", "right"):
+        add("sill_water_" + side, m.box((M.SILL_REACH / 1000, (M.SILL_L[1] - M.SILL_L[0]) / 1000, 0.0006), (0, 0, 0)), "water", hidden=True)
+    # a mouth prop between the right molars holds the jaws open (hardware/: jaw_spacer.stl)
+    for name, mesh in mouth_prop_meshes():
+        add(name, _mm_mesh(mesh), "prop")
     # the blue gel dots on the three target teeth
     for i, spot in enumerate(M.SPOTS):
         n = M.N_AX
@@ -133,6 +139,42 @@ def head() -> m.Part:
 
 STAND_PLATE = ((0.160, 0.130, 0.004), (-0.065, 0.0, 0.002))  # size, centre (x, y from the lower incisal point; z above the table), m
 STAND_BLOCK = ((0.070, 0.130, 0.040), (-0.110, 0.0, 0.020))
+
+
+def upper_closed(xyz) -> np.ndarray:
+    """Inverse of mouth.upper for (p, c): a point of the opened upper jaw, back in its closed position (mouth mm)."""
+    p, l, c = xyz
+    a = math.radians(M.OPEN_DEG)
+    dp, dc = p - M.HINGE[0], c - M.HINGE[1]
+    return np.array([M.HINGE[0] + dp * math.cos(a) - dc * math.sin(a), l, M.HINGE[1] + dp * math.sin(a) + dc * math.cos(a)])
+
+
+def upper_open_mm(p, l, c) -> np.ndarray:
+    """mouth.upper, but in mouth millimetres."""
+    return M.mouth(M.upper(p, l, c))
+
+
+PROP_P = (26.0, 46.0)  # mm: the mouth prop spans the lower right first and second molars
+PROP_L = (-31.0, -17.0)  # between the molars' lingual and buccal faces
+PROP_FLANGE = 1.5  # mm thick flanges straddle each jaw's molars, 3.5 mm deep
+
+
+def mouth_prop_meshes():
+    """The mouth prop (bite block) between the right molars: a wedge from the lower molars' cusp tips (c = 0) to the opened
+    upper molars' cusp tips, with flanges that straddle each jaw's molars on the cheek and tongue sides, so it sits in one
+    place on both jaws. Meshes in mouth millimetres (convex hulls)."""
+    out = []
+    (p0, p1), (l0, l1) = PROP_P, PROP_L
+    low = [(p, l, 0.0) for p in (p0, p1) for l in (l0, l1)]
+    up = [tuple(upper_open_mm(p, l, 0.0)) for p in (p0 - 2, p1 - 2) for l in (l0, l1)]
+    out.append(("prop", _hull_mesh(np.array(low + up, float))))
+    f = PROP_FLANGE
+    for k, (la, lb) in enumerate(((l0 - f, l0), (l1, l1 + f))):
+        pts = [(p, l, c) for p in (p0, p1) for l in (la, lb) for c in (0.5, -3.5)]
+        out.append((f"prop_lower{k}", _hull_mesh(np.array(pts, float))))
+        pts = [tuple(upper_open_mm(p, l, c)) for p in (p0 - 2, p1 - 2) for l in (la - 1.0, lb - 1.0) for c in (-0.5, 3.5)]
+        out.append((f"prop_upper{k}", _hull_mesh(np.array(pts, float))))
+    return out
 
 
 def stand_meshes():

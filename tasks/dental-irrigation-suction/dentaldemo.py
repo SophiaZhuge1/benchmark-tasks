@@ -97,8 +97,9 @@ def script(ctx):
     yield from B.move(B.at() + [0.0, 0.0, 0.03], grip=rinse_grip, t=1.5, label="bulb turned over its holder")
     yield from B.wait(1.5)
 
-    # 2. the ejector's tip into the pool behind the lower left second molar; the bulb leaning over the mouth
-    sump = M.world(58, 16, -8.5)  # the tip's centre 5.5 mm above the pool's floor
+    # 2. the ejector's tip onto the floor of the mouth against the throat sill, left of the tongue, where the water collects;
+    # the bulb leaning over the mouth
+    sill = M.world(*M.EJ_TARGET)  # the tip's centre 6 mm in front of the sill, 5 mm above the floor
     over0 = M.aim(M.SPOTS[0], M.BULB_AXIS, STANDOFF) - M.BULB_AXIS * APPROACH
     wait_pose = over0 + M.BULB_AXIS * P.TIP_Z + [0.0, -0.08, 0.0]  # beside the face, out of the ejector's way
     moves = [B.move(wait_pose, grip=rinse_grip, t=3.0, label="bulb beside the face")]
@@ -106,13 +107,13 @@ def script(ctx):
         moves.append(steer(E, ej_tip, CHIN_SIDE, 2.5, tol=0.004, label="ejector in front of the mouth, on the chin side"))
     yield from ctx.together(*moves)
     if mode != "nosuction":
-        yield from steer(E, ej_tip, sump - M.EJ_AXIS * 0.07, 1.5, tol=0.003, label="ejector at the opening")
-        yield from steer(E, ej_tip, sump - M.EJ_AXIS * 0.03, 1.2, label="ejector past the lips")
-        yield from steer(E, ej_tip, sump, 1.2, label="ejector into the pool")
+        yield from steer(E, ej_tip, sill - M.EJ_AXIS * 0.07, 1.5, tol=0.003, label="ejector at the opening")
+        yield from steer(E, ej_tip, sill - M.EJ_AXIS * 0.03, 1.2, label="ejector past the lips")
+        yield from steer(E, ej_tip, sill, 1.2, label="ejector onto the floor against the sill")
     yield from B.move(over0 + M.BULB_AXIS * P.TIP_Z, t=1.5, label="bulb over the face")
 
     # 3. rinse each dot: nozzle in, squeeze a little more, next. All the while the other hand keeps the ejector's tip in
-    # the pool, closing the loop on where the tip is seen.
+    # the water against the sill, closing the loop on where the tip is seen.
     holding = {"on": mode != "nosuction"}
 
     def square(arm, name, upright_only=False):
@@ -128,7 +129,7 @@ def script(ctx):
 
     def keep_ejector():
         while holding["on"]:
-            err = sump - ej_tip()
+            err = sill - ej_tip()
             if np.linalg.norm(err) > 0.001:
                 E._solve(E.at() + np.clip(0.3 * err, -0.002, 0.002) + E.trim, E.grip.rot)
             yield
@@ -149,7 +150,7 @@ def script(ctx):
             yield from B.move(B.at(), finger=f, t=0.8, label="squeeze")
             yield from B.wait(0.4)
 
-        # 4. bulb out and home, while the ejector keeps the pool clear
+        # 4. bulb out and home, while the ejector keeps the mouth clear
         yield from steer(B, bulb_tip, bulb_tip() - bulb_axis() * APPROACH, 1.0, tol=0.004, label="nozzle out")
         yield from B.move(B.at() + wait_pose - ctx.pos("bulb"), t=1.5, label="bulb beside the face")
         home_b = np.array(P.BULB_START)
@@ -172,8 +173,8 @@ def script(ctx):
 
     yield from ctx.together(bulb_work(), keep_ejector())
     if mode != "nosuction":
-        yield from E.wait(2.0)  # the vestibule drains into the pool for a few seconds after the last rinse
-        yield from steer(E, ej_tip, sump - M.EJ_AXIS * 0.075, 1.5, tol=0.004, label="ejector out along its leg")
+        yield from E.wait(2.0)  # the vestibule drains back to the sill for a few seconds after the last rinse
+        yield from steer(E, ej_tip, sill - M.EJ_AXIS * 0.075, 1.5, tol=0.004, label="ejector out along its leg")
         yield from steer(E, ej_tip, CHIN_SIDE, 1.5, tol=0.006, label="ejector away on the chin side")
         home_e = np.array(P.EJ_START)
         yield from E.move(E.at() + home_e + [0, 0, 0.04] - ctx.pos("ejector"), t=2.5, label="ejector over its cradle")
