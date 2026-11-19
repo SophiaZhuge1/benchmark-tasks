@@ -348,7 +348,7 @@ class Recorder:
 
     def __init__(self, out: Path, size: tuple[int, int]):
         self.out, self.size = out, size
-        self.pipes = {c: subprocess.Popen([_ffmpeg(), "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{size[0]}x{size[1]}", "-r", str(CONTROL_HZ), "-i", "-",
+        self.pipes = {c: subprocess.Popen([_ffmpeg(), "-nostdin", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{size[0]}x{size[1]}", "-r", str(CONTROL_HZ), "-i", "-",
                                            "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", str(out / f"{c}.mp4")], stdin=subprocess.PIPE) for c in self.CAMS}
         self.frames, self.blank, self.setup = 0, 0, False
         self.blank_by_camera = {c: 0 for c in self.CAMS}
@@ -360,7 +360,7 @@ class Recorder:
             self.blank_by_camera[c] += 1
         if blank_cameras:
             self.blank += 1
-        elif self.frames == 1:
+        elif not self.setup:
             _save_png(images["top_cam"], self.out / "setup.png")
             self.setup = True
         for c in self.CAMS:
@@ -373,7 +373,7 @@ class Recorder:
                 raise RuntimeError("Camera video encoding failed")
         path = self.out / "demo.mp4"
         graph = "[0:v]scale=854:480:flags=lanczos[t];[1:v]scale=426:240:flags=lanczos[l];[2:v]scale=426:240:flags=lanczos[r];[l][r]vstack[s];[t][s]hstack[v]"
-        subprocess.run([_ffmpeg(), "-loglevel", "error", "-y", *sum((["-i", str(self.out / f"{c}.mp4")] for c in self.CAMS), []), "-filter_complex", graph, "-map", "[v]",
+        subprocess.run([_ffmpeg(), "-nostdin", "-loglevel", "error", "-y", *sum((["-i", str(self.out / f"{c}.mp4")] for c in self.CAMS), []), "-filter_complex", graph, "-map", "[v]",
                         "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(path)], check=True)
         return path
 

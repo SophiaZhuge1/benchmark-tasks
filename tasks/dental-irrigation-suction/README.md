@@ -1,99 +1,177 @@
 # Dental hygienist assistant: rinse, clear the mouth and return both tools
-Current submission media: **M-XPKWYY** — Dream-1 beta **0.0**, scripted demo **1.0**; source and video hashes accompany the current evidence. Earlier media IDs below are historical.
 
+> Rinse the blue gel off the three marked lower teeth while keeping the mouth clear with the saliva ejector, then put both tools back in their holders.
 
-**Current revision: mouth-water v4 (continuous raw-score endpoint hold).** Category: **Impact on jobs**. Equipment revision: **15 November 2026**.
+A reclined phantom head holds a real-size adult typodont inside a printed face, cheeks, tongue, floor of the mouth and
+throat. The right arm squeezes a bulb syringe to rinse a blue gel dot off each of three lower back teeth. The left arm
+holds a saliva ejector in the pool behind the last molar. The water runs off the teeth into that pool, and over the throat sill
+when the pool is full. Afterwards both tools go back to their holders.
 
-> Rinse the highlighted teeth, lift the rinsing tool while suction clears the mouth, then return and release both tools on their stands.
+## Why it matters
 
-The procedure represents rinsing/evacuation after professional air polishing on an inert dental phantom. It does not simulate polishing, plaque removal or clinical treatment. Equipment, dimensions, physical measurement procedures and limitations are in [PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md).
+Rinsing off polishing-paste residue while suction keeps the mouth clear is a routine step of a dental cleaning. It is
+done at every prophylaxis visit, by the hygienist with one hand while an assistant or the hygienist's other hand keeps the
+saliva ejector in place.
 
-## Relevance and the ability being tested
+| Occupation | US jobs (BLS Occupational Outlook Handbook, 2025) | The duty, in the source's words |
+|---|---|---|
+| Dental assistants (SOC 31-9091) | 388,600 | "Dry patients' mouths using suction hoses and other equipment" (BLS OOH); "assist dentist during dental procedures" (O*NET 31-9091.00) |
+| Dental hygienists (SOC 29-1292) | 225,300 | "Clean calcareous deposits, accretions, and stains from teeth" (O*NET 29-1292.00); polishing, then rinsing the paste away (BLS OOH) |
 
-**Impact on jobs:** coordinated rinsing and evacuation is a supporting motor subtask in dental hygiene and chairside assistance. The occupational mapping is [O*NET Dental Hygienists, 29-1292.00](https://www.onetonline.org/link/summary/29-1292.00) and [Dental Assistants, 31-9091.00](https://www.onetonline.org/link/summary/31-9091.00). This evaluates simultaneous wet crown coverage and locally positioned water recovery, followed by cleanup and return of tools. It is not a claim to automate the entire occupation or establish patient readiness. The [Cavitron JET Plus instructions, section 9.8](https://www.dentsplysirona.com/content/dam/master/product-procedure-brand-categories/preventive/product-categories/ultrasonic-scaling/table-top-units/cavitron-jet-plus-ultrasonic-scaler-and-air-polishing-prophylaxis-system-with-tap-on-technology/documents/PRE-IFU-Cavitron-Jet-Plus-Ultrasonic-Scaler-and-Air-Polishing-Prophylaxis-System-with-Tap-On-Technology-2020-05.pdf) support the rinse/evacuation workflow, not the benchmark's synthetic anatomy or water thresholds.
+Together 613,900 jobs. The task is the rinse and the suction only: no polishing, no plaque removal, no clinical treatment.
 
-## Standard affordable equipment
+**What makes it hard for a robot.** Everything happens inside a real-size mouth: an opening 45 mm high and 64 mm wide,
+two tools in it at once, molars about 30 mm behind the lips, an 8 mm gap between the second molar and the tongue for the
+ejector, and water that runs toward the throat. The rinse must be aimed within a few millimetres. The squeeze must be
+metered by grip, not by a button. Suction has to be in the pool before the water arrives, and stay until the mouth is
+clear. Then both tools come out without hitting teeth or lips.
 
-The previous specialist syringe pump and vacuum system have been replaced in the physical build specification by **two Adafruit 1150 peristaltic pumps**, standard silicone tubing, an Arduino Nano Every timer, open collection cups, a pocket balance and existing 60 fps phone cameras. A reusable **PETG fixture, handles and stands** can be made from the supplied [OpenSCAD source](hardware/fixture.scad); no machined acetal or custom bent stainless instruments are required. A commercial dental chair, scaler or compressed-air line is unnecessary.
+**Stand-ins, and why.**
+- The *blue gel dots* stand in for prophy-paste residue. They are rinsed off by water, and you can see in a photo whether
+  each one is gone.
+- The *bulb syringe* stands in for the chairside air-water (3-in-1) syringe, which assistants and hygienists use to spray
+  water into the mouth during a cleaning. A 3-in-1 needs a dental unit and a thumb button, which a parallel gripper cannot
+  press. A 2 oz bulb syringe costs about $2, sprays a stream of water into the mouth, and the hand holding it controls the
+  spray, by how hard and how far it squeezes.
 
-The full [equipment list and assembly guide](EQUIPMENT.md) gives named products, quantities, dimensions, supplier links, approximate costs, tubing connections, calibration and substitution rules. Budget **GBP 180–240** excluding the YAM station/computer/existing cameras, plus GBP 20–40 if outsourcing the prints. This is a purchasing estimate, not measured hardware performance.
+## The real build
 
-[PHYSICAL_PROTOCOL.md](PHYSICAL_PROTOCOL.md) retains all geometric/scoring definitions. Use its numerical limits with the affordable build and calibration procedure. Ordinary cameras and gravimetric checks must establish the required uncertainty; if they cannot, the physical result is unverified. The proposed hardware has not been built or validated. The current simulation instruction, runtime code, scoring, layout and videos are unchanged, so the recorded simulation scores remain applicable; they do not establish the new pumps' physical performance.
+All parts are standard and cheap. Prices are approximate (US, November 2026).
 
-## Required finishing sequence
+| Item | Part | Price |
+|---|---|---|
+| Typodont | Kilgore/Nissin 200-type 28-tooth typodont with screw-in teeth (generic M8011, or genuine Nissin D85SDP-200 series) | $30-40 generic, about $255 genuine |
+| Shell | PETG and TPU 95A prints from `hardware/stl/` (about 450 g PETG, 60 g TPU) | $15-25 of filament |
+| Bulb syringe | Medline DYND70280, 2 oz (60 mL) PVC ear/ulcer syringe, 52 mm bulb, 45 mm tapered nozzle | $2 |
+| Saliva ejector | Benco 3743-620, clear with blue tip, 6.5 mm OD x 4.4 mm ID, 150 mm, bent into an L (95 mm leg) | $5.29 for 100 |
+| Ejector handle | printed 14 x 80 mm handle (`ejector_handle.stl`), drilled 6.6 mm through; a commercial saliva-ejector valve for 1/4 in tubing also works | - |
+| Suction | 12 V DC diaphragm vacuum pump, -80 kPa, 15 L/min free flow (for example the 559-BD-04V15L type), with a 12 V 2 A supply | $25-35 |
+| Trap | 250 mL glass side-arm flask with a one-hole rubber stopper; 1/4 in ID silicone tubing, 2 m | $15 |
+| Alternative suction | Yuwell 7E-A portable suction unit (18 L/min, 1000 mL jar) in place of the pump and trap | $150-200 |
+| Measuring | pocket scale 0.01 g / 200 g; gauze squares; a bath towel; a 30 mL cup (the throat cup) on a 6 mm drain tube | $20 |
+| Gel | water-based lubricant gel with a drop of blue food dye per 10 g | $5 |
 
-1. Finish rinsing the third tooth; the timed water pulse stops.
-2. Lift the rinsing tool clear while keeping suction inside the mouth.
-3. Suction all remaining mouth-floor regions until total retained water is <=0.05 mL; the demo aims for <=0.005 mL. Continue in-mouth suction for at least1 s after the rinsing tool lifts.
-4. Withdraw suction, return both tools to their **original** stands, open both grippers and withdraw the fingers. Both tools must settle for1 s.
+**The shell** (`hardware/make_stl.py` writes the STL files from the same numbers as the simulation):
 
-Water still visibly travels from the nozzle onto crowns, runs into connected mouth-floor pools and enters the suction inlet only when the volume model actually recovers it. Pool depth follows retained volume. Blue is a visibility cue, not a measured liquid colour or CFD solution.
+- `oral_tray.stl` (PETG) is the floor of the mouth, the cheeks and the back wall, with the throat sill 66 mm behind the
+  lower incisors and a pool bowl behind each second molar. The lower typodont base sits in it. Seal the seam with
+  aquarium silicone, so that the tray holds water. A 6 mm hole behind the sill drains to the throat cup.
+- `tongue.stl` (TPU 95A, 15 % infill) is an adult tongue at rest, 60 mm long and 26 mm wide between the molars. It is
+  screwed to the floor.
+- `jaw_spacer.stl` holds the typodont's articulator open 28 degrees, 45 mm between the incisal edges.
+- `face_shell.stl` (PETG) and `lips.stl` (TPU) form the face. The opening between the lips is a rounded rectangle 45 x
+  64 mm: a wide-open mouth with the cheeks retracted, as for work on the back teeth.
+- `stand.stl` (a 160 x 130 x 4 mm plate and a 70 x 130 x 40 mm block under the back of the head) holds the head with its
+  crown toward the robot, reclined so that the lower occlusal plane is at 35 degrees to the table. The lower incisal point
+  is 0.28 m in front of the arms' base line and 60 mm above the table.
+- `bulb_holder.stl` (a ring 32 mm across and 70 mm high, its post on the outer side, over a drip cup 64 mm across and 14 mm
+  deep) stands at (0.36, -0.20), on the right arm's side. `ejector_cradle.stl` (two notched posts, 105 mm high) stands at
+  (0.36, 0.24), on the left arm's side; the ejector lies in it with its bent leg toward the head.
 
-## Scoring
+**Calibrate once, and write the numbers on the rig:**
 
-| Condition | Requirement |
+1. *Bulb.* Squeeze the full bulb between two flat plates (or the robot's fingers) at 2, 4, 6, 8 and 10 mm and weigh the
+   water out each time. The simulation uses 1.0 mL per mm (a 2 oz bulb gives about 40 mL over its full squeeze).
+2. *Gel dot.* Put a 4 mm dot (0.02 g) on a tooth and rinse it from 18 mm with metered volumes from a syringe. It should
+   come off with 0.3-0.5 mL. Adjust the gel's water content until it does.
+3. *Suction.* Time the ejector draining 20 mL from a cup. The simulation uses 4 mL/s.
+4. *Pools.* Fill a pool from a syringe until water crosses the sill. The simulation uses 1.2 mL.
+
+## A real trial and its score
+
+Before the trial: refill the bulb with 20.0 g of water; weigh the bulb, the throat cup, the trap and the dry towel; put
+a fresh dot on each of the three teeth and take a photo; start the video.
+
+After the trial, once both tools are out of the mouth:
+
+1. Photograph the three teeth: is each dot gone?
+2. Wipe the mouth (pools, vestibules, tongue, floor) with pre-weighed gauze and weigh it: water left in the mouth.
+3. Weigh the throat cup: water that went past the sill.
+4. Weigh the towel: water sprayed outside the mouth.
+5. Weigh the trap and the bulb, as a balance check: the water squeezed out equals the water in the trap, left in the
+   mouth, in the throat cup, on the towel and in the bulb holder's drip cup.
+6. Check on the video that both tools were released in their holders and stayed there for 1 s.
+
+| Outcome | Score |
 |---|---|
-| Whole-trial peak mouth water | <=1.00 mL total |
-| Final mouth water | <=0.50 mL for partial credit; **<=0.05 mL for1.0** |
-| Recovery | >=90% of supplied water |
-| Spill/loss | <=0.30 mL |
-| Each completed tooth | >=1.8 mL delivery and >=0.15 s wet dwell in each of9 regions |
-| Full-score cleanup | Irrigator lifted; suction remains in mouth>=1 s after the final pulse and mouth water reaches<=0.05 mL |
-| Full-score return | Each original stand: XY<=10 mm, Z<=5 mm, orientation<=10 degrees, speed<20 mm/s |
-| Full-score release | Every fingertip>65 mm from both handle references; settled endpoint holds1 s |
+| Throat cup gained over 0.2 g, towel over 0.5 g, gauze over 0.3 g, or a tool still in the mouth at the end | 0 |
+| Otherwise, for each blue dot rinsed off completely | 0.25 each, up to 0.75 |
+| All three dots off, and the bulb and the ejector each in its own holder (within 1 cm, upright within 10 degrees), released (fingers 3 cm or more away), for 1 s | 1.0 |
 
-Any permanent guard or general water-gate failure gives0. Otherwise zero/one/two/three completed teeth earn0/0.25/0.50/0.75. Full1.0 additionally requires the complete cleanup, return and release sequence. Exact geometry/measurement boundaries are in the protocol. These are inert-fixture benchmark choices, not patient-treatment limits.
+Water squeezed out away from the patient, for example while picking up the bulb, falls into the holder's drip cup and
+does not count.
 
-The fixed water schedule is0.4 mL/s during16-21,24-29,32-37 s, independent of robot readiness. Limit1,200 actions/60 s at20 Hz, seed1, no jitter. The setup wait before16 s is retained.
-
-## Verification
+## In simulation
 
 ```bash
-python -m unittest -v test_fluid test_mouth_water test_finish test_evidence
-python scenario_checks.py --output validation/mouth_water_v3/scenario_results.json
-export YAM_PYTHON=/path/to/yam-environment/bin/python
-bash run_scenarios.sh /new/output/root full early_return no_return
+python -m unittest -v test_mouth                                    # the water model and the score, on hand-built trials
+python demokit.py task.py OUT                                      # the scripted demo at 640 x 360: OUT/full/demo.mp4
+python demokit.py task.py OUT --no-record --mode skip,nosuction,outside,none   # the failure checks
+# a policy (POLICY) on the task, as Dream-1 runs it:
+inspect-robots run --embodiment yam_arena --policy POLICY -E task=task.py -E object_jitter=0 -E control_hz=20 \
+  -E cam_width=320 -E cam_height=176 --scorer task_score --max-steps 1600 --instruction "$(python -c 'import json;print(json.load(open("task.json"))["instruction"])')"
 ```
 
-51 tests and14 prescribed-coordinate model comparisons pass. Model comparisons supply endpoint assumptions and do not establish robot feasibility. The three recorded robot cases below passed trace, camera and source checks; sampled finishing frames were visually inspected. The scripted controller uses privileged geometric/volume state only to choose arm actions; it never sets fluid inventories, object poses, coverage or rewards.
+One trial takes up to 1,600 control steps (80 s simulated); the demo ends after about 990 steps (50 s), which takes about 4 minutes on one RTX 4090. There is no randomness (object
+jitter 0); the demo's score does not depend on the seed.
 
-Earlier mouth-water v2 recordings remain historical: its full1.0 ended with both tools held and is **not** evidence for the new finishing requirement. The current Dream-1 trial completed on 12 November 2026; hardware calibration remains pending; current media are identified in task.json. Current media are identified in task.json.
+**What is simulated.** The arms, the tools and the head are rigid bodies on GPU physics. The bulb has soft contacts, so
+the fingers sink into it as they squeeze. Its centre of mass is 10 mm below its middle, where the water lies. The squeeze is
+read from the gap between the fingers. The water is a reduced
+model in `mouth.py`:
 
-## Earlier v3 recorded robot results — 12 November 2026
+- The bulb sends out 1.0 mL for each millimetre the gap across it closes, past its deepest squeeze so far. On release it
+  draws air back in.
+- The stream leaves the nozzle at 0.5 m/s and falls under gravity. It lands on the first surface it meets: the face
+  outside the lips (spill), a lower tooth (a gel dot if within 3.5 mm of it), the tongue, or the floor.
+- Water on teeth and tongue runs off within about 0.4 s. A third goes to the vestibule on that side, which drains on
+  into the pool behind the second molar in about 2.5 s; the rest goes straight to the pool. A pool holds 1.2 mL below
+  the throat sill; the excess goes into the throat cup.
+- The ejector draws 4 mL/s from a pool when its 8 mm tip is in the pool, its centre within 8 mm of the pool's floor.
+- A gel dot is rinsed off once 0.4 mL has landed within 3.5 mm of it.
 
-CPU PhysX with RTX rendering, seed 1, no jitter, 20 Hz; all three native cameras contain no blank frames. Runtime Python source hashes match the reviewed source. Each run covers all 27 regions, peaks at 0.4650 mL retained water, loses 0 mL and passes the mechanical guard.
+What is drawn: a stream of drops from the nozzle to where it lands, a water surface that rises in each pool, a film in
+the vestibule, and drops going into the ejector. The scorer (`mouth.score`, called each step from `task.py`) follows
+`task.json`'s scoring line by line. The 1 s hold of the full score is timed in `task.py`.
 
-| Scenario | Score | Duration | Final mouth water | Recovered | Cleanup | Tools returned/released |
-|---|---:|---:|---:|---:|---|---|
-| Complete sequence | 1.00 | 50.35 s | 0.0027 mL | 5.9973 mL | Yes | Both |
-| Return before clearance | 0.75 | 47.20 s | 0.2222 mL | 5.7778 mL | No | Both |
-| Clear mouth but omit return | 0.75 | 48.40 s | 0.0027 mL | 5.9973 mL | Yes | Neither |
+**The scripted demo** (`dentaldemo.py`) reads the tools' poses, which the cameras see, and its own joints. It steers on
+the exact poses of the visible tools read from the simulator. It uses the head's geometry and the stream's speed, never
+the water ledger or the score. A policy gets only the cameras and the joints. The right hand takes the bulb from its ring
+and turns it over the drip cup to lean 52 degrees back, its nozzle pointing a little toward the patient's left. The left
+hand puts the ejector's tip into the pool behind the lower left second molar and keeps it there, closing the loop on where
+the tip is seen. The right hand leans the nozzle in from the right side of the opening over each tooth in turn, aimed
+along the bulb's axis as it is seen and held a few millimetres high for the stream's fall. Over each tooth it closes the
+fingers' target by 1.6 mm over 0.8 s, about 1 mL. Then it takes the bulb out, stands it upright over its ring, lowers it
+in and lets go. The left hand waits for the vestibule to drain, then takes the ejector out, squares it and lays it in its
+cradle.
 
-In the successful run, the near-dry cleanup condition first latches at 43.15 s; full reward is awarded only after original-stand placement, release and the 1 s settled hold. The no_release case has unit coverage but has not been recorded as a robot rollout. These are scripted simulations, not Dream-1 or real-water results. Detailed evidence and source/video hashes: `validation/mouth_water_v3/recorded_results_20261112.json`.
+**Failure checks** (`TASK_DEMO=<mode>`):
 
-## Exact guard and endpoint checks
+| Mode | What it does | Score |
+|---|---|---|
+| `full` | the demo | 1.0 |
+| `skip` | rinses two teeth only | 0.5 |
+| `nosuction` | rinses without the ejector: the pools fill and water is left in the mouth | 0 |
+| `outside` | squeezes with the nozzle outside the lips: water on the towel | 0 |
+| `none` | does nothing | 0 |
 
-Every trial checks tip separation>6 mm; a tip entering195<x<340,abs(y)<45 belowz30 or a tool originz<=5 permanently fails. During flowing pulses, suction within9 mm XY of the active crown centre belowz65 may obstruct it for at most0.25 s cumulatively. Water gates apply to every partial tier. Aftert37, cleanup needs irrigator tipz>80 while downward suction axisz<-0.94 remains atx221-319,abs(y)<=9,z30.5-32.5 for>=1 s and total retained water<=0.05 mL. Both tools then return within10 mm XY,5 mm Z and10 degrees of their own starting stands, speed<20 mm/s; all fingertips>65 mm from both handle references, and both tips withdrawn(z>80 orabs(y)>75). Hold the returned/released endpoint1 s.
+## Files
 
-## Source and asset provenance
+| File | What it is |
+|---|---|
+| `task.py` | the scene, the per-step water and score bookkeeping, and the demo's entry point |
+| `mouth.py` | the head's geometry (real tooth sizes), the water model and the score; no simulator |
+| `parts.py` | meshes and colliders of the head, the tools and the holders |
+| `dentaldemo.py` | the scripted demo and the failure modes |
+| `test_mouth.py` | offline checks of the water model and the score |
+| `mechkit.py`, `demokit.py`, `steptime.py` | helpers: USD props for a task file, closed-loop demos, step timing |
+| `hardware/make_stl.py`, `hardware/stl/` | the printable parts |
 
-The task phantom, instruments, water indicators and racks are procedural geometry in task.py; no additional third-party task mesh, scan or texture is bundled. Robot/station assets come from the installed YAM/Arena runtime. A scripted controller may read simulator state to select actions; it does not teleport objects or set coverage, water inventories or score.
+## Assets and licence
 
-## Endpoint-hold correction after independent review
+Every mesh is generated by the code in this folder (tooth sizes from standard adult crown dimensions). No third-party
+meshes, scans or textures. The robot and the station come with the harness.
 
-The raw scorer now requires **one continuous second** of the complete full-score endpoint before returning1.0. The first eligible observation starts the clock; loss of any full-score condition resets it. Timing out just after placement cannot earn full marks. Before that hold completes, otherwise complete dental endpoints receive0.75. Runtime success adds no second hold. This changes scoring timing only; the scene, controller, liquid limits and operational instruction are unchanged. Earlier videos/manifests preserve their original scorer; the current scorer-version evidence is reported below.
+## Licence
 
-Check with `python -m unittest -v test_endpoint_hold`.
-
-## Current v4 held-endpoint recording — 12 November 2026
-
-The corrected scorer completes the full scripted sequence at **1008/1200 steps,50.40 s,score1.0**, leaving0.0027 mL, recovering5.9973 mL, peaking at0.4650 mL, with no spill. Both tools return and release. All three640x360 camera streams have zero blank frames. Raw score remains0.75 at step1007 with0.95 s hold and becomes1.0 at step1008 with1.00 s hold. Fifty-one offline tests pass. Current task.py hash: `4e1c014efffee6276c4c58b7da8aea57d6f264e3f19c85e41a1ed4d2ef40dc34`.
-
-Both recordings use CPU PhysX and RTX rendering, seed1, zero jitter and20 Hz; these are scripted runs, not Dream-1 or physical experiments. Complete traces, source snapshots and three-camera footage are retained. Source bytes were independently checked against the separate pre-run run_config hashes. The automatically generated manifest mistakenly hashed its own preceding version; its original and original failed verification were preserved, that self-entry was removed with a correction note, and all remaining source hashes and evidence checks pass. No source/score was changed to repair packaging. The current Dream-1 result is recorded below; current official media are identified in task.json.
-
-
-## Current Dream-1 evidence — 12 November 2026
-
-Dream-1 beta (`dreamlabs/dream-1-beta`) completed the current instruction, scene and continuous-hold scorer with **score0.0** after **1200 control steps**, with no evaluation error. This is an actual model-policy run, not a refusal or an access failure. Seed1, zero jitter,20 Hz, CPU PhysX and RTX rendering; three640x360 camera recordings are retained. Model failure does not alter the independently recorded full-score scripted demonstration. The run configuration, results, source hashes and recording validation are in `validation/current_dream_20261112.json`. Current demo, model and setup media are prepared separately from the historical media ID; current media are identified in task.json.
-
-Prepared current `model_run.mp4`, `demo.mp4` and `setup.png` are recorded in `validation/current_media_20261112.json`; both videos are H.264 and below50 MB. Current public media mapping: M-XPKWYY.
+MIT

@@ -282,13 +282,28 @@ _COL_HEAD = f"""(
     {{
         rel material:binding:physics = </{_ROOT}/PhysicsMaterial>
         token visibility = "invisible"
-        float physxCollision:contactOffset = 0.001
+        float physxCollision:contactOffset = __OFFSET__
         float physxCollision:restOffset = 0"""
 
 
-def col_box(name: str, size, center=(0.0, 0.0, 0.0)) -> str:
+def _head(offset: float) -> str:
+    return _COL_HEAD.replace("__OFFSET__", f"{offset:.6f}")
+
+
+def col_box(name: str, size, center=(0.0, 0.0, 0.0), offset: float = 0.004, quat_wxyz=None) -> str:
+    """A box collider; `quat_wxyz` turns it about its centre."""
+    if quat_wxyz is not None:
+        w, x, y, z = quat_wxyz
+        return f"""
+    def Cube "{name}" {_head(offset)}
+        double size = 1
+        double3 xformOp:translate = ({center[0]:.6f}, {center[1]:.6f}, {center[2]:.6f})
+        quatf xformOp:orient = ({w:.6f}, {x:.6f}, {y:.6f}, {z:.6f})
+        float3 xformOp:scale = ({size[0]:.6f}, {size[1]:.6f}, {size[2]:.6f})
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }}"""
     return f"""
-    def Cube "{name}" {_COL_HEAD}
+    def Cube "{name}" {_head(offset)}
         double size = 1
         double3 xformOp:translate = ({center[0]:.6f}, {center[1]:.6f}, {center[2]:.6f})
         float3 xformOp:scale = ({size[0]:.6f}, {size[1]:.6f}, {size[2]:.6f})
@@ -296,10 +311,10 @@ def col_box(name: str, size, center=(0.0, 0.0, 0.0)) -> str:
     }}"""
 
 
-def col_cylinder(name: str, radius: float, height: float, center=(0.0, 0.0, 0.0)) -> str:
+def col_cylinder(name: str, radius: float, height: float, center=(0.0, 0.0, 0.0), offset: float = 0.004) -> str:
     """A cylinder collider about z."""
     return f"""
-    def Cylinder "{name}" {_COL_HEAD}
+    def Cylinder "{name}" {_head(offset)}
         uniform token axis = "Z"
         double height = {height:.6f}
         double radius = {radius:.6f}
@@ -308,10 +323,10 @@ def col_cylinder(name: str, radius: float, height: float, center=(0.0, 0.0, 0.0)
     }}"""
 
 
-def col_hull(name: str, mesh: Mesh) -> str:
+def col_hull(name: str, mesh: Mesh, offset: float = 0.004) -> str:
     """The convex hull of a mesh, as a collider: the way to a collider that is not axis-aligned."""
     v, f = mesh.v, mesh.f
-    head = _COL_HEAD.replace('"MaterialBindingAPI"', '"PhysicsMeshCollisionAPI", "MaterialBindingAPI"')
+    head = _head(offset).replace('"MaterialBindingAPI"', '"PhysicsMeshCollisionAPI", "MaterialBindingAPI"')
     return f"""
     def Mesh "{name}" {head}
         uniform token physics:approximation = "convexHull"
@@ -322,11 +337,15 @@ def col_hull(name: str, mesh: Mesh) -> str:
     }}"""
 
 
-def _file(root: str, head_api: str, attrs: str, body: str, looks: dict[str, Look], friction: tuple[float, float]) -> str:
+def _file(root: str, head_api: str, attrs: str, body: str, looks: dict[str, Look], friction: tuple[float, float], compliant: tuple[float, float] | None = None) -> str:
+    """`compliant` (stiffness N/m, damping N s/m) makes the part's contacts soft: a pad that gives under a press."""
     api = f""" (
     prepend apiSchemas = [{head_api}]
 )""" if head_api else ""
     mats = "".join(_material(n, k) for n, k in looks.items())
+    soft = "" if compliant is None else f"""
+        float physxMaterial:compliantContactStiffness = {compliant[0]}
+        float physxMaterial:compliantContactDamping = {compliant[1]}"""
     text = f"""#usda 1.0
 (
     defaultPrim = "{root}"
@@ -337,12 +356,12 @@ def _file(root: str, head_api: str, attrs: str, body: str, looks: dict[str, Look
 def Xform "{root}"{api}
 {{{attrs}
     def Material "PhysicsMaterial" (
-        prepend apiSchemas = ["PhysicsMaterialAPI"]
+        prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
     )
     {{
         float physics:staticFriction = {friction[0]}
         float physics:dynamicFriction = {friction[1]}
-        float physics:restitution = 0
+        float physics:restitution = 0{soft}
     }}
 
     def Scope "Looks"
@@ -382,6 +401,7 @@ class Link:
     gravity: bool = False
     com: tuple | None = None
     parent: str | None = None
+    inertia: tuple | None = None  # this folder's copy: the link's principal inertia (kg m^2) in the part's axes, if not the kit's round guess
 
     @property
     def joint(self) -> str:
@@ -440,6 +460,7 @@ def _link_usda(link: Link) -> str:
     com = np.asarray(link.com, float) if link.com is not None else (pts.mean(axis=0) if link.gravity else at)
     reach = max(float(np.linalg.norm(pts - com, axis=1).max()), 0.01)
     inertia = max(link.mass * (0.5 * reach) ** 2, 1e-6)
+    diag = (inertia,) * 3 if link.inertia is None else tuple(link.inertia)
     gravity = "" if link.gravity else "\n        bool physxRigidBody:disableGravity = 1"
     body = _visual(link.parts) + "".join(link.colliders)
     return f"""
@@ -449,7 +470,7 @@ def _link_usda(link: Link) -> str:
     {{
         float physics:mass = {link.mass:.5f}
         point3f physics:centerOfMass = ({com[0]:.5f}, {com[1]:.5f}, {com[2]:.5f})
-        float3 physics:diagonalInertia = ({inertia:.3e}, {inertia:.3e}, {inertia:.3e})
+        float3 physics:diagonalInertia = ({diag[0]:.3e}, {diag[1]:.3e}, {diag[2]:.3e})
         float physxRigidBody:maxDepenetrationVelocity = 1{gravity}
 {body}
     }}"""
@@ -459,6 +480,9 @@ def _joint_usda(link: Link) -> str:
     kind, drive = ("PhysicsRevoluteJoint", "angular") if link.kind == "hinge" else ("PhysicsPrismaticJoint", "linear")
     x, y, z = link.at
     parent = "frame" if link.parent is None else link.parent
+    limits = "" if not (math.isfinite(link.lower) and math.isfinite(link.upper)) else f"""
+        float physics:lowerLimit = {link.lower:.6f}
+        float physics:upperLimit = {link.upper:.6f}"""  # an infinite limit leaves the joint free: a wheel, a roller
     return f"""
     def {kind} "{link.joint}" (
         prepend apiSchemas = ["PhysicsDriveAPI:{drive}"]
@@ -475,8 +499,7 @@ def _joint_usda(link: Link) -> str:
         quatf physics:localRot0 = (1, 0, 0, 0)
         point3f physics:localPos1 = ({x:.6f}, {y:.6f}, {z:.6f})
         quatf physics:localRot1 = (1, 0, 0, 0)
-        float physics:lowerLimit = {link.lower:.6f}
-        float physics:upperLimit = {link.upper:.6f}
+{limits}
     }}"""
 
 
@@ -496,6 +519,9 @@ class Part(Box):
     torsional_patch: float | None = None
     solver_iters: int = 32
     yaw_deg: float = 0.0
+    start_quat: tuple | None = None  # xyzw: the starting rotation, if not only a yaw
+    contact_offset: float = 0.0005  # a free part's contact offset (m), on all its colliders
+    compliant: tuple | None = None  # a free part's soft contacts: (stiffness N/m, damping N s/m)
 
     def _check(self) -> None:
         if self.role not in ("fixed", "free", "jointed"):
@@ -508,21 +534,42 @@ def _root_name(name: str) -> str:
     return "P_" + name
 
 
-def fixed(name: str, pos, parts, colliders=(), looks=None, yaw_deg: float = 0.0, friction=(1.0, 0.8)) -> Part:
+def fixed(name: str, pos, parts, colliders=(), looks=None, yaw_deg: float = 0.0, friction=(1.0, 0.8), compliant: tuple[float, float] | None = None) -> Part:
     """A prop that does not move. `parts`: (prim name, Mesh, look name[, hidden]). `colliders`: from `col_box`, `col_cylinder` or `col_hull`."""
     return Part(name, pos=tuple(pos), size=(0.1, 0.1, 0.1), role="fixed", yaw_deg=yaw_deg,
-                build=lambda: _file(_root_name(name), "", "", _visual(parts) + "".join(colliders), looks or {}, friction))
+                build=lambda: _file(_root_name(name), "", "", _visual(parts) + "".join(colliders), looks or {}, friction, compliant))
 
 
-def free(name: str, pos, parts, colliders, looks, mass: float, friction=(0.9, 0.8), torsional_patch: float | None = 0.015, solver_iters: int = 32, yaw_deg: float = 0.0) -> Part:
-    """One rigid body, with `mass` in kg. Its origin is what `state` reports."""
-    return Part(name, pos=tuple(pos), size=(0.1, 0.1, 0.1), mass=mass, role="free", friction=friction, torsional_patch=torsional_patch, solver_iters=solver_iters, yaw_deg=yaw_deg,
-                build=lambda: _file(_root_name(name), '"PhysicsRigidBodyAPI", "PhysicsMassAPI"', "", _visual(parts) + "".join(colliders), looks, friction))
+def free(name: str, pos, parts, colliders, looks, mass: float, friction=(0.9, 0.8), torsional_patch: float | None = 0.015, solver_iters: int = 32, yaw_deg: float = 0.0, start_quat: tuple | None = None,
+         contact_offset: float = 0.0005, inertia: tuple | None = None, compliant: tuple[float, float] | None = None, com: tuple | None = None) -> Part:
+    """One rigid body, with `mass` in kg. Its origin is what `state` reports. `start_quat`, xyzw, starts it in any rotation, such as lying on its side.
+    `com` puts its centre of mass away from its origin (in its own axes, m)."""
+    attrs = "" if inertia is None else f"""
+    float3 physics:diagonalInertia = ({inertia[0]:.3e}, {inertia[1]:.3e}, {inertia[2]:.3e})"""
+    if com is not None:
+        attrs += f"""
+    point3f physics:centerOfMass = ({com[0]:.5f}, {com[1]:.5f}, {com[2]:.5f})"""
+    return Part(name, pos=tuple(pos), size=(0.1, 0.1, 0.1), mass=mass, role="free", friction=friction, torsional_patch=torsional_patch, solver_iters=solver_iters, yaw_deg=yaw_deg, start_quat=start_quat,
+                contact_offset=contact_offset, compliant=compliant,
+                build=lambda: _file(_root_name(name), '"PhysicsRigidBodyAPI", "PhysicsMassAPI"', attrs, _visual(parts) + "".join(colliders), looks, friction))
 
 
-def mechanism(name: str, pos, links, looks, frame_parts=(), frame_colliders=(), yaw_deg: float = 0.0, friction=(1.2, 1.0), solver_iters: int = 32, start=()) -> Part:
-    """A fixed articulation: a frame, with `frame_parts` and `frame_colliders`, and each `Link` on its joint. `start` gives (link name, joint value) to differ from joint zero at a reset."""
+def mechanism(name: str, pos, links, looks, frame_parts=(), frame_colliders=(), yaw_deg: float = 0.0, friction=(1.2, 1.0), solver_iters: int = 32, start=(), free_mass: float | None = None, start_quat: tuple | None = None,
+              frame_inertia: tuple = (0.01, 0.01, 0.01), self_collide: bool = False, frame_com: tuple | None = None) -> Part:
+    """An articulation: a frame, with `frame_parts` and `frame_colliders`, and each `Link` on its joint. `start` gives (link name, joint value) to differ from joint zero at a reset.
+    The frame is fixed in place, unless `free_mass` gives it a mass in kg: it then stands free on what is under it, and needs colliders. `start_quat`, xyzw, starts a free one in any rotation.
+    `self_collide` lets links that are not parent and child collide with each other (a door with a flag in its way); `frame_com` sets the frame's centre of mass."""
     links = tuple(links)
+    world_joint = "" if free_mass is not None else f"""
+    def PhysicsFixedJoint "world_joint"
+    {{
+        rel physics:body1 = </{_ROOT}/frame>
+    }}
+"""
+    frame_mass = 1.0 if free_mass is None else float(free_mass)
+
+    com_attr = "" if frame_com is None else f"""
+        point3f physics:centerOfMass = ({frame_com[0]:.5f}, {frame_com[1]:.5f}, {frame_com[2]:.5f})"""
 
     def build() -> str:
         body = f"""
@@ -530,25 +577,20 @@ def mechanism(name: str, pos, links, looks, frame_parts=(), frame_colliders=(), 
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
     )
     {{
-        float physics:mass = 1
-        float3 physics:diagonalInertia = (0.01, 0.01, 0.01)
+        float physics:mass = {frame_mass}
+        float3 physics:diagonalInertia = ({frame_inertia[0]:.3e}, {frame_inertia[1]:.3e}, {frame_inertia[2]:.3e}){com_attr}
 {_visual(frame_parts)}{"".join(frame_colliders)}
     }}
 {"".join(_link_usda(k) for k in links)}
-
-    def PhysicsFixedJoint "world_joint"
-    {{
-        rel physics:body1 = </{_ROOT}/frame>
-    }}
-{"".join(_joint_usda(k) for k in links)}"""
+{world_joint}{"".join(_joint_usda(k) for k in links)}"""
         attrs = f"""
-    bool physxArticulation:enabledSelfCollisions = 0
+    bool physxArticulation:enabledSelfCollisions = {int(self_collide)}
     int physxArticulation:solverPositionIterationCount = {solver_iters}
     int physxArticulation:solverVelocityIterationCount = 1"""
         return _file(_root_name(name), '"PhysicsArticulationRootAPI", "PhysxArticulationAPI"', attrs, body, looks, friction)
 
-    limits = tuple((k.joint, *(math.radians(v) if k.kind == "hinge" else v for v in (k.lower, k.upper))) for k in links)
-    return Part(name, pos=tuple(pos), size=(0.1, 0.1, 0.1), role="jointed", build=build, friction=friction, yaw_deg=yaw_deg, limits=limits,
+    limits = tuple((k.joint, *(math.radians(v) if k.kind == "hinge" else v for v in (k.lower, k.upper))) for k in links if math.isfinite(k.lower) and math.isfinite(k.upper))
+    return Part(name, pos=tuple(pos), size=(0.1, 0.1, 0.1), role="jointed", build=build, friction=friction, yaw_deg=yaw_deg, start_quat=start_quat, limits=limits,
                 drives=tuple((k.joint, k.gains()) for k in links), start_joints=tuple((f"{n}_joint", v) for n, v in start))
 
 
@@ -607,7 +649,7 @@ def _arena_object(spec: Part):
     with open(usd, "w") as f:
         f.write(spec.build())
     h = math.radians(spec.yaw_deg) / 2
-    pose = Pose(position_xyz=tuple(float(v) for v in spec.pos), rotation_xyzw=(0.0, 0.0, math.sin(h), math.cos(h)))
+    pose = Pose(position_xyz=tuple(float(v) for v in spec.pos), rotation_xyzw=tuple(float(v) for v in spec.start_quat) if spec.start_quat else (0.0, 0.0, math.sin(h), math.cos(h)))
     if spec.role == "fixed":
         return Object(name=spec.name, object_type=ObjectType.BASE, usd_path=usd, initial_pose=pose)
     if spec.role == "jointed":
@@ -622,12 +664,19 @@ def _arena_object(spec: Part):
                 return self._add_initial_pose_to_cfg(cfg)
 
         return Jointed(name=spec.name, object_type=ObjectType.ARTICULATION, usd_path=usd, initial_pose=pose)
-    material = sim_utils.RigidBodyMaterialCfg(static_friction=spec.friction[0], dynamic_friction=spec.friction[1])
-    collision: dict[str, Any] = {"contact_offset": 0.005, "rest_offset": 0.0}
+    if spec.compliant:
+        from isaaclab_physx.sim.spawners.materials import PhysxRigidBodyMaterialCfg
+
+        material = PhysxRigidBodyMaterialCfg(static_friction=spec.friction[0], dynamic_friction=spec.friction[1],
+                                             compliant_contact_stiffness=spec.compliant[0], compliant_contact_damping=spec.compliant[1])
+    else:
+        material = sim_utils.RigidBodyMaterialCfg(static_friction=spec.friction[0], dynamic_friction=spec.friction[1])
+    collision: dict[str, Any] = {"contact_offset": spec.contact_offset, "rest_offset": 0.0}
     if spec.torsional_patch:
         collision.update(torsional_patch_radius=spec.torsional_patch, min_torsional_patch_radius=0.8 * spec.torsional_patch)
     addon = {"physics_material": material, "collision_props": sim_utils.CollisionPropertiesCfg(**collision),
-             "rigid_props": sim_utils.RigidBodyPropertiesCfg(solver_position_iteration_count=spec.solver_iters),
+             "rigid_props": sim_utils.RigidBodyPropertiesCfg(solver_position_iteration_count=spec.solver_iters, max_depenetration_velocity=0.2,
+                                                             sleep_threshold=0.0, stabilization_threshold=0.0),
              "mass_props": sim_utils.MassPropertiesCfg(mass=spec.mass)}
     obj = Object(name=spec.name, object_type=ObjectType.RIGID, usd_path=usd, spawn_cfg_addon=addon)
     obj.set_initial_pose(pose)
@@ -648,6 +697,11 @@ def _state(environment, spec: Part) -> PartState:
     origin = _np(base.scene.env_origins[0])
     pose = _np(asset.data.root_link_pose_w)[0]
     vel = _np(asset.data.root_vel_w)[0]
+    if spec.role == "jointed" and "frame" in asset.body_names and asset.body_names[0] != "frame":
+        # A free mechanism's root link is PhysX's choice, and may be a link: report its frame, which is what the task authored.
+        i = asset.body_names.index("frame")
+        pose = _np(asset.data.body_link_pose_w)[0, i]
+        vel = _np(asset.data.body_link_vel_w)[0, i]
     joints = {}
     if spec.role == "jointed":
         q = _np(asset.data.joint_pos)[0]
@@ -722,11 +776,35 @@ def unlock(environment, part: str, link: str) -> None:
     asset.set_joint_position_target(_tensor(asset, 0.0), joint_ids=[j])
 
 
+_PUSHED: set[tuple[str, int]] = set()
+
+
+def push(environment, part: str, force, at=None, body: str | None = None) -> None:
+    """Hold `force` (N, station frame) on a part's body at station point `at` (default: the body's centre of mass), at every
+    physics step until changed: the drag of a braked tape roll, a cable's pull. `push(env, part, (0, 0, 0))` stops it; a reset stops all."""
+    import torch
+
+    base = environment.unwrapped
+    asset = base.scene[part]
+    origin = _np(base.scene.env_origins[0])
+    if body is None and "frame" in getattr(asset, "body_names", ()):
+        body = "frame"  # a mechanism's frame, wherever PhysX put its root
+    i = 0 if body is None else int(asset.find_bodies(body)[0][0])
+    f = torch.tensor([[[float(v) for v in force]]], device=asset.device)
+    pos = None if at is None else torch.tensor([[[float(v) for v in np.asarray(at, float) + origin]]], device=asset.device)
+    asset.permanent_wrench_composer.set_forces_and_torques_index(forces=f, torques=torch.zeros_like(f), positions=pos, body_ids=[i], is_global=True)
+    _PUSHED.add((part, i))
+
+
 def _restore_touched(environment) -> None:
-    """Give changed joints back their own gains and targets, before a reset's settling steps can act on the old ones."""
+    """Give changed joints back their own gains and targets, and stop held forces, before a reset's settling steps can act on the old ones."""
     for part, link in list(_TOUCHED):
         unlock(environment, part, link)
     _TOUCHED.clear()
+    for part, i in list(_PUSHED):
+        asset = environment.unwrapped.scene[part]
+        asset.permanent_wrench_composer.reset()
+    _PUSHED.clear()
 
 
 def set_visible(path: str, visible: bool) -> None:
@@ -748,6 +826,12 @@ def set_visible(path: str, visible: bool) -> None:
 
 _STEP: list = []
 _RESET: list = []
+_ENV: dict = {"env": None}
+
+
+def env():
+    """The Isaac Lab environment of the running trial (set at each reset and step)."""
+    return _ENV["env"]
 
 
 def on_step(fn):
@@ -760,6 +844,14 @@ def on_reset(fn):
     """Run ``fn(env)`` after every reset, once the scene has settled."""
     _RESET.append(fn)
     return fn
+
+
+_SEED: list = [None]
+
+
+def run_seed() -> int | None:
+    """The seed of the latest reset. `inspect-robots run` derives it from its `--seed`; demokit passes its `--seed` as it is, or None if not given."""
+    return _SEED[0]
 
 
 _WARNED: set[str] = set()
@@ -779,6 +871,8 @@ def _check_limits(environment) -> None:
 
 
 def _patch_scene(scene) -> None:
+    if PHYSICS_HZ[0]:
+        scene.PHYSICS_DT = 1.0 / PHYSICS_HZ[0]
     if getattr(scene, "_mechkit", False):
         return
     task_object, object_states = scene.task_object, scene.object_states
@@ -806,15 +900,21 @@ def _patch_embodiment(module) -> None:
     task_step, reset = cls._task_step, cls.reset
 
     def task_step_hook(self, *a, **k):
+        _ENV["env"] = self._env
         for fn in _STEP:
             fn(self._env)
         _check_limits(self._env)
+        if os.environ.get("TASK_STEP_FILE"):  # the simulated time, for anything following the run from outside
+            with open(os.environ["TASK_STEP_FILE"], "w") as f:
+                f.write(f"{self._t:.3f}\n")
         return task_step(self, *a, **k)
 
     def reset_hook(self, *a, **k):
+        _SEED[0] = k.get("seed")
         if self._env is not None:
             _restore_touched(self._env)
         obs = reset(self, *a, **k)
+        _ENV["env"] = self._env
         for fn in _RESET:
             fn(self._env)
         return obs
@@ -849,6 +949,16 @@ class _Finder(importlib.abc.MetaPathFinder):
         return spec
 
 
+PHYSICS_HZ = [None]
+
+
+def set_physics_hz(hz: float) -> None:
+    """Run physics at `hz` instead of the harness's 240 Hz, set when `yam_arena.scene` loads, before the environment is built. Nothing in yam_arena is edited."""
+    PHYSICS_HZ[0] = float(hz)
+    if "yam_arena.scene" in sys.modules:
+        sys.modules["yam_arena.scene"].PHYSICS_DT = 1.0 / float(hz)
+
+
 def install() -> None:
     """Hook yam_arena now for modules already imported, and on import for the rest. Idempotent."""
     for name, patch in _Finder.targets.items():
@@ -859,3 +969,4 @@ def install() -> None:
 
 
 install()
+
