@@ -43,7 +43,7 @@ gaps used at each pick and release.
 ## How it is scored
 
 `cellrules.py` is the scorer, a state machine fed once per control step (`task.py` feeds it). It reads what the overhead
-video, the fingertip blot, the meter and the scale would show:
+videos, the fingertip-cover blot, the depth gauge, the meter and the scale would show:
 
 - **Order, each part once.** Each part counts once, at the first moment it lies in the can. The order must be zinc,
   separator, zinc, spacer, spring, cap, with the dispense between the separator and the second zinc. A part that leaves
@@ -53,42 +53,54 @@ video, the fingertip blot, the meter and the scale would show:
   than 5 cm from the can's axis (the arm is away at a dish), until the next part covers it. The offset is the distance
   from the part's centre to the can's axis, which equals half of (widest minus narrowest gap to the wall). The
   zinc-to-zinc distance is measured between the two zinc discs' centres, each taken from its own frame.
-- **Flat, and stacked.** No edge is raised more than 0.5 mm. When the cap goes in, and in every step after that until
-  the press begins, each part rests on the one below: at most 0.4 mm above it and at most 0.1 mm into it. This catches a
-  stack in the wrong physical order (a separator under the first zinc) whatever the order of arrival. After the press only
-  the in-plane offsets, flatness and seating are checked, because the simulated thin discs can sink into each other under
-  the press (see Fidelity). The log gives each part's height over the one below whenever the tier changes (`sink_mm`).
+- **Flat: the depth gauge.** After the trial, with the cap and the spring lifted off, a depth gauge zeroed on the can's
+  rim reads the spacer's top at 4 points 6.5 mm from the axis, 90 degrees apart (`gauge_mm`). The 4 heights must agree
+  within 0.3 mm (a raised edge anywhere under the spacer tilts it), and none may stand more than 0.3 mm over the nominal
+  1.46 mm stack (zinc 0.1, separator 0.26, zinc 0.1, spacer 1.0: a doubled, folded or raised part lifts it). The log
+  gives the 4 heights at every change of tier.
 - **Electrolyte (`pipette.py`).** The plunger, held at the first stop, is let back up to rest with the tip at least
   2 mm under the surface the whole way: the tip then holds 80 uL. Pressing to the first stop with the tip 1 to 6 mm above
   the separator and within 3 mm of the can's axis, with the separator in the can, puts 0.105 g on the separator.
   Anywhere else the dose is spilled, and any electrolyte dispensed off the separator scores 0. Letting the plunger up
   with the tip still in the dispensed liquid would draw some back in a real pipette; that is not modelled, so the demo
   lifts the tip 15 mm clear before it lets the plunger up.
-- **Meter (over R0).** The separator lies between the zinc discs, covering both. The spacer and the spring do not touch
-  the can's wall: an offset of 1.85 mm brings the spacer to the wall, and a spacer offset of 1.85 mm or more scores 0.
+- **Meter (over R0).** Read with the cap and the spring lifted off, so it needs neither: a weighted probe on the
+  spacer, the other on the can's wall. The separator lies between the zinc discs (above the first, under the second) and
+  covers both, and the spacer does not touch the can's wall: an offset of 1.85 mm brings it to the wall, and a spacer
+  offset of 1.85 mm or more scores 0. In the simulation the separator-between-zincs check is taken in the last step
+  before the cap press (after it the simulated thin discs may sink into each other; see Fidelity).
+- **Spring.** Seen in its own frame before the cap covers it: an offset of 2.25 mm or more puts it on the can's wall
+  (a short once the cell is crimped) and scores 0.
 - **Cap.** The cap is seated when it is open side down, square, and its gasket is inside the can's mouth all round. It
   is pressed when the right fingers bear on its top and push it below where the spring holds it, while it is seated.
-- **Tweezers only.** A contact episode is the run of steps in which a gripper's fingertip is within 2 mm of a part. If
-  the part moves more than 0.3 mm in total from where it was when the episode began, the trial scores 0, however slowly
-  it moved. The cap press is exempt, and only narrowly: while the right fingers bear on the cap's top, they may move the
-  cap and the parts lying in the can under it.
-  A fingertip in the can's well after the separator is wet and before the cap closes it counts as a wet blot.
+- **Tweezers only.** A contact is the run of steps in which a gripper's fingertip is within 2 mm of a part. A part's
+  finger travel is how far it moved during each contact, summed over all contacts in the trial; 1.0 mm or more scores 0,
+  however slowly it moved. 1 mm is about 18 pixels in phone A's video, so it is read off the video. The cap press is
+  exempt, and only narrowly: while the right fingers bear on the cap's top, they may move the cap and the parts lying in
+  the can under it. A fingertip in the can's well after the separator is wet and before the cap closes it counts as a wet
+  blot.
 - **Tools.** The tweezers stand tips down in their slot and the pipette hangs on its cradle. Every fingertip is at least
   3 cm from both tools and from the cell (the can and its cap) for 1 s, so the press hand must lift away.
 - **Tiers.** 1.0, 0.5, 0.25 and 0 exactly as in `task.json`'s `scoring`, in `CellJudge.tier`.
 
 ### Scoring a real trial
 
-- **Video.** A phone 45 cm above the mould films the whole trial in 4K; the can's 20.0 mm outside diameter is the scale.
-  A part's offset is half of (widest minus narrowest gap to the can's wall), read in the part's last frame with the arm
-  away at a dish (re-centring is allowed). Each zinc disc's centre is marked in its own frame, before the next part covers
-  it; the zinc-to-zinc distance is between those two marks. Flatness: an even ring of gap all round, with a raking-light
-  still if unclear. The video also shows the order, each part laid once, and every finger contact.
-- **Blot.** Press a fingertip of each gripper on blot paper. A wet mark scores 0.
-- **Meter.** With the cell still in the mould, hold the cap down with a plastic rod and read cap to can on the 2 kOhm
-  range after 5 s. R0 = max(5 Ohm, a fifth of the lowest reading of 3 cells built by hand). Under R0 is a short.
-- **Scale.** Lift the cell by the can's wall with plastic tweezers, the cap held on, and weigh it to 0.001 g. Electrolyte =
-  cell minus the dry set weighed before the trial.
+- **Video.** Phone A, 45 cm above the mould on its 3x camera, films the can in 4K at about 0.055 mm per pixel (the
+  can's 20.0 mm outside diameter, about 360 px, is the scale). Phone B, 60 cm up on its 1x camera, films the whole
+  station for the tools and the hands. A part's offset is half of (widest minus narrowest gap to the can's wall), read
+  in the part's last frame with the arm away at a dish (re-centring is allowed). Each zinc disc's centre is marked in its
+  own frame, before the next part covers it; the zinc-to-zinc distance is between those two marks. The video also shows
+  the order, each part laid once, and how far any fingertip contact moves a part (summed over the trial).
+- **Blot.** Each gripper's finger pads wear single-use 50 um film covers. After the trial, press the covered fingertips on
+  blot paper: a wet mark scores 0. The covers then go to zinc waste, so electrolyte never reaches the robot's pads.
+- **Cap and spring.** Lift them out with plastic tweezers, if present, onto a tared boat; weigh them (0.001 g).
+- **Depth gauge.** Can still in the mould, gauge zeroed on the rim: the spacer's top at 4 points, 6.5 mm from the axis.
+- **Meter.** A flat-tipped probe in a 50 g weight stands on the spacer's centre; the other probe touches the can's outer
+  wall; read on the 2 kOhm range after 5 s. R0 = max(5 Ohm, a fifth of the lowest reading of 3 cells built by hand and
+  read the same way). Under R0 is a short.
+- **Scale.** Lift the can by its wall with plastic tweezers and weigh it with its contents. Electrolyte = boat + can minus
+  the dry mass of exactly the parts present, each weighed alone before the trial, so a missing cap or spring changes
+  nothing.
 
 Offline checks of the rules on hand-built trials, with no simulator: `python -m unittest test_cellrules`.
 
@@ -106,8 +118,9 @@ Offline checks of the rules on hand-built trials, with no simulator: `python -m 
 - The can is fixed in the mould's pocket; in the lab it is a loose fit.
 - The electrolyte is an event model, not a fluid (above). Re-aspiration when the plunger is let up is not modelled.
 - Under the cap press the simulated 0.1 mm and 0.26 mm discs can sink into each other (0.34 mm for the second zinc in the demo).
-  This is the simulator's only allowance and applies after the press: before it, parts must rest on each other within
-  0.1 mm (above).
+  So the meter's separator-between-zincs check uses the last step before the press; the depth gauge reads after it (a
+  sunk stack reads lower, which the gauge allows).
+- The finger-pad covers (50 um film) are not modelled.
 - The cell is not crimped: the task ends at the pressed cap, where NPL's procedure hands the cell to the crimper.
 
 ## Runtime and seeds

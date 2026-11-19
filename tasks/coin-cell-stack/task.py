@@ -126,8 +126,9 @@ class Trial:
                        "zinc_2_offset_mm": round(j.frame_offset("zinc_2") * 1000, 3) if "zinc_2" in j.frame else None,
                        "zinc_to_zinc_mm": round(j.zinc_distance() * 1000, 3) if "zinc_2" in j.frame else None,
                        "spacer_offset_mm": round(j.frame_offset("spacer") * 1000, 3) if "spacer" in j.frame else None,
-                       "sink_mm": j.sinks_mm(s), "stack_at_cap": None if j.cap_check is None else j.cap_check[3] or "ok",
-                       "stack_before_press": None if j.pre_press_check is None else j.pre_press_check[3] or "ok", "left_can": list(j.left_can),
+                       "sink_mm": j.sinks_mm(s), "gauge_mm": cr.gauge_mm(s.parts["spacer"], j.lay.floor) if "spacer" in s.parts else None,
+                       "separator_between_zincs": j.pre_press_sep if j.press_started else j.separated(s), "left_can": list(j.left_can),
+                       "finger_travel_mm": {n: round(v * 1000, 3) for n, v in j.finger_travel.items()},
                        "peak_since_arrival_mm": {n: [round(v * 1000, 2) for v in hs] for n, hs in j.peak.items()},
                        "seated": j.seated(s), "stowed": j.tools_stowed(s), "gripper_moved": list(j.gripper_moved[:3]),
                        "tweezers_tips_mm": np.round((np.asarray(s.tweezers[0]) - np.array([*STAND_XY, Z0])) * 1000, 1).tolist(),
@@ -135,7 +136,7 @@ class Trial:
                        "clear_s": None if j.clear_since is None else round(self.t - j.clear_since, 2)}
         if self.tier != self._tier_shown:  # the log: each change of tier, with the final sinks and peaks
             self._tier_shown = self.tier
-            print(f"[task] t={self.t:.2f} tier {self.tier}: {self.why}; sink_mm {self.report['sink_mm']}; peaks {self.report['peak_since_arrival_mm']}", flush=True)
+            print(f"[task] t={self.t:.2f} tier {self.tier}: {self.why}; sink_mm {self.report['sink_mm']}; gauge_mm {self.report['gauge_mm']}; peaks {self.report['peak_since_arrival_mm']}", flush=True)
         if self._wet_shown != self.pip.wet:
             self._wet_shown = self.pip.wet
             try:

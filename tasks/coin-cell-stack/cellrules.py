@@ -1,4 +1,4 @@
-"""The scoring rules, as a plain state machine fed once per control step with what an overhead video, a blot, a meter and
+"""The scoring rules, as a plain state machine fed once per control step with what the overhead videos, a blot, a depth gauge, a meter and
 a scale would show. Pure Python and NumPy: test it on hand-built states with test_cellrules.py.
 
 The tiers follow task.json's `scoring`, line by line (see `CellJudge.tier`).
@@ -17,12 +17,13 @@ DIAM = {"zinc_1": 0.012, "zinc_2": 0.012, "separator": 0.019, "spacer": 0.0158, 
 THICK = {"zinc_1": 0.0001, "zinc_2": 0.0001, "separator": 0.00026, "spacer": 0.0010, "spring": 0.0012}
 CAP_H, CAP_TOP_T = 0.0020, 0.00025
 CAN_ID = 0.0195
-FLAT_MM = 0.5  # no edge raised more than this
-STACK_TOL = 0.0004  # m: a part rests on the one below within this (above it)
-SINK_TOL = 0.0001  # m: and how far it may sit into it (checked when the cap goes in and up to the press, not after it)
-SPRING_GIVE = 0.0009  # m: the most the spring compresses under a press
+GAUGE_R = 0.0065  # m: the depth gauge reads the spacer's top at 4 points on this radius, 90 degrees apart
+GAUGE_SPREAD = 0.0003  # m: the 4 readings agree within this (the stack under the spacer lies flat)
+GAUGE_HIGH = 0.0003  # m: and none is higher than the nominal stack by more than this (nothing doubled, folded or raised)
+NOMINAL_STACK = 0.0001 + 0.00026 + 0.0001 + 0.0010  # m: zinc, separator, zinc, spacer, floor to the spacer's top
+SEP_GAP = 0.00005  # m: the separator lies above the first zinc and under the second (the meter: no zinc-to-zinc contact)
 FINGER_NEAR = 0.002  # m: a fingertip this close to a part's outline counts as touching it
-MOVED = 0.0003  # m: a part moved by this in total during one contact with a gripper's fingertips is displaced
+MOVED = 0.0010  # m: a part moved this far in all by gripper fingertips (summed over every contact) is displaced
 OUT_UP, OUT_SIDE = 0.006, 0.0115  # m: a part this far above the rim, or this far from the axis (past the wall), is out
 CLEAR = 0.030  # m: fingers clear of the tools and of the cell
 CAN_R = 0.010  # m: the can's outside radius
@@ -58,8 +59,15 @@ class Part:
         return (self.pos + self.up * height / 2)[:2]
 
 
-def edge_rise_mm(part: Part, name: str) -> float:
-    return DIAM[name] * math.sin(math.radians(part.tilt_deg())) * 1000.0
+def gauge_mm(spacer: Part, floor: float) -> list:
+    """The depth gauge: the spacer's top at 4 points on GAUGE_R, 90 degrees apart, as heights over the can's floor, mm.
+    Read after the cap and the spring are lifted off, so the reading needs neither."""
+    out = []
+    for a in (0.0, 90.0, 180.0, 270.0):
+        r = math.radians(a)
+        local = np.array([GAUGE_R * math.cos(r), GAUGE_R * math.sin(r), THICK["spacer"]])
+        out.append(round(float((spacer.pos + spacer.rot @ local)[2] - floor) * 1000.0, 3))
+    return out
 
 
 @dataclass
@@ -86,10 +94,10 @@ class CellJudge:
     frozen: set = field(default_factory=set)
     gripper_moved: list = field(default_factory=list)
     contact: dict = field(default_factory=dict)  # (side, part) -> the part's position when that contact began
+    finger_travel: dict = field(default_factory=dict)  # part -> its travel over finished contacts with the fingertips, m
     left_can: list = field(default_factory=list)  # parts that left the can after they had been laid in it
     peak: dict = field(default_factory=dict)  # part -> (highest over the rim, farthest from the axis) since it arrived, m
-    cap_check: tuple | None = None  # the layers' check when the cap went in
-    pre_press_check: tuple | None = None  # the layers' check in the latest step before the press began
+    pre_press_sep: bool | None = None  # the separator between the zinc discs in the latest step before the press began
     press_started: bool = False
     blot_wet: bool = False
     left_table: list = field(default_factory=list)
@@ -118,8 +126,6 @@ class CellJudge:
                 k = ORDER.index(name)
                 for below in ORDER[:k]:  # a part laid on top hides the ones below: their frames are final
                     self.frozen.add(below)
-                if name == "cap":
-                    self.cap_check = self.layers(s)
             elif name in self.arrived:
                 up, side = p.pos[2] - lay.rim, float(np.linalg.norm(p.pos[:2] - np.asarray(lay.axis)))
                 hi, far = self.peak.get(name, (-math.inf, 0.0))
@@ -128,8 +134,8 @@ class CellJudge:
                     self.left_can.append(name)  # each part once: lifted back out after it was laid in
         if s.cap_pressing and "cap" in self.arrived:
             self.press_started = True
-        if "cap" in self.arrived and not self.press_started:
-            self.pre_press_check = self.layers(s)
+        if not self.press_started:
+            self.pre_press_sep = self.separated(s)
         away = s.left.size == 0 or float(np.min(np.linalg.norm(s.left[:, :2] - np.asarray(lay.axis), axis=1))) > ARM_AWAY
         for name in self.arrived:
             if name in self.frozen or name not in s.parts:
@@ -149,10 +155,13 @@ class CellJudge:
                         self.contact.pop(key, None)  # the press: the fingers on the cap's top move the cap and the stack under it
                         continue
                     if not (touching(pts, p, name) or touching(getattr(self.last, side), q, name)):
-                        self.contact.pop(key, None)
+                        start = self.contact.pop(key, None)
+                        if start is not None:  # a contact ends: its travel adds to the part's total
+                            self.finger_travel[name] = self.finger_travel.get(name, 0.0) + float(np.linalg.norm(q.pos - start))
                         continue
                     start = self.contact.setdefault(key, q.pos.copy())
-                    if np.linalg.norm(p.pos - start) >= MOVED and not any(g[1:] == key for g in self.gripper_moved):
+                    total = self.finger_travel.get(name, 0.0) + float(np.linalg.norm(p.pos - start))
+                    if total >= MOVED and not any(g[1:] == key for g in self.gripper_moved):
                         self.gripper_moved.append((round(s.t, 2), side, name))
         # the blot: a fingertip in the wet separator's well
         if s.can_g > 0 and not ("cap" in s.parts and self.in_can("cap", s.parts["cap"])):
@@ -204,35 +213,32 @@ class CellJudge:
             return False
         return c.tilt_deg() < 2.0 and self.offset("cap", c) < 0.0004 and c.pos[2] < self.lay.rim and self.in_can("cap", c)
 
-    def stacked(self, s: Snapshot, names) -> tuple[bool, str]:
-        """Each part lies in the can, flat, on the one below (the first on the floor): at most STACK_TOL above it and
-        SINK_TOL into it."""
-        below = self.lay.floor
-        for name in names:
-            ok, why = self.placed(s, (name,))
-            if not ok:
-                return ok, why
-            p = s.parts[name]
-            give = SPRING_GIVE if name == "spring" else 0.0
-            if not (below - SINK_TOL - give <= p.pos[2] <= below + STACK_TOL):
-                return False, f"{name} not resting on the part below ({(p.pos[2] - below) * 1000:+.2f} mm)"
-            below = p.pos[2] + p.up[2] * THICK[name]
-        return True, ""
-
     def placed(self, s: Snapshot, names) -> tuple[bool, str]:
-        """Each part lies in the can, flat (no height check: after the press the simulated thin discs sink into
-        each other)."""
+        """Each part lies in the can (seen in the overhead video)."""
         for name in names:
             p = s.parts.get(name)
             if p is None or name not in self.arrived or not self.in_can(name, p):
                 return False, f"{name} not in the can"
-            if p.up[2] < 0 or edge_rise_mm(p, name) > FLAT_MM:
-                return False, f"{name} not flat ({edge_rise_mm(p, name):.2f} mm edge rise)"
         return True, ""
 
-    def layers(self, s: Snapshot) -> tuple:
-        """The stacking check of the lower four parts and of all five under the cap."""
-        return self.stacked(s, STACK[:4]) + self.stacked(s, STACK)
+    def separated(self, s: Snapshot) -> bool:
+        """The separator lies above the first zinc and under the second, so the zinc discs cannot touch."""
+        z1, sep, z2 = (s.parts.get(n) for n in ("zinc_1", "separator", "zinc_2"))
+        if None in (z1, sep, z2):
+            return False
+        return bool(sep.pos[2] > z1.pos[2] + SEP_GAP and z2.pos[2] > sep.pos[2] + SEP_GAP)
+
+    def gauge(self, s: Snapshot) -> tuple[bool, str]:
+        """The depth gauge on the spacer's top: the stack under it flat, and nothing doubled, folded or raised."""
+        sp = s.parts.get("spacer")
+        if sp is None or sp.up[2] < 0.5:
+            return False, "spacer not lying in the can"
+        h = gauge_mm(sp, self.lay.floor)
+        if max(h) - min(h) > GAUGE_SPREAD * 1000 + 1e-9:
+            return False, f"not flat: spacer top {h} mm over the floor (spread over {GAUGE_SPREAD * 1000:.1f} mm)"
+        if max(h) > (NOMINAL_STACK + GAUGE_HIGH) * 1000 + 1e-9:
+            return False, f"stack too high: spacer top {h} mm over the floor (over {(NOMINAL_STACK + GAUGE_HIGH) * 1000:.2f} mm)"
+        return True, ""
 
     def sinks_mm(self, s: Snapshot) -> dict:
         """Each part's height over the top of the one below (negative: sunk into it), mm; for the log."""
@@ -245,27 +251,21 @@ class CellJudge:
             below = p.pos[2] + p.up[2] * THICK[name]
         return out
 
-    def stack_ok(self, s: Snapshot, upto: int) -> tuple[bool, str]:
-        """The layers rest on each other when the cap goes in and up to the press (or now, before the cap); after the
-        press, only in the can and flat. `upto`: 4 (zinc to spacer) or 5 (to the spring)."""
-        names = STACK[:upto]
-        ok, why = self.placed(s, names)
+    def stack_ok(self, s: Snapshot) -> tuple[bool, str]:
+        """Zinc, separator, zinc and spacer in the can, and the depth gauge on the spacer passes."""
+        ok, why = self.placed(s, STACK[:4])
         if not ok:
             return ok, why
-        k = 0 if upto == 4 else 2
-        checks = [self.cap_check, self.pre_press_check] if "cap" in self.arrived else [self.layers(s)]
-        for c in checks:
-            if c is not None and not c[k]:
-                return False, c[k + 1] + (" when the cap went in" if c is self.cap_check else "")
-        return True, ""
+        return self.gauge(s)
 
     def in_order(self, names) -> bool:
         times = [self.arrived.get(n) for n in names]
         return all(t is not None for t in times) and all(a < b for a, b in zip(times, times[1:]))
 
-    def no_short(self, s: Snapshot, upto: str) -> bool:
-        """The meter reads over R0: the separator lies between the zinc discs, and nothing of the upper electrode
-        touches the can's wall."""
+    def no_short(self, s: Snapshot) -> bool:
+        """The meter, cap and spring lifted off, probe on the spacer, reads over R0: the separator lies between the zinc
+        discs (judged before the press, since the simulated thin discs can sink into each other under it) and covers
+        both, and the spacer does not touch the can's wall."""
         z1, sep, z2 = (s.parts.get(n) for n in ("zinc_1", "separator", "zinc_2"))
         if None in (z1, sep, z2):
             return False
@@ -273,10 +273,9 @@ class CellJudge:
         cover = (DIAM["separator"] - DIAM["zinc_1"]) / 2
         if np.linalg.norm(z1.centre_xy(1e-4) - sc) > cover or np.linalg.norm(z2.centre_xy(1e-4) - sc) > cover:
             return False
-        if self.offset("spacer", s.parts["spacer"]) >= (CAN_ID - DIAM["spacer"]) / 2:
+        if not (self.pre_press_sep if self.press_started else self.separated(s)):
             return False
-        sp = s.parts.get("spring")
-        if upto == "spring" and sp is not None and "spring" in self.arrived and self.in_can("spring", sp) and self.offset("spring", sp) >= (CAN_ID - DIAM["spring"]) / 2:
+        if "spacer" not in s.parts or self.offset("spacer", s.parts["spacer"]) >= (CAN_ID - DIAM["spacer"]) / 2:
             return False
         return True
 
@@ -297,20 +296,22 @@ class CellJudge:
         g = s.can_g
         zinc_off = max(self.frame_offset("zinc_1"), self.frame_offset("zinc_2"))
         zz = self.zinc_distance()
-        lower_ok, why = self.stack_ok(s, 4)
+        lower_ok, why = self.stack_ok(s)
         if not lower_ok:
             return 0.0, why
         if not self.in_order(STACK[:4]):
             return 0.0, "zinc, separator, zinc, spacer not in that order"
         if not self.electrolyte_in_order():
             return 0.0, "electrolyte not dispensed between the separator and the second zinc"
-        if not self.no_short(s, "spring"):  # the meter: the separator between the zinc discs, no metal of the top on the wall
+        if not self.no_short(s):  # the meter: the separator between the zinc discs, the spacer off the wall
             return 0.0, "short: under R0"
         sp_off = self.frame_offset("spacer")
         if sp_off >= (CAN_ID - DIAM["spacer"]) / 2:  # the spacer on the wall: out of every tier
             return 0.0, f"spacer offset {sp_off * 1000:.2f} mm: on the wall"
+        if "spring" in self.frame and self.frame_offset("spring") >= (CAN_ID - DIAM["spring"]) / 2:  # seen before the cap
+            return 0.0, f"spring offset {self.frame_offset('spring') * 1000:.2f} mm: on the wall (a short once crimped)"
         quarter = zinc_off <= 0.002 and zz <= 0.002 and BAND_HALF[0] <= g <= BAND_HALF[1]
-        top_ok, why_top = self.stack_ok(s, 5)
+        top_ok, why_top = self.placed(s, ("spring",))
         complete = (top_ok and self.in_order(ORDER) and self.seated(s) and self.pressed
                     and sp_off < (CAN_ID - DIAM["spacer"]) / 2)
         if not complete:

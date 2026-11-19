@@ -109,7 +109,7 @@ class Tiers(unittest.TestCase):
     def test_spacer_frame_on_the_wall(self):
         # the spacer's frame offset at or past the wall gives 0 before the 0.25 branch, even if the meter read passes
         orig = cr.CellJudge.no_short
-        cr.CellJudge.no_short = lambda self, s, upto: True
+        cr.CellJudge.no_short = lambda self, s: True
         try:
             for press in (True, False):
                 self.assertEqual(trial(stacked({"spacer": 0.00186}), press=press)[0], 0.0)
@@ -141,21 +141,33 @@ class Tiers(unittest.TestCase):
         self.assertEqual(trial(stacked({"cap": 0.001}))[0], 0.25)
 
     def test_flat_and_order(self):
-        self.assertEqual(trial(stacked(tilt={"zinc_2": 4.0}))[0], 0.0)
+        # the depth gauge on the spacer: a raised edge under it tilts it (2 degrees: 0.45 mm across the gauge's points)
+        self.assertEqual(trial(stacked(tilt={"spacer": 2.0}))[0], 0.0)
+        self.assertEqual(trial(stacked(tilt={"spacer": 1.0}))[0], 1.0)  # 0.23 mm spread: within 0.3
+        # a stack 0.4 mm too high (a folded separator, say): out
+        high = stacked()
+        high = {n: cr.Part(p.pos + [0, 0, 0.0004], p.rot) if n in ("zinc_2", "spacer", "spring", "cap") else p for n, p in high.items()}
+        self.assertTrue(trial(high)[1].startswith("stack too high"))
         swapped = ("separator", "zinc_1", "zinc_2", "spacer", "spring", "cap")
         self.assertEqual(trial(stacked(), order=swapped)[0], 0.0)
         self.assertEqual(trial(stacked(), skip=("separator",))[0], 0.0)
 
     def test_gripper_moves_a_part(self):
-        def poke(j, t, n, parts):
-            if n == "spacer":
-                p = parts["zinc_2"]
-                fingers = np.array([p.pos + [0.006, 0, 0.0005]] * 12)
-                moved = dict(parts)
-                moved["zinc_2"] = cr.Part(p.pos + [0.0005, 0, 0], p.rot)
-                j.update(snap(t + 0.05, moved, left=fingers, disp=(2.5,)))
-                j.update(snap(t + 0.1, dict(parts), disp=(2.5,)))
-        self.assertEqual(trial(stacked(), pre=poke)[0], 0.0)
+        # a fingertip pushes the spring on its dish: 1.1 mm in one contact is displaced, 0.5 mm is not
+        def poke(dist):
+            def f(j, t, n, parts):
+                if n == "spacer":
+                    p = parts["spring"]
+                    fingers = np.array([p.pos + [0.0085, 0, 0.0005]] * 12)
+                    moved = dict(parts)
+                    moved["spring"] = cr.Part(p.pos + [dist, 0, 0], p.rot)
+                    j.update(snap(t + 0.05, moved, left=fingers, disp=(2.5,)))
+                    j.update(snap(t + 0.1, moved, disp=(2.5,)))
+            return f
+        score, why = trial(stacked(), pre=poke(0.0011))
+        self.assertEqual(score, 0.0)
+        self.assertTrue(why.startswith("the left gripper moved the spring"), why)
+        self.assertEqual(trial(stacked(), pre=poke(0.0005))[0], 1.0)
 
     def test_press_exemption_is_narrow(self):
         # the right hand presses the cap while its fingers also shove a part lying outside the can: still a fault
@@ -202,15 +214,37 @@ class Tiers(unittest.TestCase):
                     j.update(snap(t + 0.05 * k, {**parts, "cap": cr.Part(p.pos + [0.00005 * k, 0, 0], p.rot)}, left=fingers, disp=(2.5,)))
                 j.update(snap(t + 0.3, dict(parts), disp=(2.5,)))
         self.assertEqual(trial(stacked(), pre=nudge)[0], 1.0)
-        # the same brush carried on to 0.4 mm in all: displaced
+        # the same brush carried on to 1.2 mm in all: displaced
         def push(j, t, n, parts):
             if n == "spacer":
                 p = parts["cap"]
                 fingers = np.array([p.pos + [0.011, 0, 0.001]] * 12)
-                for k in range(1, 9):
+                for k in range(1, 25):
                     j.update(snap(t + 0.05 * k, {**parts, "cap": cr.Part(p.pos + [0.00005 * k, 0, 0], p.rot)}, left=fingers, disp=(2.5,)))
                 j.update(snap(t + 0.5, dict(parts), disp=(2.5,)))
         self.assertEqual(trial(stacked(), pre=push)[0], 0.0)
+
+    def test_finger_travel_adds_up_over_contacts(self):
+        # two separate brushes of 0.6 mm each: 1.2 mm in all, displaced; one alone is allowed
+        def brushes(count):
+            def f(j, t, n, parts):
+                if n != "spacer":
+                    return
+                p, tt = parts["cap"], t
+                for c in range(count):
+                    for k in range(1, 13):
+                        tt += 0.01
+                        q = cr.Part(p.pos + [0.00005 * k, 0, 0], p.rot)
+                        j.update(snap(tt, {**parts, "cap": q}, left=np.array([q.pos + [0.011, 0, 0.001]] * 12), disp=(2.5,)))
+                    p = q
+                    tt += 0.01
+                    j.update(snap(tt, {**parts, "cap": p}, disp=(2.5,)))
+                parts["cap"] = p
+            return f
+        self.assertEqual(trial(stacked(), pre=brushes(1))[0], 1.0)
+        score, why = trial(stacked(), pre=brushes(2))
+        self.assertEqual(score, 0.0)
+        self.assertTrue(why.startswith("the left gripper moved the cap"), why)
 
     def test_part_leaves_the_can(self):
         # the first zinc is lifted back out of the can after it was laid in, then laid again
@@ -232,16 +266,31 @@ class Tiers(unittest.TestCase):
         self.assertEqual(trial(sw)[0], 0.0)
 
     def test_sink_before_and_after_the_press(self):
-        # a part 0.3 mm into the one below when the cap goes in: not stacked
-        f = stacked()
-        sunk = {n: cr.Part(f[n].pos - [0, 0, 0.0003], f[n].rot) if n in ("zinc_2", "spacer", "spring", "cap") else f[n] for n in f}
-        self.assertEqual(trial(sunk)[0], 0.0)
-        # the same sink after the press (simulated thin discs under the press): only offsets, flatness and seating count
+        # the press leaves the upper discs sunk 0.3 mm (simulated thin discs): the gauge reads lower, the meter is
+        # judged from before the press, so it still scores
         self.assertEqual(trial(stacked(), sink=0.0003)[0], 1.0)
+        # but the second zinc sunk through the separator before any press: the zinc discs touch, a short
+        f = stacked()
+        sunk = dict(f)
+        sunk["zinc_2"] = cr.Part(f["separator"].pos.copy(), f["zinc_2"].rot)
+        self.assertEqual(trial(sunk, press=False)[0], 0.0)
 
     def test_spring_on_the_wall(self):
-        # the spring 2.3 mm off the axis touches the can's wall: the meter reads under R0
-        self.assertEqual(trial(stacked({"spring": 0.0023})), (0.0, "short: under R0"))
+        # the spring 2.3 mm off the axis touches the can's wall, seen in its frame before the cap covers it
+        score, why = trial(stacked({"spring": 0.0023}))
+        self.assertEqual(score, 0.0)
+        self.assertTrue(why.startswith("spring offset"), why)
+
+    def test_quarter_tier_without_cap_or_spring(self):
+        # the meter and the scale need neither: the 0.25 tier with the cap, or both the cap and the spring, missing
+        self.assertEqual(trial(stacked(), skip=("cap",))[0], 0.25)
+        self.assertEqual(trial(stacked(), skip=("spring", "cap"))[0], 0.25)
+        # and a zinc-to-zinc contact (separator under the first zinc) still reads as a short without them
+        f = stacked()
+        sw = dict(f)
+        sw["separator"] = cr.Part(np.array([*AXIS, FLOOR]), np.eye(3))
+        sw["zinc_1"] = cr.Part(np.array([*AXIS, FLOOR + cr.THICK["separator"]]), np.eye(3))
+        self.assertEqual(trial(sw, skip=("cap",))[0], 0.0)
 
     def test_wet_gripper(self):
         def dip(j, t, n, parts):
