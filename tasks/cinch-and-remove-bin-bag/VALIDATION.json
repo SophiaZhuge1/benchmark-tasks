@@ -101,6 +101,38 @@
       "max_drawn_out_string_extension_m": 0.028
     },
     {
+      "run": "LP4_g",
+      "score": 0.0,
+      "tier": "none",
+      "steps": 131,
+      "first_cinch_step": null,
+      "first_carry_step": null,
+      "final_mouth_diameter_m": 0.19633101867370636,
+      "minimum_gripper_distance_m": 0.0040699981718426,
+      "final_two_second_bag_bounds_motion_m": null,
+      "film_gripped_step": null,
+      "max_recorded_edge_stretch_ratio": 1.010078502019591,
+      "controller_stopped": "Drawstring loop slipped during measured grasp probe",
+      "wall_seconds": 139,
+      "max_drawn_out_string_extension_m": 0.014
+    },
+    {
+      "run": "LP4_h",
+      "score": 0.0,
+      "tier": "none",
+      "steps": 227,
+      "first_cinch_step": null,
+      "first_carry_step": null,
+      "final_mouth_diameter_m": 0.21698883400809507,
+      "minimum_gripper_distance_m": 0.0028154739998999994,
+      "final_two_second_bag_bounds_motion_m": null,
+      "film_gripped_step": null,
+      "max_recorded_edge_stretch_ratio": 1.1873819839658024,
+      "controller_stopped": "Grasp lost during cuff peel on arm 0",
+      "wall_seconds": 255,
+      "max_drawn_out_string_extension_m": 0.271
+    },
+    {
       "run": "LP6_a",
       "score": 0.0,
       "tier": "none",
@@ -421,5 +453,6 @@
   "grasp_checks": "cinch: both loops held between finger pads (fingers <= 15 mm), string drawn out >= 100 mm and taut, no film pinched; carry: also no film within 5 mm of either finger",
   "source_note": "The final source differs from the demo run only in the BIN_NEGATIVE branch (scripted negative controls); with it unset the controller is identical.",
   "note": "Simulation evidence only; no physical trial has been run.",
-  "earlier_strap_loop_development_note": "Same scene and scorer with earlier controller or string settings: LP_* (no hem friction term, 18 mm strap, 8 N finger force), LP2_* (hem friction term added), LP3_* (20 mm strap, standard gripper, deeper pinch), LP5_* (elastic cap 1.2 N)."
+  "earlier_strap_loop_development_note": "Same scene and scorer with earlier controller or string settings: LP_* (no hem friction term, 18 mm strap, 8 N finger force), LP2_* (hem friction term added), LP3_* (20 mm strap, standard gripper, deeper pinch), LP5_* (elastic cap 1.2 N).",
+  "repeat_summary": "Final source: 1.0 in 1 of 10 runs (0.75 x1, 0.25 x2, 0 x6); failure modes: a strap slipping out of the fingers during the grasp, peel, pull or lift, and a released strap wound round a finger."
 }
