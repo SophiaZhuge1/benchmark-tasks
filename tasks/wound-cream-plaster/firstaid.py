@@ -24,10 +24,14 @@ The parts, and what is reduced (each number is nominal, to be checked against th
   bared; otherwise it has fallen.
 * **The liners** are C-folded: each covers one wing and half the pad, is folded back on itself at the strip's middle,
   and its lower leaf runs out past the strip's end as the 25 mm tab. Pulling a tab outward along the strip, at most
-  60 degrees above the skin, peels the liner from the middle outward at half the tab's travel, while the strip is held
-  (by the other liner's tab still held, by a tacked wing, or by a fingertip pressing on it); a strip held by nothing
-  slides with the pull. Pulling steeper lifts the wing's end instead. Two tabs pulled apart in the air peel both. A
+  60 degrees above the skin, peels the liner from the middle outward at half the tab's travel, if the strip is held
+  against the peel force; pulling steeper lifts the wing's end instead. Two tabs pulled apart in the air peel both. A
   liner that is off is its tab body: carried, dropped and binned as that body is.
+* **Peel force:** the liner's release force (PEEL_N, a start-up peak PEEL_BREAK_N, a light PEEL_PAD_N under the pad)
+  pulls the held tab back, as a taut string the simulator applies to the tab body at every physics step (`tether`), and
+  pulls the strip toward the tab at the peel front (`front_force`). The strip resists with friction on the skin under
+  its weight and under pressing fingertip pads, and with the shear of its tacked nodes; past that, the other tab (held
+  taut by its hand) takes the rest of the pull, or else the strip slides with the pull.
 * **Tack:** an exposed adhesive node lying on the skin tacks only under a fingertip pad whose own native PhysX contact
   force on the forearm is at least 1 N, within 2 mm of that pad. Tack never spreads. A node that lies down on cream
   (more than 0.02 mm within 2 mm) is spoiled: cream on the adhesive.
@@ -64,6 +68,22 @@ JAW_SLACK = 0.003  # ... with the jaw closed to within this of the part's own th
 PART_W = {"applicator": 2 * S.APP_STICK_R, "tab_left": S.TAB_THICK, "tab_right": S.TAB_THICK}
 LET_GO_N, LET_GO_STEPS = 0.2, 3  # ... and let go once either pad stays under this for this many control steps
 APP_REST_Z = S.TRAY_SIZE[2] + 0.0003 + S.APP_TIP_R  # the stick's axis lying on the opened pouch
+
+# release-liner peel (README, "Peel force"). Siliconised medical liners release at about 5-20 g per 2 in (easy) to
+# 10-50 g per 2 in (easy-medium) in a 180 degree peel; the liner here is taken at 0.15 N per 25 mm, so 0.27 N over the
+# strip's 44.5 mm width, with a start-up peak of 1.6 times that over the first 3 mm of adhesive. A C-folded liner is
+# itself a 180 degree peel, so the tab feels that force; the strip feels it, equal and opposite, at the peel front. Under
+# the pad (no adhesive) the liner only slides and unfolds: a light 0.05 N.
+PEEL_N = 0.15 / 0.025 * S.PL_WID  # N: steady peel over the adhesive
+PEEL_BREAK_N = 1.6 * PEEL_N  # N: the start-up peak where the front first meets the adhesive
+BREAK_LEN = 0.003  # m of front travel into the adhesive that the peak lasts
+PEEL_PAD_N = 0.05  # N: the liner sliding off the pad and unfolding
+STRIP_MASS = 0.0008  # kg: the plaster
+G = 9.81
+MU_SKIN = 0.5  # the strip's fabric and pad on skin
+TACK_SHEAR = 0.1  # N each tacked node holds in shear (about 17 mm^2 of adhesive pressed onto skin)
+TETHER_RAMP = 0.001  # m: a tab's pull rises from nothing to full over its last millimetre of slack
+TAUT_TOL = 0.0005  # m: a tab within this of taut counts as taut (holds the strip)
 
 SIDES = ("left", "right")
 SIGN = {"left": 1.0, "right": -1.0}  # the left hand's tab is the plaster's +u end (toward +y)
@@ -393,6 +413,15 @@ def bud_contact(buds, hands: dict, pl, held_firm: bool) -> str | None:
 NU, NW = 35, 9
 
 
+def peel_force(p) -> float:
+    """The force (N) to move a liner's peel front on from p (m from the strip's middle)."""
+    if p < S.PAD_HALF:
+        return PEEL_PAD_N
+    if p < S.PAD_HALF + BREAK_LEN:
+        return PEEL_BREAK_N
+    return PEEL_N
+
+
 def tab_rest_pose(k):
     """Tab k's body as it lies on the stand, unrotated: its origin at the strip's end (the middle of the tab's root)."""
     cx, cy = S.STAND_C
@@ -402,6 +431,17 @@ def tab_rest_pose(k):
 def tab_out(k, R):
     """The direction out along tab k (from its root) for its body's rotation R."""
     return np.asarray(R) @ np.array([0.0, SIGN[k], 0.0])
+
+
+def tether_force(tt, g) -> np.ndarray:
+    """The force (N, station frame) on a tab whose grip point is at g, from its pull tt = (anchor, taut length, pull,
+    constant force): along g -> anchor, full once |g - anchor| reaches the taut length, falling to nothing over the last
+    TETHER_RAMP of slack."""
+    anchor, taut, pull, const = tt
+    v = np.asarray(g, float) - anchor
+    d = float(np.linalg.norm(v))
+    s = min(1.0, max(0.0, (d - (taut - TETHER_RAMP)) / TETHER_RAMP))
+    return -v / max(d, 1e-9) * pull * s + const
 
 
 class Liner:
@@ -445,6 +485,14 @@ class Plaster:
         self.touched_face = False
         self.slid = 0.0  # m the strip was dragged along the skin while lying on it
         self.pressed_now = False
+        # forces: what pulls on each tab body this step, as a taut-string pull the simulator applies to that body at every
+        # physics step: {k: (anchor (station frame), length at which it is taut (m), pull when taut (N), constant
+        # force (N, 3))}. The pull acts along the line from the tab's grip point to the anchor, rising from nothing to
+        # full over the last TETHER_RAMP of slack
+        self.tether = {}
+        self.front_force = np.zeros((NU, NW, 3))  # N on each strip node from the liners' peel fronts this step
+        self.hold_n = 0.0  # N the strip can resist on the skin this step (friction, pressed pads, tack)
+        self.drag_n = 0.0  # N the liners pull it with
 
     # -- geometry --
     def side_of(self):
@@ -547,6 +595,9 @@ class Plaster:
 
     # -- the step --
     def step(self, hands: dict, cream: Cream):
+        self.tether = {}
+        self.front_force = np.zeros((NU, NW, 3))
+        self.drag_n = 0.0
         self._held_tab = {}
         for k in SIDES:
             if self.tab_held[k] is not None:
@@ -583,6 +634,14 @@ class Plaster:
             if excess > 0.003:  # pulled apart in the air: both liners peel
                 for k in SIDES:
                     self._peel(k, excess / 2)
+            # the strip hangs on its tabs (its weight shared), and once they are pulled apart the liners' peel pulls each
+            # tab back toward the other (one tension through the strip)
+            on = [self.liners[k].p for k in SIDES if self.liners[k].state == "on"]
+            T = float(np.mean([peel_force(p) for p in on])) if len(on) == 2 else 0.0
+            onset = S.PL_LEN + self.tab_len["left"] + self.tab_len["right"] + max(0.003, 2 * sum(on))
+            for k in SIDES:
+                o = "right" if k == "left" else "left"
+                self.tether[k] = (self._held_tab[o].copy(), onset, T, np.array([0.0, 0.0, -STRIP_MASS * G / 2]))
             # touching down on the skin
             p, _ = self.nodes()
             d, _, _ = S.ARM.signed(p[:, NW // 2])
@@ -596,6 +655,7 @@ class Plaster:
             self.c = g - np.array([0, 0, self.tab_len[k] + S.PL_LEN / 2])
             self.en = np.array([1.0, 0, 0])
             self.ew = np.cross(self.en, self.eu)
+            self.tether[k] = (g.copy(), 1.0, 0.0, np.array([0.0, 0.0, -STRIP_MASS * G]))
         else:
             self._drop()
 
@@ -631,10 +691,31 @@ class Plaster:
             self.ew = np.cross(self.en, self.eu)
             self._event("dropped with its adhesive bared: crumpled" if bared else "dropped off the forearm")
 
-    def anchored(self, pulling):
-        other = [k for k in SIDES if k != pulling][0]
-        return bool(self.tacked.any() or self.pressed_now or
-                    (self.tab_held[other] is not None and self.liners[other].state == "on"))
+    def hold_capacity(self, press_n: float) -> float:
+        """The pull (N) the strip lying on the skin resists before it slides: friction under its own weight and under the
+        fingertip pads pressing on it (press_n, N in all), plus the shear of its tacked adhesive."""
+        return MU_SKIN * (STRIP_MASS * G + press_n) + TACK_SHEAR * int((self.tacked & self.laid).sum())
+
+    def _tug(self, k, pull, taut_at, anchor=None):
+        """Tab k pulled back toward its end of the strip (or toward anchor) with `pull` N once the grip is taut_at (m of
+        tab travel) out."""
+        if k in self.tether and self.tether[k][2] >= pull:
+            return  # already pulled harder this step (a tab both pulled and anchoring takes the larger)
+        e, _ = self.end_point(k)
+        self.tether[k] = (e.copy() if anchor is None else anchor, self.tab_len[k] + taut_at, float(pull), np.zeros(3))
+
+    def _front(self, k, pull):
+        """The liner's peel front pulls the strip toward the tab with `pull` N, spread over the front's row of nodes, along
+        the skin."""
+        ln = self.liners[k]
+        mine = np.flatnonzero(self.u * SIGN[k] > 0)
+        i = int(mine[np.argmin(np.abs(np.abs(self.u[mine]) - ln.p))])
+        p, n = self.nodes()
+        v = self._held_tab[k] - p[i, NW // 2]
+        v = v - (v @ n[i, NW // 2]) * n[i, NW // 2]
+        v /= max(np.linalg.norm(v), 1e-9)
+        self.front_force[i] += v * (pull / NW)
+        self.drag_n += pull
 
     def _peel(self, k, ext):
         ln = self.liners[k]
@@ -651,21 +732,23 @@ class Plaster:
                 self._event(f"{k} liner off")
 
     def _skin(self, held, hands, cream):
-        # is anything pressing on the strip? (a fingertip pad with >= 0.5 N over a node)
+        # what presses on the strip: each fingertip pad over it, with its own native contact force
         p, n = self.nodes()
         flat = p.reshape(-1, 3)
-        self.pressed_now = False
         press_hits = np.zeros(NU * NW, bool)
+        press_n = 0.0
         for h in hands.values():
             for R, t, lo, hi, f in h.pads():
                 inside = boxes_contain([(R, t, lo, hi)], flat, pad=0.002)
-                if f >= 0.5 and inside.any():
-                    self.pressed_now = True
+                if inside.any():
+                    press_n += f
                 if f >= PRESS_N:
                     press_hits |= inside
-        # the tabs are strings: a taut tab drags a strip that nothing holds down until the other tab is taut too, then
-        # (the strip held) peels its liner, or lifts the wing if pulled steeply
-        free = not self.tacked.any() and not self.pressed_now
+        self.pressed_now = press_n >= 0.5
+        cap = self.hold_capacity(press_n)
+        self.hold_n = cap
+        # lifted off the skin by both tabs (nothing holding it down)
+        free = not (self.tacked & self.laid).any() and not self.pressed_now
         if len(held) == 2 and free and min(self._held_tab[k][2] for k in held) > S.ARM_TOP + 0.035:
             self.state = "air"
             self._event("lifted off the skin")
@@ -680,31 +763,60 @@ class Plaster:
             elev = math.degrees(math.asin(max(-1.0, min(1.0, float(v @ en) / max(dist, 1e-9)))))
             return dist - self.tab_len[k], elev
 
-        if free and held:
-            ext = {k: ext_of(k)[0] for k in held}
-            k = max(ext, key=ext.get)
-            if ext[k] > EXT_MIN:
-                others = [o for o in held if o != k]
-                slack = max(0.0, EXT_MIN - ext[others[0]]) if others else np.inf
-                slide = min(ext[k] - EXT_MIN, slack)
+        def taut_at(k):  # the tab's travel at which its liner pulls: twice the peel front's (180 degree peel), 1 mm at least
+            return max(EXT_MIN, 2 * self.liners[k].p)
+
+        def anchor_of(k):
+            """The other tab, if it holds the strip: its hand still gripping it firmly, its liner on, and taut."""
+            o = "right" if k == "left" else "left"
+            if o in held and self.liners[o].state == "on" and self.firm.get(o, True) and ext_of(o)[0] >= EXT_MIN - TAUT_TOL:
+                return o
+            return None
+
+        # each pulled liner: its peel resistance pulls the tab back and, at the peel front, the strip toward the tab. The
+        # strip resists with its hold on the skin and, through the other liner, the other tab if a hand holds that taut.
+        # Held well enough, the front moves on (half the tab's travel); otherwise the strip slides with the pull
+        for k in sorted(held, key=lambda q: -ext_of(q)[0]):
+            if self.liners[k].state != "on":
+                continue
+            e, elev = ext_of(k)
+            P = peel_force(self.liners[k].p)
+            if e <= taut_at(k):
+                self.lift[k] = None
+                if self.liners[k].p > 0 and e > taut_at(k) - TETHER_RAMP:  # a peel paused, still taut: it pulls back
+                    self._tug(k, P if (cap >= P or anchor_of(k)) else cap, taut_at(k))
+                continue
+            P = peel_force(min(max(self.liners[k].p, e / 2), S.PL_LEN / 2 - 1e-6))  # where the front would move to
+            o = "right" if k == "left" else "left"
+            if elev > STEEP_DEG:  # pulled steeply: the wing's end lifts (if the strip is held) instead of peeling
+                if cap >= P or (o in held and self.liners[o].state == "on"):
+                    if self.lift[k] is None:
+                        self._event(f"{k} wing lifted by a steep pull")
+                    self.lift[k] = self._held_tab[k]
+                continue
+            self.lift[k] = None
+            if cap < P and anchor_of(k) is None:
+                # dragged: the strip slides with the tab until the other tab (if a hand holds it) comes taut
+                slack = max(0.0, EXT_MIN - ext_of(o)[0]) if (o in held and self.liners[o].state == "on") else np.inf
+                slide = min(e - taut_at(k), slack)
                 if slide > 1e-5:
                     y0, s0, psi = self.place
                     self.place = (y0 + SIGN[k] * slide * math.cos(psi), s0 + SIGN[k] * slide * math.sin(psi), psi)
                     self.slid += slide
-        for k in held:
-            ext, elev = ext_of(k)
-            if ext <= EXT_MIN:
-                self.lift[k] = None
+                self._tug(k, cap, taut_at(k))
+                self._front(k, cap)
+                if anchor_of(k) is None:
+                    continue
+                e, elev = ext_of(k)
+                P = peel_force(min(max(self.liners[k].p, e / 2), S.PL_LEN / 2 - 1e-6))
+            self._peel(k, e)
+            if self.liners[k].state != "on":
                 continue
-            if not self.anchored(k):
-                continue
-            if elev > STEEP_DEG:
-                if self.lift[k] is None:
-                    self._event(f"{k} wing lifted by a steep pull")
-                self.lift[k] = self._held_tab[k]
-                continue
-            self.lift[k] = None
-            self._peel(k, ext)
+            self._tug(k, P, taut_at(k))
+            self._front(k, P)
+            a = anchor_of(k)
+            if a is not None and P > cap:
+                self._tug(a, P - cap, EXT_MIN)  # the rest of the pull comes onto the other tab and the hand holding it
         for k in SIDES:
             if self.tab_held[k] is None and self.lift[k] is not None:
                 self.lift[k] = None

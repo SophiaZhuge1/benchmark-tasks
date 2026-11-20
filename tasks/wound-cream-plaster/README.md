@@ -31,9 +31,9 @@ table top.
 | Cream | 0.5 mL of 10 % povidone-iodine ointment (an antiseptic first-aid ointment; dark brown, so that the film shows on the skin in a photo), pre-dispensed as a dollop on the floor of a 30 mL graduated polypropylene medicine cup. The cup stands on a 70 x 70 x 25 mm white HDPE block at (0.30, -0.205). |
 | Applicator | A sterile 6 in (152 mm) wooden cotton-tipped applicator (for example Puritan 806-WC), its bud about 5 mm across and 14 mm long. It lies along x in its peel pouch, opened at the handle end, on a 130 x 60 x 25 mm white HDPE tray at (0.16, -0.17), bud toward the robot, with 50 mm of handle out past the tray's far edge. |
 | Plaster | Band-Aid Flexible Fabric Extra Large, 1.75 x 4 in (44 x 102 mm; JOJ5685, 10 per box), pad about 38 mm along the strip and across its full width, re-lined before the trial with two end-tab liners (below). It lies along y, liners down, on its opened wrapper on a 70 x 80 x 35 mm white HDPE riser at (0.44, 0.00), so that its wings and tabs stand out past the riser's ends. |
-| End-tab liners | The stock liners overlap at the pad's middle and are meant to be pulled from there, from under the strip, which a gripper cannot reach once the strip lies on the skin. So each plaster gets two C-folded liners whose tabs run out past its ends, as on end-tab dressings. Liner kit: 44 x 127 mm strips cut from siliconised release paper (the backing sheet of plain sticky labels, or a roll of silicone-coated release liner), each folded 51 mm from one end, silicone side out. Re-lining (about 60 s, gloved, touching only the paper and the plaster's back): peel one stock liner and lay that half of the adhesive on the 51 mm leaf of a kit liner, its fold at the middle of the pad and its long leaf running out under the strip, 25 mm past the end; repeat on the other side. Each liner then covers one wing and half the pad, and pulling its tab out along the strip peels it from the middle outward. Five plasters take about 5 minutes. Basis: the HSE (Ireland) first-aid page tells a person to "hold it by the protective strips with the pad facing down", "place the pad on the wound", then "pull away the strips and press the edges of the plaster" (https://www.hse.ie/conditions/wounds/apply/), and dressings such as Smith & Nephew PRIMAPORE have a backing paper in two halves, removed one after the other (https://www.smith-nephew.com/en-au/pharmacy/product-range/healthcare-in-the-home/primapore). The end tabs give a stock plaster that two-handed hold, place and pull sequence. The re-lining moves only where the liner is first taken: the liner still peels from the pad's middle outward, it must still be pulled low along the strip (a steep pull lifts the wing), the strip must still be held while it is pulled, and the pad and adhesive must still never be touched. |
+| End-tab liners | The stock liners overlap at the pad's middle and are meant to be pulled from there, from under the strip, which a gripper cannot reach once the strip lies on the skin. So each plaster gets two C-folded liners whose tabs run out past its ends, as on end-tab dressings. Liner kit: 44 x 127 mm strips cut from siliconised release paper (the backing sheet of plain sticky labels, or a roll of silicone-coated release liner), each folded 51 mm from one end, silicone side out. Re-lining (about 60 s, gloved, touching only the paper and the plaster's back): peel one stock liner and lay that half of the adhesive on the 51 mm leaf of a kit liner, its fold at the middle of the pad and its long leaf running out under the strip, 25 mm past the end; repeat on the other side. Each liner then covers one wing and half the pad, and pulling its tab out along the strip peels it from the middle outward. Five plasters take about 5 minutes. Basis: the HSE (Ireland) first-aid page tells a person to "hold it by the protective strips with the pad facing down", "place the pad on the wound", then "pull away the strips and press the edges of the plaster" (https://www.hse.ie/conditions/wounds/apply/), and dressings such as Smith & Nephew PRIMAPORE have a backing paper in two halves, removed one after the other (https://www.smith-nephew.com/en-au/pharmacy/product-range/healthcare-in-the-home/primapore). The end tabs give a stock plaster that two-handed hold, place and pull sequence. The re-lining moves only where the liner is first taken: the liner still peels from the pad's middle outward, it must still be pulled low along the strip (a steep pull lifts the wing), the strip must still be held while it is pulled, and the pad and adhesive must still never be touched. Release check, once per batch of liner paper: stick a kit liner's short leaf on a spare plaster laid on the film and pull its tab back along the strip with a 1 N spring gauge; it should read about 0.2-0.5 N, the range the simulator's peel force (0.27 N, 0.43 N at the start) sits in. |
 | Waste pot | A 1 L open bin, 110 mm across and 110 mm high, at (0.15, 0.02). |
-| No-touch check | Disposable nitrile finger-cot pad covers on the gripper fingertips, lightly dusted with Glo Germ UV powder (fresh covers each trial, so no powder stays on the rig), and a 365 nm UV torch. |
+| No-touch check | Disposable nitrile finger-cot pad covers on the gripper fingertips, marked with Glo Germ UV gel (not the loose powder), and a 365 nm UV torch. Containment: the gel is dabbed with a swab on the covers' outer pads only, over a lined tray away from the rig, and left 1 minute to dry; the covers are rolled onto the fingertips and, after the trial, rolled off into a bag over the same tray. The torch checks the bare fingers, the gripper bodies, the table and the underpad before each trial (nothing glows) and after it: a glow anywhere but on the covers, the plaster or the parts in the pot means the covers leaked; wipe it with soap and water, note the trial, and repeat the check until nothing glows. |
 | Skin protection | A 10 x 12 cm clear film dressing (3M Tegaderm 1626W) over the wound site, renewed each trial, with the moulage and the outline under it: the ointment and the plaster go on the film, so the iodine never stains the vinyl. |
 
 Rough cost: trainer about $350 (reusable); per trial one applicator ($0.05), one plaster ($0.60), ointment ($0.10), a
@@ -41,8 +41,8 @@ medicine cup ($0.02) and two liner strips (under $0.05).
 
 ## A real trial and its score
 
-Before a trial: a fresh dollop in a fresh cup, a fresh applicator and plaster laid as above, fresh UV-dusted finger-cot
-covers, the protective film renewed, the wound and its outline renewed if faded. Four reference ticks are drawn on the
+Before a trial: a fresh dollop in a fresh cup, a fresh applicator and plaster laid as above, fresh UV-gel-marked
+finger-cot covers fitted over the tray (above), the rig checked under the UV torch, the protective film renewed, the wound and its outline renewed if faded. Four reference ticks are drawn on the
 film with a fine marker, outside the plaster's footprint: on the arm's axis 60 mm each side of the wound's centre, and
 round the arm 30 mm each side of it. A phone on a stand looks straight down on the wound. Start the video and the timer
 (4 minutes).
@@ -63,13 +63,14 @@ After the trial:
    tolerance all round, so a pad within it covers the whole outline.
 4. Both liners are in the pot. Both wings lie flat and stuck along their whole length: a 0.25 mm feeler blade does not
    enter under any edge.
-5. Peel the plaster off slowly: no cream on either wing's adhesive. Under the UV torch, no powder on the pad's face, on
+5. Peel the plaster off slowly: no cream on either wing's adhesive. Under the UV torch, no UV marker on the pad's face, on
    the adhesive, or on the wound.
 6. From the video: both grippers end 3 cm or more from the plaster for 1 s.
+7. Roll the covers off into the bag over the tray and check the rig under the UV torch (above).
 
 | Outcome | Score |
 |---|---|
-| A gripper touched the wound, the pad's face or the adhesive (UV powder); cream under the adhesive; the applicator dipped again after touching skin, or its bud touched anything but the cream and the skin (step 2); the plaster dropped off the arm | 0 |
+| A gripper touched the wound, the pad's face or the adhesive (UV marker); cream under the adhesive; the applicator dipped again after touching skin, or its bud touched anything but the cream and the skin (step 2); the plaster dropped off the arm | 0 |
 | Cream done (step 1 and the applicator in the pot, step 2) | 0.25 |
 | ... and the pad over the whole outline, one liner off and its wing stuck along its whole length | 0.5 |
 | ... and both liners off, at least one wing stuck along its whole length | 0.75 |
@@ -83,14 +84,14 @@ After the trial:
 ```bash
 python -m pytest -q test_task.py                       # the model and the scorer, without the simulator
 python run_demo.py OUT                                  # the scripted demo through inspect-robots run, frames in OUT
-python run_demo.py OUT --no-frames --mode one_liner     # a failure check (face, drop, one_liner, cream_wing, bud_rim, none)
+python run_demo.py OUT --no-frames --mode one_liner     # a failure check (face, drop, one_liner, cream_wing, bud_rim, unheld, none)
 # a policy (POLICY), as Dream-1 runs it:
 inspect-robots run --embodiment yam_arena --policy POLICY -E task=task.py -E object_jitter=0 -E control_hz=20 \
   -E cam_width=320 -E cam_height=176 --scorer task_score --max-steps 4800 \
   --instruction "$(python -c 'import json;print(json.load(open("task.json"))["instruction"])')"
 ```
 
-One trial is up to 4,800 control steps (4 minutes at 20 Hz). The demo scores 1.0 and ends after 3,008 steps (150 s simulated), about 15 minutes on one RTX-class GPU. There is no randomness (object jitter 0).
+One trial is up to 4,800 control steps (4 minutes at 20 Hz). The demo scores 1.0 and ends after 3,089 steps (154 s simulated), about 15 minutes on one RTX-class GPU. There is no randomness (object jitter 0).
 
 **What is simulated.** The arms, the forearm (a convex collider 1.5 mm inside the drawn skin, for the vinyl's give),
 the trays, the cup, the pot and the riser are rigid bodies on GPU physics. So are the three things the hands hold:
@@ -121,15 +122,40 @@ fingertip on the forearm and on those bodies:
   on the arm only from within 10 mm of the skin, roughly level and with no adhesive bared; otherwise it has fallen
   (score 0).
 - **Liners:** a taut tab pulled at most 60 degrees above the skin peels its liner from the middle outward, at half the
-  tab's travel, as long as something holds the strip: the other liner's tab still held, a wing already stuck, or a
-  fingertip pressing on it with at least 0.5 N. If nothing holds the strip, it slides with the pull until the other tab
-  is taut. A steeper pull lifts the wing's end instead. Tabs pulled apart in the air peel both liners and bare the pad.
+  tab's travel, if the strip is held against the peel force (below). A steeper pull lifts the wing's end instead. Tabs
+  pulled apart in the air peel both liners and bare the pad.
+- **Peel force on the tab.** The liner resists the pull. A C-folded liner is a 180 degree peel, so the tab feels the
+  liner's release force as a 180 degree peel test measures it. Taken here: 0.15 N per 25 mm of width, an easy-to-medium
+  siliconised release paper (medical release liners run from about 5 to 200 g/in, Saint-Gobain's guide to medical
+  release liners,
+  https://www.globalspec.com/SaintGobainSpecialtyFilms/ref/ReleaseLinerSelectionforDrugDeliveryandMedicalDeviceDesign.pdf;
+  easy grades about 5-20 and easy-medium 10-50 g per 2 in, Adhesives Research's release liner overview,
+  https://www.adhesivesresearch.com/wp-content/uploads/2022/09/Release-Liner-Product-Overview.pdf; the FINAT FTM 10
+  release test is a 180 degree peel of 25 mm strips at 300 mm/min). Over the strip's 44.5 mm that is 0.27 N once the peel front is on the
+  adhesive, with a start-up peak of 1.6 times that (0.43 N) over the first 3 mm of adhesive; under the pad, which has no
+  adhesive, 0.05 N while the liner slides off and unfolds. It is a native PhysX external force on the tab body, set at
+  every physics step (240 Hz) from that body's pose, like a taut string: full once the tab is pulled out as far as the
+  peel front's travel needs (twice the front's distance from the strip's middle), falling to nothing over the last
+  millimetre of slack. The fingers must hold the tab against it by friction alone; a grip too light lets the tab slip
+  and the peel stops.
+- **Counterforce on the strip.** The same force acts the other way on the strip at the peel front's row of nodes, along
+  the skin toward the tab. The strip resists it with friction on the skin (coefficient 0.5) under its own weight
+  (0.8 g) and under any fingertip pads pressing on it (their measured contact forces), and with 0.1 N of shear for each
+  tacked node (about 17 mm^2 of adhesive). If that holds, the peel front moves on. If not, and the other hand holds the
+  other tab taut with its liner on, the rest of the pull passes through the strip onto that tab body, as the same kind
+  of native force, and that hand's grip must hold it. Otherwise the strip slides along with the pull (and the tab feels
+  only the strip's sliding friction): pulled with nothing holding it, the plaster is dragged off the wound. Carried in
+  the air, each tab carries half the strip's weight, and tabs pulled apart pull on each other with one tension.
+  Omitted: the release force's change with peel speed and angle (one 180 degree value for any pull up to 60 degrees
+  above the skin), stick-slip after the start-up peak, the paper's stretch, the strip turning (it slides as a whole
+  along its axis), the other liner's fold opening when its held tab takes the drag, and the torque from where the force
+  acts (at the tab body's centre).
 - **Tack:** an exposed adhesive node lying on the skin sticks only under a fingertip pad whose own native contact force
   on the forearm is at least 1 N, within 2 mm of that pad. Tack never spreads. An adhesive node that comes down on cream
   (thicker than 0.02 mm within 2 mm) is spoiled.
 
 Not simulated: wrinkles and creases (in the simulator, "flat" means every wing node lying on and stuck to the skin), the
-adhesive's strength, the peel force on the tab (the tab body feels no pull from its liner), cream flow, the bud's
+adhesive's peel strength on skin (tack holds only in shear, as above), cream flow, the bud's
 bending and the paper's flexibility (the tab bodies are rigid). Masses are rounded up for the solver (applicator 2 g,
 tab 1 g). All values are nominal.
 
@@ -158,10 +184,13 @@ The sequence:
    stick can turn a little in the fingers), then drops the applicator in the pot.
 2. Both hands take the tabs, lift the plaster, carry it over the wound and lower it, each tab held 12 mm out past its
    end and 16 mm up, so that the strip settles on the skin.
-3. The right hand pulls its tab out low along the strip, while the left hand's tab holds the strip in place. It bins
+3. The right hand pulls its tab out low and slowly along the strip (about 20 mm/s at the tab, 10 mm/s at the peel
+   front), pinched shut, while the left hand holds its own tab still: the strip's pull comes onto that tab. It bins
    the liner, then presses the right wing at 17 points (5 along the wing by 3 round the arm, and its two inner corners) with its closed fingers
    tipped 4 degrees, so that one fingertip pad leads and bears the press (at least 1 N on that pad alone).
-4. The left hand does the same on its side; the stuck right wing now holds the strip. Both hands move clear of the arm.
+4. The right hand presses the pad down beside the wound (on its right half, where no left liner is) while the left hand
+   pulls its tab the same way; the stuck right wing and the pressing fingertip hold the strip. The right hand moves
+   clear; the left bins its liner and presses its wing. Both hands end clear of the arm.
 
 **Failure checks** (`--mode`):
 
@@ -173,6 +202,7 @@ The sequence:
 | `one_liner` | leaves the left liner on | 0.5 |
 | `cream_wing` | wipes cream out along the arm where the right wing will lie | 0 |
 | `bud_rim` | wipes the excess off the bud on the cup's rim after the dip, then goes on as the demo | 0 |
+| `unheld` | lays the plaster, then the left hand lets go of its tab before the right liner is pulled: nothing holds the strip against the peel force, and the pull drags it off the wound | 0.25 (cream only) |
 | `none` | does nothing | 0 |
 
 ## Files

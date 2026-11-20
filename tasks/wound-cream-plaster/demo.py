@@ -10,7 +10,13 @@ the peel fronts or any contact force. The applicator and the tabs are real bodie
 TASK_DEMO modes: `full` (default), `none` (do nothing), and the failure modes: `face` (a fingertip touches the pad's
 face, bared by pulling the tabs a little apart in the air), `one_liner` (the left liner is left on), `cream_wing`
 (cream smeared where a wing will lie), `drop` (the tabs pulled right apart over the wound: the bared strip falls),
-`bud_rim` (the bud wiped on the cup's rim after the dip).
+`bud_rim` (the bud wiped on the cup's rim after the dip), `unheld` (the left hand lets go of its tab before the right
+liner is pulled: nothing holds the strip against the liner's peel force, so the pull drags it off the wound).
+
+Each liner peels against its release force, which pulls back on the tab and, at the peel front, drags the strip toward
+the tab: the right liner is pulled with the left hand holding its own tab still (the strip's pull comes onto that tab),
+the left one with the right wing tacked and the right hand pressing the pad down beside the wound. Both pulls go out low
+and slowly, the tabs pinched shut.
 """
 
 from __future__ import annotations
@@ -252,23 +258,55 @@ def plaster(ctx, view, l, r):
         return
     yield from ctx.together(l.move(lay["left"], t=2.0, label="lay"), r.move(lay["right"], t=2.0, label="lay"))
     yield from ctx.together(l.wait(0.5), r.wait(0.5))
+    if mode_is(ctx, "unheld"):
+        # the left hand lets go of its tab and moves off; the right pulls its liner with nothing holding the strip
+        yield from l.open(t=1.0, label="unheld: let go of the left tab")
+        yield from l.move(l.at() + [0, 0.03, 0.06], t=1.2, label="unheld: left away")
+        yield from pull_liner(r, "right")
+        yield from r.open(t=1.0, label="unheld: let go")
+        yield from r.move(W(ASIDE["right"]), grip=dk.down(0.0), t=2.0, label="right: aside")
+        yield from l.move(W(ASIDE["left"]), grip=dk.down(0.0), t=2.0, label="left: aside")
+        yield from l.wait(2.0)
+        return
     yield from peel_bin_press(ctx, view, r, "right")
     if mode_is(ctx, "one_liner"):
         yield from l.open(label="leave the left liner on")
         yield from l.move(l.at() + [0, 0.05, 0.08], t=1.5, label="left: away")
         yield from r.wait(1.5)
         return
-    yield from peel_bin_press(ctx, view, l, "left")
+    # the right hand presses the pad down beside the wound (its right half, where no left liner is) while the left liner
+    # is pulled
+    v = view()
+    centre_y = (v["ends"]["left"][1] + v["ends"]["right"][1]) / 2
+    p, n = S.ARM.point(centre_y - 0.014, 0.0)
+    g, over, push = press_grip(r, p, n, 0.007)
+    yield from r.move(over, grip=g, t=1.2, label="pad: over")
+    yield from r.move(push, t=0.6, label="pad: hold down")
+    yield from r.wait(0.3)
+    yield from pull_liner(l, "left")
+    yield from r.move(over, t=0.5, label="pad: up")
+    yield from r.move(W(ASIDE["right"]), grip=dk.down(0.0), t=1.5, label="right: aside")
+    yield from bin_press(view, l, "left")
     yield from l.wait(2.0)
 
 
-def peel_bin_press(ctx, view, arm, side):
+def pull_liner(arm, side):
+    """Pull the tab straight out along the strip, low over the skin and slowly (the liner peels at half the tab's
+    travel)."""
     s = SIGN[side]
     start = arm.at()
-    # pull the tab straight out along the strip, low over the skin
     for out, up in ((0.030, 0.018), (0.060, 0.020), (0.095, 0.024), (0.135, 0.030)):
         tgt = start + np.array([0, s * (out - 0.010), up - 0.016])
         yield from arm.move(tgt, t=1.2 if out < 0.05 else 1.6, label=f"{side} liner: pull")
+
+
+def peel_bin_press(ctx, view, arm, side):
+    yield from pull_liner(arm, side)
+    yield from bin_press(view, arm, side)
+
+
+def bin_press(view, arm, side):
+    s = SIGN[side]
     yield from arm.move(arm.at() + [0, 0, 0.08], t=1.2, label=f"{side} liner: up")
     pot = W((S.POT_C[0], S.POT_C[1] + 0.012 * s, S.POT_H + 0.07))
     yield from arm.move(pot, grip=dk.down(0.0), t=2.5, label=f"{side} liner: over the pot")

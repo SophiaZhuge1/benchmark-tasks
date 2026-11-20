@@ -411,3 +411,115 @@ def test_short_cream_caps_a_lesser_plaster():
     w.pl.covers_zone = lambda cr: False  # no plaster on: short cream alone scores nothing
     t.update(w, idle())
     assert t.score() == 0.0
+
+
+# -- the liners' peel force and its counterforce on the strip ----------------------------------------------------------------
+def test_peel_force_is_light_on_the_pad_peaks_at_the_adhesive_then_steady():
+    assert F.peel_force(0.0) == F.PEEL_PAD_N
+    assert F.peel_force(S.PAD_HALF + 0.001) == pytest.approx(1.6 * F.PEEL_N)
+    assert F.peel_force(S.PAD_HALF + F.BREAK_LEN + 0.001) == pytest.approx(0.15 / 0.025 * S.PL_WID)
+    assert 0.25 < F.PEEL_N < 0.29  # 0.15 N per 25 mm over the 44.5 mm strip
+
+
+def test_a_tab_pull_is_a_taut_string():
+    tt = (np.zeros(3), 0.030, 0.4, np.zeros(3))
+    assert np.allclose(F.tether_force(tt, [0, 0.0285, 0]), 0.0)  # slack: nothing
+    assert F.tether_force(tt, [0, 0.0295, 0])[1] == pytest.approx(-0.2)  # half-way up the last millimetre
+    f = F.tether_force(tt, [0, 0.0, 0.040])
+    assert f == pytest.approx([0, 0, -0.4])  # taut: the full pull, back toward the anchor
+
+
+def _pull_right(w, rig, tg, left_hand, out=0.13, n=40, left_held="tab_left"):
+    hist = []
+    for a in np.linspace(0, 1, n):
+        g = tg["right"] + np.array([0, -out * a, 0.012 * a])
+        hs = {"left": left_hand, "right": hand("right", g, tab_R("right"), 0.0)}
+        rig.step(hs, {"left": left_held, "right": "tab_right"})
+        hist.append((w.pl.liners["right"].p, {k: v for k, v in w.pl.tether.items()}, w.pl.front_force.copy(), w.pl.hold_n, w.pl.slid))
+    return hist
+
+
+def test_peel_pulls_the_tab_back_and_the_strip_forward_onto_the_other_tab():
+    w = F.World()
+    rig = Rig(w)
+    tg = lay_plaster(w, rig)
+    hist = _pull_right(w, rig, tg, hand("left", tg["left"], tab_R("left"), 0.0))
+    assert w.pl.liners["right"].state == "held"
+    seen = set()
+    slid = 0.0
+    for p, tether, front, hold, now in hist:
+        dragged, slid = now > slid, now
+        if "right" not in tether or tether["right"][2] == 0 or dragged:  # (dragging the left tab's slack out first)
+            continue
+        P = tether["right"][2]
+        assert P == pytest.approx(F.peel_force(p), abs=1e-9) or p >= S.PL_LEN / 2
+        seen.add(round(P, 3))
+        tot = front.sum(axis=(0, 1))
+        assert np.linalg.norm(tot) == pytest.approx(P)  # equal and opposite, at the peel front ...
+        assert tot[1] < -0.9 * P  # ... toward the right tab (-y)
+        rows = np.flatnonzero(np.abs(front).sum(axis=(1, 2)) > 0)
+        assert len(rows) == 1 and abs(abs(w.pl.u[rows[0]]) - p) < 0.002
+        # the strip holds only by friction under its own weight, so the rest of the pull comes onto the left tab
+        assert tether["left"][2] == pytest.approx(P - hold)
+    assert {round(F.PEEL_PAD_N, 3), round(F.PEEL_BREAK_N, 3), round(F.PEEL_N, 3)} <= seen
+    assert w.pl.slid < 0.003  # only the left tab's last millimetre of slack
+
+
+def test_a_strip_nobody_holds_is_dragged_and_its_tab_feels_only_the_strip_sliding():
+    w = F.World()
+    rig = Rig(w)
+    tg = lay_plaster(w, rig)
+    for _ in range(F.LET_GO_STEPS):
+        rig.step({"left": hand("left", tg["left"], tab_R("left"), 0.09), "right": hand("right", tg["right"], tab_R("right"), 0.0)},
+                 {"left": None, "right": "tab_right"})
+    hist = _pull_right(w, rig, tg, hand("left"), left_held=None)
+    assert w.pl.liners["right"].state == "on" and w.pl.liners["right"].p == 0.0
+    assert w.pl.slid > 0.1
+    friction = F.MU_SKIN * F.STRIP_MASS * F.G
+    pulls = [h[1]["right"][2] for h in hist if "right" in h[1]]
+    assert pulls and max(pulls) == pytest.approx(friction)
+    off = w.pl.pad_offset()
+    assert off[0] > 0.1  # dragged off the wound
+
+
+def _presser(y, s, forces):
+    p, n = S.ARM.point(y, s)
+    R = rot(-n, (0, -1, 0))
+    return F.Hand("left", R, p + n * (0.0128 - 0.004), 0.0, list(gripgeo.tcp_boxes(0.0)), dict(zip(("tip_left", "tip_right"), forces)))
+
+
+@pytest.mark.parametrize("forces, peeled", [((0.8, 0.8), True), ((0.15, 0.15), False)])
+def test_a_finger_pressing_the_pad_holds_the_strip_if_its_friction_beats_the_peel(forces, peeled):
+    w = F.World()
+    rig = Rig(w)
+    tg = lay_plaster(w, rig)
+    for _ in range(F.LET_GO_STEPS):
+        rig.step({"left": hand("left", tg["left"], tab_R("left"), 0.09), "right": hand("right", tg["right"], tab_R("right"), 0.0)},
+                 {"left": None, "right": "tab_right"})
+    y0 = w.pl.place[0]
+    hist = _pull_right(w, rig, tg, _presser(y0 + 0.010, 0.0, forces), left_held=None)
+    cap = F.MU_SKIN * (F.STRIP_MASS * F.G + sum(forces))
+    assert max(h[3] for h in hist) == pytest.approx(cap)
+    if peeled:  # 1.6 N pressed: 0.8 N of friction, more than the 0.43 N peak
+        assert w.pl.liners["right"].state == "held" and w.pl.slid < 1e-6
+    else:  # 0.3 N pressed: 0.15 N, enough on the pad (0.05 N) but not at the adhesive: the strip slides from there
+        assert w.pl.liners["right"].state == "on"
+        assert S.PAD_HALF - 0.002 < w.pl.liners["right"].p < S.PAD_HALF + 0.002
+        assert w.pl.slid > 0.02
+
+
+def test_tabs_pulled_apart_in_the_air_pull_each_other_equally():
+    w = F.World()
+    rig = Rig(w)
+    pts = {k: w.pl.tab_point(k) for k in F.SIDES}
+    for _ in range(F.TAKE_STEPS):
+        rig.step({k: hand(k, pts[k], tab_R(k), 0.0) for k in F.SIDES}, {k: f"tab_{k}" for k in F.SIDES})
+    up = np.array([0, 0, 0.1])
+    rig.step({k: hand(k, pts[k] + up, tab_R(k), 0.0) for k in F.SIDES})
+    g = {k: pts[k] + up for k in F.SIDES}
+    f = {k: F.tether_force(w.pl.tether[k], g[k]) for k in F.SIDES}
+    assert f["left"][2] == pytest.approx(-F.STRIP_MASS * F.G / 2)  # hanging: each tab carries half the strip
+    rig.step({k: hand(k, pts[k] + up + [0, F.SIGN[k] * 0.012, 0], tab_R(k), 0.0) for k in F.SIDES})
+    g = {k: pts[k] + up + [0, F.SIGN[k] * 0.012, 0] for k in F.SIDES}
+    f = {k: F.tether_force(w.pl.tether[k], g[k]) for k in F.SIDES}
+    assert f["left"][1] == pytest.approx(-F.PEEL_PAD_N) and f["right"][1] == pytest.approx(F.PEEL_PAD_N)

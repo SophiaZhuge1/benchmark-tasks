@@ -50,6 +50,7 @@ class Model:
         self.origin = np.zeros(3)
         self.last = {}
         self.fmax = {}
+        self.pull = {k: np.zeros(3) for k in F.SIDES}  # N: the force last applied to each tab body
 
     def reset(self):
         if self.view is not None:  # each tab hinged at its root again (rebuilt from the bodies' reset poses)
@@ -84,6 +85,36 @@ class Model:
             path = base.scene[part].root_view.prim_paths[0]
             self.part_views[part] = sim_view.create_rigid_contact_view([path], filter_patterns=[tips])
         self.render.origin = self.origin + np.array([0.0, 0.0, S.TABLE])
+        for k in F.SIDES:
+            self._install_tether(base.scene[f"tab_{k}"], k)
+
+    def _install_tether(self, obj, k):
+        """Each physics step, before the simulator steps, sets the native PhysX external force on tab k's body from the
+        model's taut-string pull on it (firstaid.Plaster.tether): read from the body's pose at that physics step, so a
+        tab that slips out of the fingers goes slack at once."""
+        import torch
+
+        write = obj.write_data_to_sim
+        up = self.origin + np.array([0.0, 0.0, S.TABLE])
+        state = {"on": False}
+
+        def write_with_pull():
+            tt = self.w.pl.tether.get(k)
+            if tt is not None or state["on"]:
+                force = np.zeros(3)
+                if tt is not None:
+                    q = _arr(obj.data.root_link_pose_w)[0]
+                    p, R = q[:3] - up, bodykit.rotation(q[3:7])
+                    off = self.w.pl.tab_off[k]
+                    g = p + R @ (off if off is not None and self.w.pl.tab_held[k] is not None else np.array([0.0, F.SIGN[k] * S.TAB_GRIP, 0.0]))
+                    force = F.tether_force(tt, g)
+                self.pull[k] = force
+                t = torch.tensor(force, dtype=torch.float32, device=obj.device).view(1, 1, 3)
+                obj.permanent_wrench_composer.set_forces_and_torques_index(forces=t, torques=torch.zeros_like(t), is_global=True)
+                state["on"] = tt is not None
+            write()
+
+        obj.write_data_to_sim = write_with_pull
 
     def hands(self):
         from yam_arena.constants import TCP_OFFSET
@@ -128,7 +159,9 @@ class Model:
             self.last = {"force": {s: {k: round(v, 2) for k, v in h.force.items()} for s, h in hands.items()},
                          "ap_mm": {s: round(h.ap * 1000, 1) for s, h in hands.items()},
                          "tcp": {s: np.round(h.t, 4).tolist() for s, h in hands.items()},
-                         "grip": {s: {p: [round(v, 2) for v in f] for p, f in c.items() if max(f) > 0} for s, c in parts["contact"].items()}}
+                         "grip": {s: {p: [round(v, 2) for v in f] for p, f in c.items() if max(f) > 0} for s, c in parts["contact"].items()},
+                         "pull": {k: round(float(np.linalg.norm(v)), 3) for k, v in self.pull.items()},
+                         "hold_n": round(self.w.pl.hold_n, 2), "drag_n": round(self.w.pl.drag_n, 2), "slid_mm": round(self.w.pl.slid * 1000, 1)}
             self.render.update()
             if DEBUG:
                 pk = self.fmax
