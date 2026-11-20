@@ -18,5 +18,6 @@
   "run_limit": "4,800 steps (4 minutes at 20 Hz)",
   "reset_notes": "Per trial: a fresh applicator, cup and 0.5 mL of ointment, and a plaster re-lined with end-tab liners (about 60 s, gloved, touching only paper and the plaster's back): fold two 44 x 127 mm strips of siliconised label backing 51 mm from one end, silicone out; peel one stock liner, lay that half's adhesive on a strip's short leaf, fold at the pad's middle, long leaf 25 mm past the end; repeat. The tabs give the hold-by-the-strips, place, pull-away sequence of first-aid guidance (HSE Ireland) and of two-half-backed dressings (Smith & Nephew PRIMAPORE). Peel the used plaster low and slow, check the adhesive for ointment and UV powder, renew the clear film over the site (and the moulage and outline under it if faded), fit fresh Glo Germ-dusted finger-cot covers and lay the parts on their outlines.",
   "fidelity": "Reduced model (README). Applicator and liner tabs are loose PhysX bodies held only by friction (held: both pads >=1 N, native contact); tabs hinged at their roots until held; shaft collider square. Ointment: 0.5 mm height field. Plaster: 35 x 9 nodes. Liners peel at half the tab's travel if pulled <=60 deg above skin while the strip is held. Tack only under a pad itself pressing >=1 N. Dropped bared, crooked or from >1 cm, it falls. No wrinkles, adhesive strength or flow.",
-  "scores": "Dream-1 run: 0.0 (valid run); scripted demo: 1.0 (3,008 steps)"
+  "scores": "Dream-1 run: 0.0 (valid run); scripted demo: 1.0 (3,008 steps)",
+  "media": "M-XE43LR"
 }
