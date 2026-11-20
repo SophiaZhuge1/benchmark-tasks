@@ -8,6 +8,7 @@ the box and hold it there, without a gripper touching a tip and with the box kep
 
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 
@@ -42,6 +43,11 @@ def _reset() -> None:
 def _step(env) -> None:
     MODEL.attach(env)
     TRACKER.update(MODEL.step())
+    if os.environ.get("TASK_CLOSEUP"):  # the demo video's close-up of the nozzles (closeup.py); not a policy camera
+        import closeup
+
+        closeup.start(env.unwrapped.scene.env_prim_paths[0])
+        closeup.step()
 
 
 def score(objects) -> float:

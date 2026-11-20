@@ -29,6 +29,7 @@ Scripted demo, through Inspect Robots' CLI with the demo registered as a policy:
 
 ```bash
 python run_demo.py runs/demo            # 640 x 360; --width 320 --height 176 for Dream-1's size
+TASK_CLOSEUP=runs/demo/closeup python run_demo.py runs/demo   # also saves the video's close-up, one picture a step
 ```
 
 The run prints `task_score` at the end: 1.0 once all eight tips are seated and level with the pipette held for 2 s.
@@ -42,10 +43,17 @@ cameras and the joints. `tipdemo.py` holds the demo; `demokit.py` its arm primit
 
 ## What the video shows
 
-`demo.mp4` (86.5 s, the scripted demo, score 1.0) has three panels: left, the top camera (the whole scene); top right,
-the left wrist camera (it looks down at the tip box's far end while that hand holds the rim); bottom right, the right
-wrist camera (mostly the white pipette handle it holds). The wrist cameras are fixed to the grippers, so the held
-pipette and the box rim block much of their view.
+`demo.mp4` (the scripted demo, score 1.0; 86.5 s simulated, 107.5 s of video) has four panels: top left, the top camera
+(the whole scene); top right, the left wrist camera (it looks down at the tip box's far end while that hand holds the
+rim) above the right wrist camera (mostly the white pipette handle it holds). The wrist cameras are fixed to the
+grippers, so the held pipette and the box rim block much of their view.
+
+Below them is a close-up of the nozzles seating in the tips, labelled "not a policy camera": a fixed camera used only
+for the video (`closeup.py`, on only with `TASK_CLOSEUP` set), on the arms' side just above the box rim, looking across
+the empty columns 1–3 at column 4. It shows the eight nozzles going into the tip mouths and pressing in, and the tips
+coming up on them at the lift. It adds no body, collider or light, and the policy's cameras and inputs are as without
+it; the run with it on gives the same trace, step for step, as without it. The video plays 4x slower from 15 to 18 s
+and from 81 to 85 s (marked on screen, with the simulated time); the times below are simulated time.
 
 - 0–6 s: the right hand comes in behind the pipette in its stand and grips the handle (about 6 s); the left hand goes to
   the box's far rim and holds it down.
@@ -60,9 +68,9 @@ pipette and the box rim block much of their view.
 - 85.3–86.5 s: the pipette is held, tips more than 3 cm above the rim; the run ends at 86.5 s, after 2 s of the
   full-score state.
 
-The seated tips themselves are small and mostly hidden behind the right hand in the top camera; what shows that they are
-on is column 4's row of empty holes in the rack after the lift (left wrist camera from 82 s, top camera from about
-85 s, once the left hand has moved away). Their depth
+The seated tips themselves are small and mostly hidden behind the right hand in the top camera; the close-up shows them
+coming up on the nozzles at 82–84 s, and column 4's row of empty holes after the lift (also in the left wrist camera
+from 82 s, top camera from about 85 s, once the left hand has moved away). Their depth
 and level are measured by the scorer from the simulated poses.
 
 ## How it is scored
@@ -187,7 +195,8 @@ session from the first action to the end: task score 0.0 (no tip seated). The vi
 - `task.py`: the scene, `score()` and `success()`, and the demo's entry point.
 - `tiplaw.py`: the fit law, the vendor-data force values and the calibration; `tip_rules.py`: the scoring; `test_tips.py`: tests.
 - `tipkit.py`: the parts (box, tips, pipette, stand, tape marks) and the fit model run in the physics step.
-- `tipdemo.py`, `demokit.py`, `run_demo.py`: the scripted demo.
+- `tipdemo.py`, `demokit.py`, `run_demo.py`: the scripted demo; `closeup.py`: the demo video's close-up of the nozzles
+  (only with `TASK_CLOSEUP=<folder>` set; not a policy camera).
 - `bodykit.py`: rigid bodies of several shapes for task files; `steptime.py`: step timing.
 
 ## Sources
