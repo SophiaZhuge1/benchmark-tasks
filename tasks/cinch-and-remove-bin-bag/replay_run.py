@@ -18,7 +18,7 @@ def main():
         digest.update(v.tobytes());judge.update(s,v)
         if step%100==0:print(json.dumps({'step':step,'score':judge.result().get('score'),'elapsed':round(time.monotonic()-start,2)}),flush=True)
         if judge.failure is not None:break
-    result=dict(judge.result(),last_replayed_step=step,expected_final_step=max(states),all_steps_replayed=step==max(states),geometry_sha256=digest.hexdigest(),source_sha256={n:hashlib.sha256(Path(__file__).with_name(n).read_bytes()).hexdigest() for n in ['drawstring_score.py','evaluate_removal.py','containment.py','replay_run.py']})
+    result=dict(judge.result(),last_replayed_step=step,expected_final_step=max(states),all_steps_replayed=step==max(states),geometry_sha256=digest.hexdigest(),source_sha256={n:hashlib.sha256(Path(__file__).with_name(n).read_bytes()).hexdigest() for n in ['drawstring_score.py','drawstring_physics.py','evaluate_removal.py','containment.py','replay_run.py']})
     a.out.parent.mkdir(parents=True,exist_ok=True);a.out.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result),flush=True)
     return int(not result.get('full_task_success'))
 

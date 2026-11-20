@@ -25,28 +25,55 @@ BAG_COLOR=(.92,.92,.90)       # white liner
 STRING_COLOR=(.80,.80,.78)    # white drawstring, slightly darker for contrast
 FILM_T=.0001                  # m, film thickness (numerical; see fidelity note)
 BEND_SCALE=.1                  # film bending stiffness factor
-LOOP_Y=.160                   # m, loop pinch point, |y| from pot axis
-LOOP_SIZE=(.014,.010,.020)    # m, bunched drawstring loop at the pinch
-LOOP_MASS=.002                # kg
-STRING_RADIUS=.004
-STRING_MASS=.0015             # kg per exposed loop chain
+# Exposed drawstring loops: flat film-tape straps (see loop_chain.py). Each
+# loop leaves its hem cut-out and lies on the mat as a U, standing on edge as
+# the tape lies in the hem channel, its two strands 16 mm apart (centres).
+STRAP_W=.020                  # m, flat drawstring tape width (real liners: about 10-20 mm)
+STRAP_T=.002                  # m, numerical collision thickness of the doubled tape
+STRAP_SEG=.010                # m, link length
+STRAP_MASS=.004               # kg per exposed loop (solver value)
+STRAND_GAP=.016               # m, strand centre spacing in the laid-out loop
+LOOP_ROOT=.020                # m, strand ends this far out from the cut-out
+LOOP_LEN=.0635                # m, straight strand length before the bight
+LOOP_YAW=30.                  # deg, loops lean toward +x (toward the operator's reach)
+STRING_RADIUS=.002
+STRING_MASS=STRAP_MASS
+
+def loop_axes(s):
+    """Unit direction along loop s (+1 left/+y, -1 right/-y) and its normal."""
+    import numpy as np
+    a=np.radians(LOOP_YAW)
+    u=np.array([np.sin(a),s*np.cos(a),0.])
+    n=np.array([np.cos(a),-s*np.sin(a),0.])
+    return u,n
 
 def loop_polylines():
-    """Authored exposed loops: from the two hem cut-outs (outside the bin, at
-    the bottom of the folded-over cuff) each loop lies flat on the mat,
-    pointing straight outward. Strands 10 mm apart."""
+    """Authored exposed loops: one U-shaped strap per side, standing on edge on
+    the mat, strands running outward from the cut-out (two root ends, then the
+    strand, a semicircular bight, the other strand back)."""
     import numpy as np
     from realistic_meshes_v32 import HEM_R
     loops=[]
+    z=.750+STRAP_W/2+.0004
     for s in (1,-1):
-        from realistic_meshes_v32 import HEM_Z
-        y0=s*(HEM_R+.004);z0=BAG_BASE_Z+HEM_Z;zm=.750+STRING_RADIUS
-        ya=s*(HEM_R+.030);yb=s*(HEM_R+LOOP_OUT)
-        left=[(.2155,y0,z0),(.2155,ya,zm),(.2155,yb,zm)]
-        right=[(.2245,yb,zm),(.2245,ya,zm),(.2245,y0,z0)]
-        pts=[*left,(.22,yb+s*.008,zm),*right]
+        u,n=loop_axes(s)
+        cut=np.array([.22,s*HEM_R,z])
+        r=STRAND_GAP/2
+        a=cut+u*LOOP_ROOT;b=a+u*LOOP_LEN
+        pts=[a+n*r,b+n*r]
+        for k in range(1,12):
+            ang=np.pi*k/12
+            pts.append(b+u*r*np.sin(ang)+n*r*np.cos(ang))
+        pts+=[b-n*r,a-n*r]
         loops.append(np.array(pts))
     return loops
+
+def pinch_point(s,from_bight=.022):
+    """Authored pinch site on loop s: across both straight strands, 22 mm short of the bight."""
+    import numpy as np
+    from realistic_meshes_v32 import HEM_R
+    u,_=loop_axes(s)
+    return np.array([.22,s*HEM_R,.750])+u*(LOOP_ROOT+LOOP_LEN-from_bight)
 
 def build_assets():
     import numpy as np
@@ -131,10 +158,9 @@ def build_assets():
             mass_props=sim.MassPropertiesCfg(mass=mass),physics_material=sim.RigidBodyMaterialCfg(static_friction=1.,dynamic_friction=.8),
             visual_material=sim.PreviewSurfaceCfg(diffuse_color=color)),initial_pose=Pose(position_xyz=tuple(map(float,pos))))
     for j,pos in enumerate(bead_positions):assets.append(marker('hem_%02d'%j,pos,(.003,.003,.003),.001,BAG_COLOR,collide=False))  # seam force points, no collider
-    # Each pulled-out drawstring loop is represented by a small rigid body at
-    # its pinch point (the bunched loop), lying on the mat outside the pot.
-    for j,s in enumerate((1,-1)):
-        assets.append(marker('cord_end_%d'%j,(.22,s*LOOP_Y,.760),LOOP_SIZE,LOOP_MASS,STRING_COLOR))
+    from loop_chain import chain,chain_asset
+    for j,poly in enumerate(loop_polylines()):
+        assets.append(chain_asset(chain('loop_%d'%j,poly,segment=STRAP_SEG,width=STRAP_W,thickness=STRAP_T,mass=STRAP_MASS,color=STRING_COLOR)))
     for i in range(BLOCK_COUNT):
         assets.append(Object(name='rubbish_%d'%i,object_type=ObjectType.RIGID,
             spawner_cfg=sim.CuboidCfg(size=BLOCK_SIZES[i],rigid_props=PhysxRigidBodyPropertiesCfg(sleep_threshold=0.),

@@ -10,7 +10,7 @@ sys.path.insert(0,os.environ.get('YAM_COMPAT_ROOT',str(HERE)))
 sys.path.insert(0,str(HERE))
 HERE=HERE/args.run
 HERE.mkdir(parents=True,exist_ok=False)
-for n in [Path(__file__).name,'realistic_meshes_v32.py','drawstring_physics.py','drawstring_score.py','removal_assets.py','evaluate_removal.py','containment.py','plan_table_transfer.py','arena_task.py','removal_runtime.py']:(HERE/('source_'+n)).write_text((Path(__file__).resolve().parent/n).read_text())
+for n in [Path(__file__).name,'loop_chain.py','realistic_meshes_v32.py','drawstring_physics.py','drawstring_score.py','removal_assets.py','evaluate_removal.py','containment.py','plan_table_transfer.py','arena_task.py','removal_runtime.py']:(HERE/('source_'+n)).write_text((Path(__file__).resolve().parent/n).read_text())
 app=None
 
 def main():
@@ -61,8 +61,7 @@ def main():
     # The cord's rest length belongs to that reset scene, not the authored pose.
     frames=HERE/'frames';frames.mkdir(exist_ok=True)
     
-    for robot in robots:
-        robot.write_joint_effort_limit_to_sim_index(limits=8.,joint_ids=robot.find_joints(['joint7','joint8'],preserve_order=True)[0])
+    # Robot and gripper keep the adapter's standard actuator settings.
     q=q_ready; grip=[1.,1.];count=0; logs=[]
     orientations=[v.copy() for v in initial_rotations]
     def tensor(value):return value.torch if hasattr(value,'torch') else value
@@ -76,9 +75,12 @@ def main():
             result[key]={'low':p.min(0).tolist(),'high':p.max(0).tolist(),'mean':p.mean(0).tolist()}
         np.savez_compressed(HERE/('state_%04d.npz'%count),loaded_bag=arr(bags['loaded_bag'].data.nodal_pos_w))
         result['rubbish']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_pos_w)[0].tolist() for i in range(BLOCK_COUNT)]
-        result['fasteners']={key:{'pos':arr(base.scene.rigid_objects[key].data.root_pos_w)[0].tolist(),'quat':arr(base.scene.rigid_objects[key].data.root_quat_w)[0].tolist()} for key in ['cord_end_0','cord_end_1']}
+        result['loop_points']=[loop_links(k).tolist() for k in range(2)]
+        result['loop_pinch_sites']=[loop_grip(k).tolist() for k in range(2)]
+        result['loop_tcp_distance']=[loop_held_dist(k) for k in range(2)]
+        from removal_runtime import finger_opening, finger_joints
+        result['finger_opening']=[finger_opening(r) for r in robots];result['finger_joints']=[finger_joints(r) for r in robots]
         result['drawcord']=dict(cable.last)
-        result['loop_points']=[[v['pos']] for v in result['fasteners'].values()]
         result['loaded_mouth_indices']=anchors['loaded_bag']
         result['rubbish_velocities']=[arr(base.scene.rigid_objects['rubbish_%d'%i].data.root_lin_vel_w)[0].tolist() for i in range(BLOCK_COUNT)]
         result['hem_marker_positions']=[body_pos('hem_%02d'%j).tolist() for j in range(bead_count)]
@@ -116,6 +118,17 @@ def main():
         for waypoint in plan:
             q[:]=waypoint;tick()
     def body_pos(name):return arr(base.scene.rigid_objects[name].data.root_pos_w)[0]
+    # The strap loops are read from their visible link poses, as a camera would
+    # see them. Pinch site: across both strands, 22 mm short of the bight.
+    from loop_chain import _SPECS as CHAINS, chain_points
+    from removal_assets import pinch_point, loop_axes, STRAND_GAP
+    pinch_ids=[]
+    for k,s in enumerate((1,-1)):
+        c,_=CHAINS[f'loop_{k}'].initial_poses();u,nrm=loop_axes(s);p0=pinch_point(s)
+        pinch_ids.append([int(np.argmin(np.linalg.norm(c[:,:2]-(p0+side*nrm*STRAND_GAP/2)[:2],axis=1))) for side in (1,-1)])
+    def loop_links(k):return chain_points(env,f'loop_{k}')
+    def loop_grip(k):return loop_links(k)[pinch_ids[k]].mean(0)
+    def loop_held_dist(k):return float(np.linalg.norm(loop_links(k)-tcp_world(robots[k]),axis=1).min())
     def body_rot(name):
         from scipy.spatial.transform import Rotation
         return Rotation.from_quat(arr(base.scene.rigid_objects[name].data.root_quat_w)[0]).as_matrix()
@@ -137,41 +150,47 @@ def main():
     def mouth_diameter():
         v=nodes('loaded_bag')[anchors['loaded_bag']]
         return float(np.max(np.linalg.norm(v[:,None,:]-v[None,:,:],axis=2)))
+    # Scorer checks only (BIN_NEGATIVE): deliberately wrong strategies.
+    NEGATIVE=os.environ.get('BIN_NEGATIVE','')
+    class NegativeDone(Exception):pass
     def cinch_loaded(release=True):
         yaw=30.  # wrist yaw at the loops; keeps both pinches inside the arms' reach
         orientations[:]=[(Rotation.from_euler('z',s*yaw,degrees=True)*Rotation.from_quat([1.,0,0,0])).as_quat().tolist() for s in (-1,1)]
         direction=[np.array([0,0,-1.]),np.array([0,0,-1.])]
-        # Put the thin cord toggle near the distal pads. The TCP sits 13 mm
-        # behind their tips, so centring the TCP on a table-level toggle drives
-        # the fingers into the support before they can close around it.
-        offsets=[.012,.012]
-        targets=[body_pos(n)-direction[j]*offsets[j] for j,n in enumerate(['cord_end_0','cord_end_1'])]
+        # Put the strap near the distal pads. The TCP sits 13 mm behind their
+        # tips, so centring the TCP on a strap lying on the mat drives the
+        # fingers into the mat before they can close around it.
+        offsets=[.003,.003]
+        targets=[loop_grip(j)-direction[j]*offsets[j] for j in range(2)]
         grip[:]=[.55,.55]
         approach([t-direction[j]*.08 for j,t in enumerate(targets)],40);state('cord_hover')
-        targets=[body_pos(n)-direction[j]*offsets[j] for j,n in enumerate(['cord_end_0','cord_end_1'])]
+        targets=[loop_grip(j)-direction[j]*offsets[j] for j in range(2)]
         move(targets,24)
-        # Track the measured toggles during closure; a fixed target can miss a settling cord.
+        # Track the measured strap during closure; a fixed target can miss a settling strap.
         for i in range(16):
             u=(i+1)/16;u=u*u*u*(10+u*(-15+6*u))
             grip[:]=[g*(1-u) for g in [.55,.55]]
             now=current_targets()
-            desired=[body_pos(n)-direction[j]*offsets[j] for j,n in enumerate(['cord_end_0','cord_end_1'])]
-            for d in desired:d[2]=max(d[2],.769)
+            desired=[loop_grip(j)-direction[j]*offsets[j] for j in range(2)]
+            for d in desired:d[2]=max(d[2],.764)
             bounded=[t+np.clip(d-t,-.002,.002) for t,d in zip(now,desired)]
             move(bounded,1)
         tick(5);state('cord_ends_grasped')
-        before=np.array([body_pos(n).copy() for n in ['cord_end_0','cord_end_1']])
+        before=np.array([loop_grip(k) for k in range(2)])
         move([t+[0,0,.05] for t in current_targets()],20);state('cord_grasp_probe')
-        after=np.array([body_pos(n).copy() for n in ['cord_end_0','cord_end_1']])
-        if np.min(after[:,2]-before[:,2])<.025:raise RuntimeError('Drawstring loop slipped during measured grasp probe')
+        if NEGATIVE=='no_pull':
+            # Scorer check only: hold both loops without pulling the string out.
+            tick(200);state('negative_no_pull_hold');raise NegativeDone()
+        after=np.array([loop_grip(k) for k in range(2)])
+        if NEGATIVE!='film_lift' and np.min(after[:,2]-before[:,2])<.025:raise RuntimeError('Drawstring loop slipped during measured grasp probe')
         # Peel the folded cuff outward and above the rim before rotating the
         # wrists; rotating while under the brim can trap the tab between a
         # finger and the bin and strip it out of the grasp.
         peel=current_targets()
         peel[0]+=np.array([0,.02,.12]);peel[1]+=np.array([0,-.02,.12])
         move(peel,96);state('cuff_peeled_above_rim')
-        for k,n in enumerate(['cord_end_0','cord_end_1']):
-            if np.linalg.norm(body_pos(n)-tcp_world(robots[k]))>.03:raise RuntimeError('Grasp lost during cuff peel on arm %d'%k)
+        for k in range(2):
+            if NEGATIVE!='film_lift' and loop_held_dist(k)>.03:raise RuntimeError('Grasp lost during cuff peel on arm %d'%k)
         orientations[:]=[(Rotation.from_euler('y',-60,degrees=True)*Rotation.from_quat(r)).as_quat().tolist() for r in orientations]
         held_targets=current_targets()
         held_targets[0]+=np.array([.03,0,.04]);held_targets[1]+=np.array([.03,0,.04])
@@ -186,11 +205,35 @@ def main():
             held_targets=[t+np.asarray(d) for t,d in zip(held_targets,delta)]
             move(held_targets,steps)
             state('continuous_drawstring_pull_%d'%j)
-            for k,n in enumerate(['cord_end_0','cord_end_1']):
-                if np.linalg.norm(body_pos(n)-tcp_world(robots[k]))>.025:raise RuntimeError('Measured cord grasp lost during pull on arm %d'%k)
+            if NEGATIVE=='film_lift' and j==1:negative_film_lift()
+            for k in range(2):
+                if NEGATIVE!='film_lift' and loop_held_dist(k)>.025:raise RuntimeError('Measured strap grasp lost during pull on arm %d'%k)
 
         state('vertical_pre_cinch')
         if release:raise RuntimeError('Use full mode for the gather-and-lift controller')
+    def negative_film_lift():
+        """Scorer check only: cinch with the loops (pulls 0 and 1), then let go
+        of both loops and lift the bag out by pinching its gathered neck film."""
+        move([x+[0,0,-.06] for x in current_targets()],60);state('negative_slacken')
+        for n in range(1,9):
+            u=n/8;grip[:]=[u,u];tick()
+        tick(40);state('negative_loops_released')
+        # Left hand turns to a reachable forward-down pinch (checked offline);
+        # the right hand keeps its pose.
+        orientations[0]=(Rotation.from_euler('z',-30,degrees=True)*Rotation.from_euler('y',-80,degrees=True)*Rotation.from_quat([1.,0,0,0])).as_quat().tolist()
+        neck=nodes('loaded_bag')[anchors['loaded_bag']].mean(0)
+        axis=Rotation.from_quat(orientations[0]).apply([0,0,1.])
+        approach([neck-[0,0,.025]-axis*.05,current_targets()[1]],80);state('negative_neck_hover')
+        # Aim 25 mm below the hem, into the gathered film bundle of the neck.
+        neck=nodes('loaded_bag')[anchors['loaded_bag']].mean(0)-[0,0,.025]
+        move([neck+axis*.01,current_targets()[1]],40);state('negative_neck_reached')
+        for n in range(1,17):
+            u=n/16;grip[0]=1-u;tick()
+        tick(5);state('negative_film_pinched')
+        now=current_targets()
+        move([now[0]+[0,0,.25],now[1]],200);tick(60);state('negative_film_lifted')
+        raise NegativeDone()
+
     def full_removal():
         cinch_loaded(release=False)
         def wrist(pitch,yaws=(0.,0.)):
@@ -198,21 +241,22 @@ def main():
         wrist(110)
         now=current_targets()
         move([now[0]+[0,0,.02],now[1]+[0,0,.02]],30);state('converge_020')
-        move([[.3226,.0458,1.3777],[.3226,-.0458,1.3777]],50);state('converged_lift')
+        move([[.3226,.0458,1.3777],[.3226,-.0458,1.3777]],100);state('converged_lift')
         wrist(110,(-20.,20.))
         move(current_targets(),30);state('wrist_yaw_clearance')
         wrist(135,(-20.,20.))
-        move([[.27,.06,1.49],[.27,-.06,1.49]],65);tick(10);state('high_lift_hold')
+        move([[.27,.06,1.49],[.27,-.06,1.49]],130);tick(20);state('high_lift_hold')
         wrist(145,(-20.,20.))
-        move([[.24,.06,1.54],[.24,-.06,1.54]],40);tick(45);state('full_clearance_hold')
-        result=inspect.task.module.TRACKER.result
-        if result.get('first_carry_step') is None:
-            raise RuntimeError('Closed load was not carried clear of the bin: '+str(result))
+        move([[.24,.06,1.54],[.24,-.06,1.54]],80);tick(60);state('full_clearance_hold')
+        # Visible check only (the controller never reads the scorer): the
+        # hanging bag must have been above the rim during the hold (it bounces).
+        if max(x['loaded_bag']['low'][2] for x in logs[-120:])<RIM_Z+.02:
+            raise RuntimeError('Bag not lifted clear of the bin rim')
         from plan_table_transfer import plan
         # Closed loop on measured state: lower the hands until the hanging
         # bag's bottom is just above the tabletop, beside the bin.
         bag=nodes('loaded_bag');hang=float(np.mean([x[2] for x in current_targets()])-bag[:,2].min())
-        command,report=plan(logs[-1],final_z=.7475+.012+hang,final_x=-.03)
+        command,report=plan(logs[-1],steps=240,final_z=.7475+.012+hang,final_x=-.03)
         report['hang_depth_m']=hang
         (HERE/'table_transfer_plan.json').write_text(json.dumps(command))
         (HERE/'table_transfer_preflight.json').write_text(json.dumps(report,indent=2))
@@ -223,10 +267,31 @@ def main():
         # loops onto the gathered neck before opening, as a person would, so
         # they are not dropped from carrying height.
         top=float(nodes('loaded_bag')[:,2].max())
-        move([np.r_[x[:2],max(x[2]-.25,top+.06)] for x in current_targets()],40);state('loops_lowered')
+        # Lower all the way to just above the neck so the strings go slack and
+        # the straps can drop out of the opened fingers.
+        for clear in (.06,.10,.15,.20):
+            try:move([np.r_[x[:2],max(x[2]-.45,top+clear)] for x in current_targets()],80);break
+            except RuntimeError as exc:
+                if 'Path rejected before movement' not in str(exc):raise
+        tick(10);state('loops_lowered')
         for n in range(1,9):
             u=n/8;u=u*u*u*(10+u*(-15+6*u));grip[:]=[u,u];tick()
         state('loops_released');tick(10)
+        # The open fingers point across the bag, so a released strap can hang
+        # over the lower finger like a towel on a rail. Draw each hand straight
+        # back along its approach axis first so the strap slides off the tip.
+        # A strap can lie across the tip of the lower finger: first lower the
+        # open hands so the strap settles on the bag, then draw them back.
+        try:move([x+[0,0,-.025] for x in current_targets()],30)
+        except RuntimeError as exc:
+            if 'Path rejected before movement' not in str(exc):raise
+        tick(10);state('hands_lowered_open')
+        axes=[link_poses(r)['gripper'][:3,2] for r in robots]
+        for back in (.07,.05,.03):
+            try:move([x-a*back for x,a in zip(current_targets(),axes)],40);break
+            except RuntimeError as exc:
+                if 'Path rejected before movement' not in str(exc):raise
+        state('hands_withdrawn')
         # Retreat straight up; if the arm cannot reach the full height from this
         # pose (checked before any motion), retreat less.
         for rise in (.15,.10,.06,.03):
@@ -235,8 +300,6 @@ def main():
                 if 'Path rejected before movement' not in str(exc):raise
         state('hands_retreated')
         tick(80);state('table_landing_settled')
-        if inspect.task.module.TRACKER.result.get('score')!=1.:
-            raise RuntimeError('Table deposit not verified: '+str(inspect.task.module.TRACKER.result))
     (HERE/'task_parameters.json').write_text(json.dumps({'bin_center_xy':[.22,0.],'bin_top_z':RIM_Z,'bin_outer_radius_m':.0855,'control_hz':20.,'clear_hold_seconds':2.,'sample_interval_steps':1,'mode':args.mode,'require_table_deposit':True}))
     state('initial')
     try:
@@ -269,7 +332,10 @@ def main():
                 except Exception as exc:
                     state(request['label']+'_failed');(HERE/'command_error.json').write_text(json.dumps({'label':request['label'],'failure':str(exc)}))
         elif args.mode=='cinch':cinch_loaded()
-        elif args.mode=='full':full_removal()
+        elif args.mode=='full':
+            try:full_removal()
+            except NegativeDone:
+                state('negative_done');(HERE/'negative.json').write_text(json.dumps({'negative':NEGATIVE,'live_result':inspect.task.module.TRACKER.result}))
         (HERE/'completed.json').write_text(json.dumps({'completed':True,'mode':args.mode,'full_task_success':False,'score':None,'reason':'Requires independent evaluation; completion alone does not establish success'}))
     except Exception as exc:
         state('sequence_failed');(HERE/'completed.json').write_text(json.dumps({'completed':False,'failure':str(exc),'score':None}));raise

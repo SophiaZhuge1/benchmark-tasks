@@ -113,7 +113,9 @@ class Tracker:
         self.record(env)
     def record(self,env):
         from removal_runtime import observation
-        s,v=observation(env,self.count,self.anchors['loaded_bag']);self.trace.append(s);self.snapshots[self.count]=v
+        s,v=observation(env,self.count,self.anchors['loaded_bag'])
+        if self.runtime is not None and self.runtime.cable.last:s['string_tension_n']=float(self.runtime.cable.last.get('tension',0.))  # diagnostic only
+        self.trace.append(s);self.snapshots[self.count]=v
         self.result=self.judge.update(s,v)
         if self.save_dir is not None:
             np.savez_compressed(self.save_dir/f'state_{self.count:04d}.npz',loaded_bag=v[None])

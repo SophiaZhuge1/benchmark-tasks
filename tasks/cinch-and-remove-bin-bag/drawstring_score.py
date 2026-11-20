@@ -1,15 +1,30 @@
 """Tiered, latched, geometry-only score for the drawstring bin-bag task.
 
 Shared by the scripted demo, the Dream-1 run and offline replay. It reads only
-recorded geometry (film mesh, waste-block poses, drawstring-loop poses, TCPs).
-Every rule mirrors a check a person can make with a ruler, a photo and a count.
+recorded geometry (film mesh, waste-block poses, strap-loop link positions, hem
+markers, gripper poses and finger openings). Every rule mirrors a check a person
+can make with a ruler, a photo or video and a count.
+
+Grasp evidence (gripper frame: approach axis +z, fingers closing along x):
+  loop held      the fingers are closed to <= 15 mm and a link of that strap
+                 loop lies between the finger pads;
+  film gripped   a film node lies between the finger pads while the fingers are
+                 closed to <= 30 mm (latched: voids any tier not yet earned);
+  film contact   a film node lies within 5 mm of either finger's outline;
+  pulled         the string is drawn out of the hem cut-outs by >= 100 mm in
+                 total (strap-end-to-cut-out distances, summed over the four
+                 strand ends, minus their start values) and is taut (routed
+                 string length no shorter than at the start minus 10 mm).
 
 Tiers (highest satisfied applies; failures latch to 0 for the rest of the run):
-  0.00  never cinched (opening never <= 80 mm), any waste block escapes the bag,
-        or invalid/incomplete geometry (film edge stretch > 1.5, gaps, NaN).
-  0.25  cinched: opening <= 80 mm at some step with all three blocks inside.
-  0.50  carried: after cinching, the whole bag and its contents were clear of
-        the bin (>= 20 mm above its rim) with the opening <= 80 mm.
+  0.00  never cinched, any waste block escapes the bag, or invalid/incomplete
+        geometry (film edge stretch > 1.5, gaps, NaN).
+  0.25  cinched: opening <= 80 mm with all three blocks inside, while both
+        loops are held (one per gripper) and pulled, and no film has been gripped.
+  0.50  carried: after cinching, the whole bag and its contents are clear of
+        the bin (>= 20 mm above its rim) with the opening <= 80 mm, while both
+        loops are held and the string taut, neither gripper touches the film
+        and no film has been gripped: the load hangs from the loops.
   0.75  set down: at the end the bag rests upright on the tabletop, beside and
         clear of the bin, opening <= 80 mm, contents inside; still held or
         moving.
@@ -20,6 +35,7 @@ Tiers (highest satisfied applies; failures latch to 0 for the rest of the run):
 from collections import deque
 import numpy as np
 from evaluate_removal import contents_retained
+from drawstring_physics import SlidingDrawstring
 
 TABLE_Z = .7475
 TABLE_LO = np.array([-.19, -.65])
@@ -34,6 +50,65 @@ SUPPORT_M = .025        # bag bottom within this of the tabletop
 RELEASE_M = .060        # grippers away from film and loops
 STILL_M = .010          # bag-bounds motion over the final hold
 HOLD_STEPS = 40         # two seconds at 20 Hz
+# Grasp geometry in the gripper link frame (adapter: TCP 134 mm along +z, pads
+# end 13 mm beyond it, fingers close along x).
+TCP_Z = .134
+PAD_TIP = .013          # pad tips beyond the TCP
+PAD_BACK = .030         # pad length behind the TCP counted as "between the pads"
+PAD_HALF_W = .012       # half the pad width (gripper y)
+PAD_MARGIN = .003       # contact margin beyond the pad faces
+FINGER_T = .010         # finger thickness behind each pad face
+FINGER_BASE = .070      # finger root along +z
+CONTACT_M = .005        # film-contact margin around the finger outline
+HELD_OPEN_MAX = .015    # fingers closed on the strap
+GRIP_OPEN_MAX = .030    # fingers closed enough to grip film
+DRAW_M = .100           # string drawn out of the cut-outs (sum of four strand ends)
+TAUT_M = .010           # routed length may be at most this short of its start value
+EXIT_INDEX = 5          # hem markers 5 and 15 are the cut-outs
+
+
+def _local(points, pose):
+    pose = np.asarray(pose, float)
+    return (np.asarray(points, float).reshape(-1, 3) - pose[:3, 3]) @ pose[:3, :3]
+
+
+def between_pads(points, pose, opening):
+    """Mask of points between a gripper's finger pads."""
+    x, y, z = _local(points, pose).T
+    z = z - TCP_Z
+    return (np.abs(x) <= opening / 2 + PAD_MARGIN) & (np.abs(y) <= PAD_HALF_W) & (z >= -PAD_BACK) & (z <= PAD_TIP + PAD_MARGIN)
+
+
+def near_fingers(points, pose, opening):
+    """Mask of points touching (within CONTACT_M of) a gripper's finger outline."""
+    x, y, z = _local(points, pose).T
+    return (np.abs(x) <= opening / 2 + FINGER_T + CONTACT_M) & (np.abs(y) <= PAD_HALF_W + CONTACT_M) \
+        & (z >= FINGER_BASE) & (z <= TCP_Z + PAD_TIP + CONTACT_M)
+
+
+def grasp_evidence(s, v, string=None):
+    """Per-step grasp facts from recorded geometry (see module docstring)."""
+    poses = np.asarray(s['gripper_poses'], float)
+    opening = np.asarray(s['finger_opening'], float)
+    loops = [np.asarray(x, float).reshape(-1, 3) for x in s['loop_points']]
+    if poses.shape != (2, 4, 4) or opening.shape != (2,) or len(loops) != 2 or min(len(x) for x in loops) < 3:
+        raise ValueError('grasp evidence missing')
+    held = np.array([[bool(opening[g] <= HELD_OPEN_MAX and between_pads(loop, poses[g], opening[g]).any())
+                      for g in range(2)] for loop in loops])
+    both_held = bool((held[0, 0] and held[1, 1]) or (held[0, 1] and held[1, 0]))
+    film_gripped = any(opening[g] <= GRIP_OPEN_MAX and between_pads(v, poses[g], opening[g]).any() for g in range(2))
+    film_contact = any(near_fingers(v, poses[g], opening[g]).any() for g in range(2))
+    hem = np.asarray(s['hem_marker_positions'], float)
+    if hem.shape != (20, 3):
+        raise ValueError('hem marker evidence missing')
+    ends = np.array([loops[0][0], loops[0][-1], loops[1][0], loops[1][-1]])
+    drawn = float(sum(np.linalg.norm(ends[2 * k + i] - hem[c]) for k, c in enumerate((EXIT_INDEX, EXIT_INDEX + 10)) for i in range(2)))
+    positions = np.r_[hem, ends]
+    if string is None:
+        string = SlidingDrawstring(positions, exit_index=EXIT_INDEX)
+    routed = string.length_gradient(positions)[0]
+    return {'held': held, 'both_held': both_held, 'film_gripped': film_gripped, 'film_contact': film_contact,
+            'drawn': drawn, 'routed': routed, 'string': string}
 
 
 class DrawstringJudge:
@@ -58,6 +133,10 @@ class DrawstringJudge:
         self.max_strain = 1.
         self.tail = deque()
         self.last = {}
+        self.string = None
+        self.drawn0 = None
+        self.routed0 = None
+        self.film_gripped_step = None
 
     def fail(self, why, **extra):
         self.failure = {'score': 0., 'full_task_success': False, 'tier': 'failed', 'reason': why,
@@ -100,13 +179,23 @@ class DrawstringJudge:
             if not retained:
                 return self.fail('Waste block outside the bag' if self.count else 'Initial three waste blocks not retained')
             points = np.concatenate([v, corners])
-            if mouth <= CINCH_M and self.first_cinch is None:
+            g = grasp_evidence(s, v, self.string)
+            if self.count == 0:
+                self.string, self.drawn0, self.routed0 = g['string'], g['drawn'], g['routed']
+            drawn_out = g['drawn'] - self.drawn0
+            taut = g['routed'] >= self.routed0 - TAUT_M
+            if g['film_gripped'] and self.film_gripped_step is None:
+                self.film_gripped_step = step
+            clean = self.film_gripped_step is None
+            pulled = bool(g['both_held'] and taut and drawn_out >= DRAW_M)
+            if mouth <= CINCH_M and self.first_cinch is None and pulled and clean:
                 self.first_cinch = step
             above_rim = bool(points[:, 2].min() >= self.top + CLEAR_M)
-            if self.first_cinch is not None and self.first_carry is None and above_rim and mouth <= CLOSED_M:
+            lifted_by_loops = bool(g['both_held'] and taut and not g['film_contact'] and clean)
+            if self.first_cinch is not None and self.first_carry is None and above_rim and mouth <= CLOSED_M and lifted_by_loops:
                 self.first_carry = step
             # Tabletop state.
-            loops = np.asarray(s.get('loop_points', []), float).reshape(-1, 3)
+            loops = np.concatenate([np.asarray(x, float).reshape(-1, 3) for x in s.get('loop_points', [])] or [np.zeros((0, 3))])
             tcp = np.asarray(s.get('tcp', []), float)
             if len(loops) and tcp.shape == (2, 3):
                 grasp_points = np.concatenate([v, loops])
@@ -125,7 +214,9 @@ class DrawstringJudge:
             self.tail.append((step, set_down, released, bounds))
             while len(self.tail) > 1 and self.tail[1][0] <= step - HOLD_STEPS:
                 self.tail.popleft()
-            self.last = {'final_mouth_diameter_m': mouth, 'bag_bottom_above_table_m': bottom - TABLE_Z,
+            self.last = {'string_drawn_out_m': drawn_out, 'string_taut': bool(taut), 'loops_held': bool(g['both_held']),
+                         'film_contact_now': bool(g['film_contact']), 'film_gripped_step': self.film_gripped_step,
+                         'final_mouth_diameter_m': mouth, 'bag_bottom_above_table_m': bottom - TABLE_Z,
                          'mouth_height_above_table_m': mouth_height, 'whole_load_on_table': on_table,
                          'beside_bin': beside, 'minimum_gripper_distance_m': separation,
                          'set_down_now': set_down, 'released_now': released}
@@ -143,7 +234,8 @@ class DrawstringJudge:
         base = {'first_cinch_step': self.first_cinch, 'first_carry_step': self.first_carry,
                 'max_recorded_edge_stretch_ratio': self.max_strain, 'steps': self.previous, **self.last}
         if self.first_cinch is None:
-            return dict(base, score=0., full_task_success=False, tier='none', reason='Opening never reached 80 mm')
+            return dict(base, score=0., full_task_success=False, tier='none',
+                        reason='Opening never reached 80 mm while both loops were held and pulled with no film gripped')
         tail = list(self.tail)
         motion = float(np.ptp(np.asarray([x[3] for x in tail]), axis=0).max()) if tail else float('inf')
         full_window = len(tail) >= 2 and tail[0][0] <= self.previous - HOLD_STEPS
