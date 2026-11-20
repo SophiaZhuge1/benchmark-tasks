@@ -43,6 +43,10 @@ at 3.2-4.2 N.
 
 ## The real build
 
+Parts: about 150 g of PLA, 0.5 mm braided line, 4 mm silicone cord, 2 mm round elastic, 3 mm steel pins, a foam
+pillow and four pocket luggage scales, together well under $150. The hand is reusable for many trials; a worn cord is
+replaced in minutes.
+
 Positions in m from the arm bases' midpoint, x forward, y left, heights above the table. Printable meshes of the palm,
 the eight finger pieces and the cone are in `stl/` (millimetres; `python export_stl.py` writes them from the same
 shapes the simulation uses).
@@ -61,8 +65,9 @@ shapes the simulation uses).
   1.5 mm channels on the palm side, 8 mm from the MCP pin and 6 mm from the PIP pin, over a 24 mm radius pulley (a
   printed half-disc on the palm side of the wrist pin), into the forearm. There it joins a 60 mm length of 4 mm Shore 40A
   silicone cord (300 N/m), with a loop of the same braided line tied beside it, 15.5 mm slack, through a 6 mm rubber
-  bumper (together about 2.5 N/mm once taut): the contracted tissue's end-stop. The cord ends on the hook of a 10 N
-  push-pull force gauge with peak hold (for example a Sauter FK 10) screwed to the forearm, one gauge per finger.
+  bumper (together about 2.5 N/mm once taut): the contracted tissue's end-stop. The cord ends on the hook of a digital
+  hanging scale with peak hold (0.01 kg = 0.1 N resolution, for example a pocket luggage scale) fixed to the forearm, one
+  per finger.
   Pre-tension about 1 N with the fist clenched and the wrist straight.
 - Extensor cord, one per finger: 2 mm round elastic (300 N/m), anchored on the back of the proximal phalanx, runs in a
   covered 3 mm groove along the back of the hand (8 mm from the MCP pin, 3 mm from the PIP pin), over a 20 mm radius
