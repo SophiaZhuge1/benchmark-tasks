@@ -16,6 +16,6 @@
   "run_limit": "4,000 control steps at 20 Hz (200 simulated seconds); requested CLI seed 0, installed adapter environment seed 42, no object jitter.",
   "reset_notes": "Fresh unmodified liner each trial: bottom flat in the pot, surplus folded over the rim, cut-outs facing the arms, each loop hooked out and laid on the mat at its marked spot as a narrow U, tape on edge, without gathering the mouth. Three blocks in place, arms at ready, tabletop beside the pot clear.",
   "fidelity": "PhysX deformable film folded over the rim, rigid blocks, standard robot and gripper, contact grasps, no scripted poses. Each loop is a flexible strap: 15 jointed 20 x 10 x 2 mm links (4 g), pinched across the doubled tape; twist spring stiffer than real tape, thickness/mass numerical. String: force-only routed spring on the strap ends, no lock, 0.7 N cap. Containment checked every step (8 mm centres, 20 mm corners). 0.10 mm film; straight pot. No physical trial.",
-  "scores": "Scripted demo, official Arena 0.3.1, strap loops: 1.0 (LP4_a, replay 1.0); same source 1.0 in 1 of 10 runs (strap slips out of the fingers). Negatives: loops held, not pulled 0.0; film pinched after cinch 0.25, no carry. Dream-1 not re-run (previous revision errored).",
+  "scores": "Scripted demo, official Arena 0.3.1, strap loops: 1.0 (LP4_a, replay 1.0); same source 1.0 in 1 of 10 runs (strap slips out of the fingers). Negatives: loops held, not pulled 0.0; film pinched after cinch 0.25, no carry. Dream-1: 0.0 (valid run, all 4,000 steps).",
   "media": "M-K63S4Z"
 }

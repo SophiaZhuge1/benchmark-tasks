@@ -428,21 +428,16 @@
     }
   ],
   "dream1": {
-    "summary": "Dream-1: errored at step 1,427 (the bridge rejected an out-of-range gripper reply: q_l_chunk gripper [-0.071, 1.004]); not scored; session not lost",
-    "status": "errored at step 1,427; not scored; session not lost",
-    "steps_played": 1427,
+    "summary": "Dream-1: 0.0, valid run (one session, all 4,000 steps)",
+    "score": 0.0,
+    "status": "completed",
+    "steps_played": 4000,
     "step_limit": 4000,
-    "error": "the Dream bridge rejected a model reply: q_l_chunk gripper leaves 0..1: [-0.071, 1.004]",
-    "session": "one session throughout; no expiry",
-    "live_judge_at_error": {
-      "score": 0.0,
-      "tier": "none",
-      "reason": "Opening never reached 80 mm",
-      "final_mouth_diameter_m": 0.194
-    },
-    "environment": "official (same as the scripted demo), 320 x 176 cameras, task.json instruction and step limit",
-    "video": "model_run.mp4 shows the 1,427 steps played",
-    "note": "Run on the previous revision of this task (rigid loop bodies, previous scorer); not re-run for this revision."
+    "rows_per_request": 4,
+    "cameras": "320 x 176",
+    "scene": "this revision (strap loops, grasp-verified scorer)",
+    "environment": "official (same as the scripted demo)",
+    "earlier_attempts": "two earlier starts on this revision ended before scoring: the bridge rejected a first reply with gripper -0.058 outside 0..1, and a session sat idle past the gateway limit at 20 steps per request; the previous revision's run errored at step 1,427"
   },
   "seed": {
     "requested_cli_seed": 0,
