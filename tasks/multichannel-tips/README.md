@@ -60,11 +60,14 @@ and from 81 to 85 s (marked on screen, with the simulated time); the times below
 - 7.5–10.5 s: the pipette is lifted out of the stand and carried over column 4.
 - 10.5–16 s: it is lined up over the column and lowered; all eight nozzles enter their tips at about 16 s.
 - 17.5–81.5 s: press and rock: rolls of ±6° that push the end tips on, then smaller rolls for the middle ones; a small
-  front-to-back rock; then it eases off.
+  front-to-back rock; then it eases off. The rocking is the manufacturers' loading technique: each roll loads only two or three tips,
+  so all eight seat at a peak of about 11 N instead of the 30–40 N a straight push needs (beyond the arm). The score
+  checks only that all eight tips are seated; a straight push that seats them all would also score.
 - 81.5–84 s: the lift, straight up. All eight tips come away at full seat (82.0 s); column 4's holes are empty from then
   on.
 - About 84 s: the left hand lets go of the box and moves up, while the pipette is raised a little further and turned 35°
-  (84–85.3 s).
+  (84–85.3 s). The turn has no role in the task or the score: it only moves the
+  wrist out of the top camera's line of sight so the seated tips can be seen.
 - 85.3–86.5 s: the pipette is held, tips more than 3 cm above the rim; the run ends at 86.5 s, after 2 s of the
   full-score state.
 
