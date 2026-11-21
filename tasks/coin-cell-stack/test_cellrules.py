@@ -132,6 +132,20 @@ class Tiers(unittest.TestCase):
         self.assertEqual(trial(stacked(), right=over_cell)[0], 0.5)
         self.assertEqual(trial(stacked(), right=over_cell + [0, 0, 0.008])[0], 1.0)
 
+    def test_stowed_places(self):
+        j = cr.CellJudge(LAY)
+        base = snap(0.0, stacked())
+
+        def with_(**kw):
+            return cr.Snapshot(**{**base.__dict__, **kw})
+        self.assertTrue(j.tools_stowed(base))
+        lean = (np.array(LAY.holder) + [0.003, -0.008, 0.0], np.array(LAY.holder) + [0, 0, 0.262])  # leaning in its own slot
+        self.assertTrue(j.tools_stowed(with_(pipette=lean, pipette_tilt=2.5)))
+        next_place = (np.array(LAY.holder) + [0, 0.045, 0.0], np.array(LAY.holder) + [0, 0.045, 0.262])
+        self.assertFalse(j.tools_stowed(with_(pipette=next_place)))
+        on_rim = ((0.28, 0.02 + 0.016, TOP + 0.020), (0.28, 0.036, TOP + 0.14))  # tips outside the 29 mm well
+        self.assertFalse(j.tools_stowed(with_(tweezers=on_rim)))
+
     def test_cap(self):
         self.assertEqual(trial(stacked(), press=False)[0], 0.25)
         self.assertEqual(trial(stacked(), skip=("cap",))[0], 0.25)
@@ -274,6 +288,15 @@ class Tiers(unittest.TestCase):
         sunk = dict(f)
         sunk["zinc_2"] = cr.Part(f["separator"].pos.copy(), f["zinc_2"].rot)
         self.assertEqual(trial(sunk, press=False)[0], 0.0)
+
+    def test_thin_discs_sink_after_the_spacer(self):
+        # separated when the spacer arrives; afterwards the simulated 0.1 / 0.26 mm discs sink into each other (as seen
+        # in the simulator: all three within 0.1 mm of one height). The meter's order check holds from before the spacer
+        f = stacked()
+        sunk = dict(f)
+        for n, dz in (("zinc_1", 0.000095), ("separator", 0.000092), ("zinc_2", 0.0)):
+            sunk[n] = cr.Part(np.array([*AXIS, FLOOR + dz]), np.eye(3))
+        self.assertEqual(trial(sunk, frames=f)[0], 1.0)
 
     def test_spring_on_the_wall(self):
         # the spring 2.3 mm off the axis touches the can's wall, seen in its frame before the cap covers it

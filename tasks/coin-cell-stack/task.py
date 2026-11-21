@@ -44,7 +44,9 @@ RACK_XY = (0.24, -0.22)
 PIP_HOME = (*HOLDER_XY, Z0 + cp.HOLDER_CRADLE_Z - cp.PIP_COLLAR_Z + 0.0003)
 LIQUID_Z = Z0 + cp.TUBE_SEAT + cp.LIQUID_TOP
 TUBE_R = cp.TUBE_ID / 2
-SCORE_CAM_Z = 1.20  # the phone over the mould
+SCORE_CAM_Z = 1.20  # phone A over the mould
+DISH_CAM_XY = ((DISH_A[0] + DISH_B[0]) / 2, (DISH_A[1] + DISH_B[1]) / 2)  # phone C, over the middle of the two dishes
+DISH_CAM_Z = TOP + 0.45
 
 OBJECTS = [
     cp.bench_pad("bench_pad", (0.28, -0.07, TOP)),
@@ -58,16 +60,17 @@ OBJECTS = [
     cp.spacer("spacer", (DISH_B[0] - 0.025, DISH_B[1], LINER)),
     cp.wave_spring("spring", (DISH_B[0], DISH_B[1], LINER)),
     cp.cap("cap", (DISH_B[0] + 0.025, DISH_B[1], LINER)),
-    cp.tweezer_stand("tw_stand", (*STAND_XY, Z0)),
-    cp.tweezers("tweezers", (*STAND_XY, Z0 + cp.TW_STAND[2] - cp.TW_SLOT[2] + 0.0003)),
+    cp.tweezer_rack("tw_stand", (*STAND_XY, Z0)),
+    cp.tweezers_in_well("tweezers", (*STAND_XY, Z0 + cp.TW_WELL_FLOOR + 0.0003)),
     cp.pipette_holder("pip_holder", (*HOLDER_XY, Z0)),
     cp.pipette("pipette", PIP_HOME),
     cp.tube_rack("tube_rack", (*RACK_XY, Z0)),
     cp.phone_rig("score_cam", (*CAN_XY, TOP), SCORE_CAM_Z - TOP),
+    cp.phone_rig("dish_cam_rig", (*DISH_CAM_XY, TOP), DISH_CAM_Z - TOP),
 ]
 PARTS = cr.ORDER
 
-LAYOUT = cr.Layout(top=TOP, axis=CAN_XY, floor=FLOOR, rim=RIM, stand=(*STAND_XY, Z0 + cp.TW_STAND[2]), holder=PIP_HOME)
+LAYOUT = cr.Layout(top=TOP, axis=CAN_XY, floor=FLOOR, rim=RIM, stand=(*STAND_XY, Z0 + cp.TW_RACK_H), holder=PIP_HOME)
 
 
 # -- the trial's record ------------------------------------------------------------------------------------------------
@@ -85,6 +88,7 @@ class Trial:
         self.report = {}
         self._wet_shown = None
         self._tier_shown = None
+        self._sep_shown = None
 
     def snapshot(self, env) -> cr.Snapshot:
         parts = {}
@@ -127,7 +131,7 @@ class Trial:
                        "zinc_to_zinc_mm": round(j.zinc_distance() * 1000, 3) if "zinc_2" in j.frame else None,
                        "spacer_offset_mm": round(j.frame_offset("spacer") * 1000, 3) if "spacer" in j.frame else None,
                        "sink_mm": j.sinks_mm(s), "gauge_mm": cr.gauge_mm(s.parts["spacer"], j.lay.floor) if "spacer" in s.parts else None,
-                       "separator_between_zincs": j.pre_press_sep if j.press_started else j.separated(s), "left_can": list(j.left_can),
+                       "separator_between_zincs": j.pre_spacer_sep if "spacer" in j.arrived else j.separated(s), "separated_now": j.sep_now, "left_can": list(j.left_can),
                        "finger_travel_mm": {n: round(v * 1000, 3) for n, v in j.finger_travel.items()},
                        "peak_since_arrival_mm": {n: [round(v * 1000, 2) for v in hs] for n, hs in j.peak.items()},
                        "seated": j.seated(s), "stowed": j.tools_stowed(s), "gripper_moved": list(j.gripper_moved[:3]),
@@ -137,6 +141,9 @@ class Trial:
         if self.tier != self._tier_shown:  # the log: each change of tier, with the final sinks and peaks
             self._tier_shown = self.tier
             print(f"[task] t={self.t:.2f} tier {self.tier}: {self.why}; sink_mm {self.report['sink_mm']}; gauge_mm {self.report['gauge_mm']}; peaks {self.report['peak_since_arrival_mm']}", flush=True)
+        if j.sep_now != self._sep_shown:  # the log: each change of the separator lying between the zinc discs
+            self._sep_shown = j.sep_now
+            print(f"[task] t={self.t:.2f} separator between the zincs: {j.sep_now}; sink_mm {self.report['sink_mm']}", flush=True)
         if self._wet_shown != self.pip.wet:
             self._wet_shown = self.pip.wet
             try:
@@ -157,11 +164,11 @@ def _reset(env) -> None:
 @m.on_step
 def _step(env) -> None:
     TRIAL.step(env, 1.0 / float(os.environ.get("TASK_CONTROL_HZ", "20")))
-    if os.environ.get("TASK_INSET"):  # the demo video's overhead inset of the can (inset.py); not a policy camera
+    if os.environ.get("TASK_INSET"):  # the demo video's overhead views of the can and the dishes (inset.py); not policy cameras
         import inset
 
-        inset.start(m.ENV_PATH, CAN_XY, SCORE_CAM_Z - 0.005, RIM)  # just under the phone
-        inset.step()
+        inset.start(m.ENV_PATH, CAN_XY, SCORE_CAM_Z - 0.005, RIM, DISH_CAM_XY, DISH_CAM_Z - 0.005, LINER)  # just under the phones
+        inset.step(TRIAL.t, m.state(env, "tweezers").to_world(np.array([[0.0, 0.0, 0.0]]))[0])
 
 
 def score(objects) -> float:

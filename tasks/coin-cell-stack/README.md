@@ -67,20 +67,23 @@ videos, the fingertip-cover blot, the depth gauge, the meter and the scale would
 - **Meter (over R0).** Read with the cap and the spring lifted off, so it needs neither: a weighted probe on the
   spacer, the other on the can's wall. The separator lies between the zinc discs (above the first, under the second) and
   covers both, and the spacer does not touch the can's wall: an offset of 1.85 mm brings it to the wall, and a spacer
-  offset of 1.85 mm or more scores 0. In the simulation the separator-between-zincs check is taken in the last step
-  before the cap press (after it the simulated thin discs may sink into each other; see Fidelity).
+  offset of 1.85 mm or more scores 0. In the simulation the separator-between-zincs check is read in the last step before the spacer arrives; after
+  that, only a swap of layers (one sunk more than 0.15 mm below the one under it) counts, because the simulated thin
+  discs can sink into each other under the spacer's drop and the press (see Fidelity).
 - **Spring.** Seen in its own frame before the cap covers it: an offset of 2.25 mm or more puts it on the can's wall
   (a short once the cell is crimped) and scores 0.
 - **Cap.** The cap is seated when it is open side down, square, and its gasket is inside the can's mouth all round. It
   is pressed when the right fingers bear on its top and push it below where the spring holds it, while it is seated.
 - **Tweezers only.** A contact is the run of steps in which a gripper's fingertip is within 2 mm of a part. A part's
   finger travel is how far it moved during each contact, summed over all contacts in the trial; 1.0 mm or more scores 0,
-  however slowly it moved. 1 mm is about 18 pixels in phone A's video, so it is read off the video. The cap press is
+  however slowly it moved, at the can or at the dishes. 1 mm is about 18 pixels in phone A's video of the can and
+  about 12 pixels in phone C's video of the dishes, so it is read off the video. The cap press is
   exempt, and only narrowly: while the right fingers bear on the cap's top, they may move the cap and the parts lying in
   the can under it. A fingertip in the can's well after the separator is wet and before the cap closes it counts as a wet
   blot.
-- **Tools.** The tweezers stand tips down in their slot and the pipette hangs on its cradle. Every fingertip is at least
-  3 cm from both tools and from the cell (the can and its cap) for 1 s, so the press hand must lift away.
+- **Tools.** The tweezers stand tips down in the one-well rack's well and the pipette hangs by its finger hook in the
+  pipette stand's upper slot. Every fingertip is at least 3 cm from both tools and from the cell (the can and its cap)
+  for 1 s, so the press hand must lift away.
 - **Tiers.** 1.0, 0.5, 0.25 and 0 exactly as in `task.json`'s `scoring`, in `CellJudge.tier`.
 
 ### Scoring a real trial
@@ -90,7 +93,10 @@ videos, the fingertip-cover blot, the depth gauge, the meter and the scale would
   station for the tools and the hands. A part's offset is half of (widest minus narrowest gap to the can's wall), read
   in the part's last frame with the arm away at a dish (re-centring is allowed). Each zinc disc's centre is marked in its
   own frame, before the next part covers it; the zinc-to-zinc distance is between those two marks. The video also shows
-  the order, each part laid once, and how far any fingertip contact moves a part (summed over the trial).
+  the order, each part laid once, and how far any fingertip contact moves a part in the can. Phone C, 45 cm above the
+  middle of the dishes on its 2x camera, films the pickups in 4K: a field of about 32 x 18 cm, about 0.083 mm per pixel
+  (1 mm is about 12 px); the dishes' 90 mm rims are the scale. It shows how far any fingertip contact moves a part in a
+  dish. Finger travel is summed over both videos and the whole trial.
 - **Blot.** Each gripper's finger pads wear single-use 50 um film covers. After the trial, press the covered fingertips on
   blot paper: a wet mark scores 0. The covers then go to zinc waste, so electrolyte never reaches the robot's pads.
 - **Cap and spring.** Lift them out with plastic tweezers, if present, onto a tared boat; weigh them (0.001 g).
@@ -117,17 +123,18 @@ Offline checks of the rules on hand-built trials, with no simulator: `python -m 
 - The wave spring is a rigid 1.2 mm ring with soft contacts, about 20 N per mm.
 - The can is fixed in the mould's pocket; in the lab it is a loose fit.
 - The electrolyte is an event model, not a fluid (above). Re-aspiration when the plunger is let up is not modelled.
-- Under the cap press the simulated 0.1 mm and 0.26 mm discs can sink into each other (0.34 mm for the second zinc in the demo).
-  So the meter's separator-between-zincs check uses the last step before the press; the depth gauge reads after it (a
-  sunk stack reads lower, which the gauge allows).
+- Under the spacer's drop from the rim and the cap press, the simulated 0.1 mm and 0.26 mm discs can sink into each
+  other (up to about 0.35 mm for the second zinc in the demo). So the meter's separator-between-zincs check is read in
+  the last step before the spacer arrives, and after it only a swap of layers counts; the depth gauge reads after the
+  press (a sunk stack reads lower, which the gauge allows).
 - The finger-pad covers (50 um film) are not modelled.
 - The cell is not crimped: the task ends at the pressed cap, where NPL's procedure hands the cell to the crimper.
 
 ## Runtime and seeds
 
-- Demo: about 6,070 steps (304 s simulated); the success state holds from about 303 s. About 1.5 to 2 control steps per
+- Demo: about 6,510 steps (325 s simulated); the success state holds from about 324 s. About 1.5 to 2 control steps per
   second of wall time on one RTX 4090 with physics at 480 Hz, so a recorded demo takes about an hour.
-- The run limit is 9,600 steps (8 minutes at 20 Hz): the demo uses about 6,070, which leaves a policy room to re-centre
+- The run limit is 9,600 steps (8 minutes at 20 Hz): the demo uses about 6,510, which leaves a policy room to re-centre
   and re-seat parts. A full 9,600-step trial takes about 1.5 to 2 hours.
 - `object_jitter=0` keeps the layout fixed, so no seed is needed.
 - Model run: Dream-1 on the task's own instruction and 9,600-step limit (320 x 176 cameras, 8 rows per request), one
@@ -141,19 +148,29 @@ Offline checks of the rules on hand-built trials, with no simulator: `python -m 
 - `cellparts.py`: every part, tool and fixture, as plain meshes and simple colliders.
 - `mechkit.py`: props written as USD text (fixed, free and jointed), soft contacts, the physics rate.
 - `celldemo.py`, `demokit.py`, `run_demo.py`: the scripted demo.
-- `make_stl.py`, `stl/`: the printed parts, as STL files.
+- `make_stl.py`, `stl/`: the one printed part, the assembly mould, as an STL file.
 - `steptime.py`: step timing.
-- `inset.py`: the demo video's overhead view of the can (only with `TASK_INSET` set; not a policy camera).
+- `inset.py`: the demo video's overhead views of the can and of the dishes (only with `TASK_INSET` set; not policy
+  cameras).
 
-## Printed parts (STL)
+## Printed part (STL) and standard holders
 
-`stl/` holds the mould (60 x 60 x 20 mm POM, with a 20.3 mm pocket 2 mm deep), the tweezer stand (40 x 40 x 30 mm, a
-37 x 9 mm slot 25 mm deep), the tube rack (30 x 30 x 25 mm, an 11.4 mm hole) and the pipette holder. The holder has a
-60 x 60 x 8 mm base, a post at one side and a cradle of two prongs 22 mm apart at 203 mm. All dimensions are in
-millimetres. `python make_stl.py` writes them from the same numbers the simulation uses. The stand, rack and holder are
-unions of touching boxes, which a slicer merges. Print the mould and the stand in POM or PETG and the holder in PLA. Set
-the holder's post height from the measured hook-to-tip length of the pipette with its tip on, so that the tip hangs
-about 10 mm clear of the base.
+`stl/` holds the one printed part, the assembly mould (60 x 60 x 20 mm POM, with a 20.3 mm pocket 2 mm deep; all
+dimensions in millimetres). `python make_stl.py` writes it from the same numbers the simulation uses.
+
+The tool holders are standard catalogue products, modelled at their published sizes:
+
+- **Tweezers: Heathrow Scientific One-Well Tube Rack, HS23053A** (polystyrene, for one 50 mL tube): 92 mm round base,
+  30 mm high, a 29 mm well. The tweezers stand tips down in the well, their tips sprung out against its wall.
+- **Pipette: Heathrow Scientific 3-Place Pipette Stand, HS206203** (clear acrylic): 153 x 172 x 206 mm, upper slots
+  28 mm wide, lower slots 20 mm. The pipette hangs by its finger hook in the place nearest the work.
+- **Tube: Corning CoolRack M6, cat. 432036** (aluminium, six 1.5/2 mL tubes): 60 x 43 x 38 mm, wells 11.1 mm wide and
+  32.7 mm deep at 17.8 mm pitch. The tube stands on a well's floor, in a middle well of the row nearer the dishes.
+
+Not published, so assumed in the model: the one-well rack is a solid puck with the well 25 mm deep; the pipette stand is
+5 mm acrylic with its upper shelf's top at 206 mm and its lower shelf's top at 80 mm, 45 mm between places, and each
+place's two slots in line, so the pipette hangs upright (the real stand leans it a few degrees); the CoolRack's wells
+are in 2 rows of 3, so its floor is 5.3 mm thick.
 
 ## Sources
 
@@ -165,6 +182,8 @@ products:
 - MTI CR20SPA10 spacer, 15.8 x 1.0 mm; MTI CR20WS-SPR wave spring, about 15 mm OD and 1.2 mm free height.
 - Zinc foil 0.1 mm, punched to 12 mm. Whatman GF/A glass microfibre, 260 um, punched to 19 mm.
 - Bergeon 6460 plastic battery tweezers, 119 x 15 x 11 mm.
+- The three holders above: Heathrow Scientific HS23053A and HS206203, Corning CoolRack M6 432036 (catalogue
+  dimensions).
 - A 10-100 uL air-displacement micropipette with a 200 uL tip: about 25 cm long, first stop at 6 mm (about 3 N) and
   blow-out at 8 mm.
 - A 1.5 mL microcentrifuge tube with 1.0 mL of 2 M ZnSO4 (1.31 g/mL), and 90 mm glass petri dishes.

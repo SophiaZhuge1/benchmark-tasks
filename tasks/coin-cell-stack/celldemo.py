@@ -120,16 +120,16 @@ def stow_tweezers(ctx, l):
     sx, sy, stop = T.LAYOUT.stand
     yield from set_gap(ctx, l, 0.020)
     yield from go_tips(ctx, l, (sx, sy), stop + 0.010, label="tweezers: over the stand")
-    for _ in range(3):  # square the tips over the slot (a dither lets the joints past their friction)
+    for _ in range(3):  # centre the tips over the well (a dither lets the joints past their friction)
         tc = tip_centre(ctx)
         err = np.array([sx - tc[0], sy - tc[1], stop + 0.008 - tip_bottom(ctx)])
         if np.linalg.norm(err[:2]) < 0.0004:
             break
         yield from dither_to(l, l.at() + err, amp=0.0015, t=1.0)
-    floor = stop - cp.TW_SLOT[2]
-    yield from l.move(l.at() + np.array([0, 0, floor + 0.0015 - tip_bottom(ctx)]), t=1.4, label="tweezers: into the slot")
+    floor = stop - cp.TW_WELL_DEPTH
+    yield from l.move(l.at() + np.array([0, 0, floor + 0.0015 - tip_bottom(ctx)]), t=1.4, label="tweezers: into the well")
     yield from l.wait(0.3)
-    log(ctx, f"tweezers in the slot: tips {(tip_bottom(ctx) - floor) * 1000:.1f} mm over its floor, {np.round((tip_centre(ctx)[:2] - [sx, sy]) * 1000, 1)} mm off")
+    log(ctx, f"tweezers in the well: tips {(tip_bottom(ctx) - floor) * 1000:.1f} mm over its floor, {np.round((tip_centre(ctx)[:2] - [sx, sy]) * 1000, 1)} mm off")
     yield from l.open(t=0.6)
     yield from l.move(l.at() + np.array([-0.10, 0, 0.0]), t=1.0, label="tweezers: let go")
     yield from l.move(l.at() + np.array([0, 0, 0.05]), t=0.6, label="tweezers: away")
@@ -336,7 +336,7 @@ def electrolyte(ctx, l, r):
     yield from l.move(grip, t=1.2, label="pipette: in")
     yield from l.servo(grip, tol=0.0015, timeout=1.0, label="pipette: in")
     yield from l.close(width=0.018, force=30.0)
-    yield from l.move(l.at() + [0, 0, 0.015], t=0.8, label="pipette: off the cradle")
+    yield from l.move(l.at() + [0, 0, 0.015], t=0.8, label="pipette: off the shelf")
     yield from l.move(l.at() + [-0.05, 0, 0.01], t=1.0, label="pipette: out")
     tube = np.array([*T.RACK_XY, T.Z0 + cp.TUBE_SEAT + cp.TUBE_H + 0.012])
     clear = np.array([0.37, -0.05, tube[2]])  # round the far side of the tweezer stand and the mould
@@ -371,11 +371,11 @@ def electrolyte(ctx, l, r):
     log(ctx, f"dispensed: {T.TRIAL.pip.dispenses}")
     yield from r.move(r.at() + np.array([0, 0, 0.04]), t=0.8, label="right: off")
     yield from r.move(r.at() + np.array([-0.08, -0.05, 0.0]), t=1.0, label="right: away")
-    # back to the holder: over the cradle's open side, in, down onto the cradle
+    # back to the stand: in through its slot's open side, down onto the upper shelf
     home = np.asarray(T.PIP_HOME)
     yield from tip_to(ctx, l, np.array([0.37, 0.0, home[2] + 0.03]), t=1.6, label="pipette: past the stand")
     yield from tip_to(ctx, l, home + np.array([-0.05, 0, 0.03]), t=1.6, label="pipette: to the holder")
-    yield from tip_to(ctx, l, home + np.array([0.002, 0, 0.012]), t=1.2, label="pipette: over the cradle")
+    yield from tip_to(ctx, l, home + np.array([0.002, 0, 0.012]), t=1.2, label="pipette: over the shelf")
     yield from tip_to(ctx, l, home + np.array([0.002, 0, 0.0005]), t=0.8, label="pipette: down")
     yield from l.open(t=0.6)
     yield from l.move(l.at() + np.array([-0.06, 0, 0.0]), t=1.0, label="pipette: let go")

@@ -476,8 +476,17 @@ def _link_usda(link: Link) -> str:
     }}"""
 
 
-def _joint_usda(link: Link) -> str:
+def _joint_usda(link: Link, start: float | None = None) -> str:
+    """`start`, if given, is the joint's value as the stage is built (radians or metres), so that a part that starts
+    away from joint zero is not pushed out of what holds it before the first reset applies `start_joints`."""
     kind, drive = ("PhysicsRevoluteJoint", "angular") if link.kind == "hinge" else ("PhysicsPrismaticJoint", "linear")
+    state_api, state = "", ""
+    if start is not None:
+        state_api = f', "PhysicsJointStateAPI:{drive}"'
+        value = math.degrees(start) if link.kind == "hinge" else start
+        state = f"""
+        float state:{drive}:physics:position = {value:.6f}
+        float state:{drive}:physics:velocity = 0"""
     x, y, z = link.at
     parent = "frame" if link.parent is None else link.parent
     limits = "" if not (math.isfinite(link.lower) and math.isfinite(link.upper)) else f"""
@@ -485,9 +494,9 @@ def _joint_usda(link: Link) -> str:
         float physics:upperLimit = {link.upper:.6f}"""  # an infinite limit leaves the joint free: a wheel, a roller
     return f"""
     def {kind} "{link.joint}" (
-        prepend apiSchemas = ["PhysicsDriveAPI:{drive}"]
+        prepend apiSchemas = ["PhysicsDriveAPI:{drive}"{state_api}]
     )
-    {{
+    {{{state}
         uniform token drive:{drive}:physics:type = "force"
         float drive:{drive}:physics:stiffness = 0
         float drive:{drive}:physics:damping = 0
@@ -574,7 +583,7 @@ def mechanism(name: str, pos, links, looks, frame_parts=(), frame_colliders=(), 
 {_visual(frame_parts)}{"".join(frame_colliders)}
     }}
 {"".join(_link_usda(k) for k in links)}
-{world_joint}{"".join(_joint_usda(k) for k in links)}"""
+{world_joint}{"".join(_joint_usda(k, dict(start).get(k.name)) for k in links)}"""
         attrs = f"""
     bool physxArticulation:enabledSelfCollisions = 0
     int physxArticulation:solverPositionIterationCount = {solver_iters}

@@ -131,25 +131,32 @@ def block(name: str, pos, size, look: str = "pom_white") -> m.Part:
     return m.fixed(name, pos, [("b", vis, look)], [m.col_box("c", size, (0, 0, size[2] / 2), offset=0.001)], LOOKS)
 
 
-TW_STAND = (0.040, 0.040, 0.030)
-TW_SLOT = (0.009, 0.037, 0.025)  # along x, along y, deep
+# Heathrow Scientific One-Well Tube Rack HS23053A (polystyrene), for a 50 mL tube: published 92 mm round base, 30 mm
+# high, 29 mm well. The tweezers stand tips down in the well. Not published, so assumed: a solid round puck, the well
+# 25 mm deep with a flat floor.
+TW_RACK_D, TW_RACK_H = 0.092, 0.030
+TW_WELL_D, TW_WELL_DEPTH = 0.029, 0.025
+TW_WELL_FLOOR = TW_RACK_H - TW_WELL_DEPTH
+# the tweezers start in the well with leg b closed this far, so that both tips' outer faces (35 mm apart at rest) clear
+# the well's wall; the leg's spring then presses them against it
+TW_START_CLOSE = 0.0070
 
 
-def tweezer_stand(name: str, pos) -> m.Part:
-    """A POM block with a slot the tweezers stand in, tips down, legs opening along y."""
-    sx, sy, sz = TW_STAND
-    wx, wy, d = TW_SLOT
-    floor = sz - d
-    pieces = [
-        ((sx, sy, floor), (0, 0, floor / 2)),
-        (((sx - wx) / 2, sy, d), (-(sx + wx) / 4, 0, floor + d / 2)),
-        (((sx - wx) / 2, sy, d), ((sx + wx) / 4, 0, floor + d / 2)),
-        ((wx, (sy - wy) / 2, d), (0, -(sy + wy) / 4, floor + d / 2)),
-        ((wx, (sy - wy) / 2, d), (0, (sy + wy) / 4, floor + d / 2)),
-    ]
-    parts = [(f"p{k}", m.box(s, c), "pom_white") for k, (s, c) in enumerate(pieces)]
-    cols = [m.col_box(f"c{k}", s, c, offset=0.001) for k, (s, c) in enumerate(pieces)]
-    return m.fixed(name, pos, parts, cols, LOOKS, friction=(0.3, 0.25))
+def tweezer_rack(name: str, pos) -> m.Part:
+    """The one-well rack: a round puck with a 29 mm well, the tweezers standing in it tips down."""
+    R, H, r, fl = TW_RACK_D / 2, TW_RACK_H, TW_WELL_D / 2, TW_WELL_FLOOR
+    vis = m.lathe([(0.0, fl), (r, fl), (r, H), (R - 0.002, H), (R, H - 0.002), (R, 0.0), (0.0, 0.0)][::-1], 64)
+    cols = [m.col_cylinder("floor_c", R, fl, (0, 0, fl / 2), offset=0.001)]
+    n = 20
+    for k in range(n):
+        a = 2 * math.pi * k / n
+        cols.append(m.col_box(f"wall_{k}", (0.004, 0.0050, H - fl), ((r + 0.002) * math.cos(a), (r + 0.002) * math.sin(a), fl + (H - fl) / 2),
+                              offset=0.0005, quat_wxyz=quat_z(math.degrees(a))))
+    for k in range(8):  # the puck's body outside the well
+        a = 2 * math.pi * (k + 0.5) / 8
+        cols.append(m.col_box(f"body_{k}", (R - r - 0.004, 0.024, H - fl), ((R + r + 0.004) / 2 * math.cos(a), (R + r + 0.004) / 2 * math.sin(a), fl + (H - fl) / 2),
+                              offset=0.001, quat_wxyz=quat_z(math.degrees(a))))
+    return m.fixed(name, pos, [("puck", vis, "rack_ps")], cols, LOOKS, friction=(0.3, 0.25))
 
 
 # -- the tweezers ----------------------------------------------------------------------------------------------------
@@ -200,7 +207,7 @@ def _leg(side: float):
     return [(f"leg_{tag}", leg_mesh, "tweezer"), (f"tip_{tag}", tip_mesh, "tweezer"), (f"grip_{tag}", grip_mesh, "tweezer")], cols
 
 
-def tweezers(name: str, pos) -> m.Part:
+def tweezers(name: str, pos, close: float = 0.0) -> m.Part:
     """Plastic battery tweezers: leg a and the joined head are the frame; leg b turns on a sprung hinge at the head,
     joint zero at rest (tips 24 mm apart), positive closing, up to the tips meeting."""
     parts_a, cols_a = _leg(+1.0)
@@ -212,8 +219,15 @@ def tweezers(name: str, pos) -> m.Part:
     leg_i = TW_MASS_LEG * TW_L**2 / 12
     link = m.hinge("leg_b", "X", (0.0, 0.0, TW_L), 0.0, close_deg, parts_b, cols_b, mass=TW_MASS_LEG, spring=TW_SPRING, damping=0.002,
                    friction=0.0, gravity=True, com=(0.0, -0.007, TW_L / 2), inertia=(leg_i, leg_i, 2e-8))
-    return m.mechanism(name, pos, [link], LOOKS, frame_parts=parts_a, frame_colliders=cols_a, free_mass=TW_MASS_LEG + 0.0005,
+    start = (("leg_b", close / (TW_L - TW_TIP_H / 2)),) if close else ()
+    return m.mechanism(name, pos, [link], LOOKS, frame_parts=parts_a, frame_colliders=cols_a, free_mass=TW_MASS_LEG + 0.0005, start=start,
                        frame_inertia=(leg_i, leg_i, 3e-8), friction=(0.9, 0.8), solver_iters=64)
+
+
+def tweezers_in_well(name: str, pos) -> m.Part:
+    """The tweezers standing tips down in the one-well rack's well, centred on `pos`: leg b starts closed by
+    TW_START_CLOSE and the frame (leg a) shifted by half of it, so that both tips sit inside the 29 mm well."""
+    return tweezers(name, (pos[0], pos[1] - TW_START_CLOSE / 2, pos[2]), close=TW_START_CLOSE)
 
 
 def grip_width_for(tip_gap: float) -> float:
@@ -224,15 +238,28 @@ def grip_width_for(tip_gap: float) -> float:
 
 # -- the pipette, its holder, the tube ---------------------------------------------------------------------------------
 PIP_GRIP_Z = 0.120  # the left gripper holds the body this far above the tip's end
-PIP_COLLAR_Z = 0.185  # the finger hook's underside, above the tip's end: it rests on the holder's cradle
+PIP_COLLAR_Z = 0.185  # the finger hook's underside, above the tip's end: it rests on the stand's upper shelf
+PIP_COLLAR_R = 0.0175  # the finger hook's collar: 35 mm across, as wide as a real pipette's finger rest
 PIP_BUTTON_Z = 0.262  # the plunger button's top at rest
 PIP_FIRST_STOP, PIP_BLOWOUT = 0.0060, 0.0080  # plunger travel to the first stop and to the blow-out stop
 PIP_SPRING = 500.0  # N/m: 3 N at the first stop
 PIP_MASS = 0.10
-HOLDER_CRADLE_Z = 0.203  # the cradle's top above the table
-TUBE_XY_IN_RACK = (0.0, 0.0)
-RACK = (0.030, 0.030, 0.025)
-TUBE_OD, TUBE_ID, TUBE_H, TUBE_SEAT = 0.0108, 0.0087, 0.039, 0.005  # a 1.5 mL tube, its bottom 5 mm up in the rack
+# Heathrow Scientific 3-Place Pipette Stand HS206203 (clear acrylic): published 153 x 172 x 206 mm, upper slots 28 mm
+# wide, lower slots 20 mm. Not published, so assumed: 5 mm acrylic, the upper shelf's top at the full 206 mm, the lower
+# shelf's top at 80 mm, 45 mm between places, and each place's two slots in line (the real stand leans a pipette a few
+# degrees). The pipette hangs by its finger hook on the upper shelf in the place nearest the work.
+PIP_STAND = (0.172, 0.153, 0.206)
+PIP_STAND_T = 0.005
+PIP_SLOTS = ((0.028, 0.206, 0.014), (0.020, 0.080, 0.010))  # (width, the shelf's top, the slot's closed end past the pipette's axis)
+PIP_PLACE_PITCH = 0.045
+HOLDER_CRADLE_Z = PIP_SLOTS[0][1]  # where the finger hook's collar rests
+# Corning CoolRack M6, cat. 432036 (aluminium), for six 1.5/2 mL tubes: published 60 x 43 x 38 mm, wells 11.1 mm wide
+# and 32.7 mm deep at 17.8 mm pitch, so its floor is 5.3 mm thick. The tube stands in a middle well of the row nearer
+# the dishes.
+RACK = (0.060, 0.043, 0.038)
+RACK_WELL_D, RACK_PITCH = 0.0111, 0.0178
+TUBE_XY_IN_RACK = (0.0, RACK_PITCH / 2)
+TUBE_OD, TUBE_ID, TUBE_H, TUBE_SEAT = 0.0108, 0.0087, 0.039, RACK[2] - 0.0327  # a 1.5 mL tube on the well's floor
 LIQUID_TOP = 0.030  # the electrolyte's surface above the tube's bottom (1.0 mL)
 
 LOOKS.update({
@@ -242,7 +269,10 @@ LOOKS.update({
     "pip_tip": m.Look(m.rgb(0.92, 0.93, 0.90), roughness=0.2, opacity=0.55),
     "liquid": m.Look(m.rgb(0.80, 0.88, 0.95), roughness=0.1, opacity=0.6),
     "tube": m.Look(m.rgb(0.95, 0.95, 0.93), roughness=0.2, opacity=0.45),
-    "pla": m.Look(m.rgb(0.25, 0.55, 0.85), roughness=0.55),
+    "acrylic": m.Look(m.rgb(0.90, 0.95, 0.97), roughness=0.08, opacity=0.35),
+    "rack_ps": m.Look(m.rgb(0.95, 0.80, 0.20), roughness=0.5),
+    "alu": m.Look(m.rgb(0.70, 0.72, 0.75), metallic=0.9, roughness=0.4),
+    "hole": m.Look(m.rgb(0.08, 0.08, 0.09), roughness=0.9),
 })
 
 
@@ -262,7 +292,7 @@ def pipette(name: str, pos) -> m.Part:
     parts = [
         ("tip", m.lathe([(0.0, 0.0), (0.0004, 0.0), (0.0026, 0.050), (0.0, 0.050)], 24), "pip_tip"),
         ("body", m.lathe(body_prof, 32), "pip_body"),
-        ("collar", m.cylinder(0.015, 0.006, (0, 0, PIP_COLLAR_Z + 0.003), segments=32), "pip_grey"),
+        ("collar", m.cylinder(PIP_COLLAR_R, 0.006, (0, 0, PIP_COLLAR_Z + 0.003), segments=32), "pip_grey"),
         ("hook", m.box((0.012, 0.024, 0.010), (0.016, 0.0, PIP_COLLAR_Z + 0.008)), "pip_grey"),
         ("band", m.cylinder(0.0101, 0.010, (0, 0, 0.205), segments=32), "pip_blue"),
         ("window", m.box((0.002, 0.008, 0.020), (-0.0098, 0.0, 0.215)), "pip_grey"),
@@ -272,7 +302,7 @@ def pipette(name: str, pos) -> m.Part:
         _hull_cyl("nose_c", 0.0028, 0.045, 0.075, r1=0.0042),
         _hull_cyl("lower_c", 0.0090, 0.075, 0.152, patch=0.012),
         _hull_cyl("upper_c", 0.0100, 0.152, 0.248),
-        _hull_cyl("collar_c", 0.015, PIP_COLLAR_Z, PIP_COLLAR_Z + 0.006),
+        _hull_cyl("collar_c", PIP_COLLAR_R, PIP_COLLAR_Z, PIP_COLLAR_Z + 0.006),
     ]
     b0 = PIP_BUTTON_Z
     plunger = m.slider("plunger", "Z", -PIP_BLOWOUT, 0.0,
@@ -284,30 +314,59 @@ def pipette(name: str, pos) -> m.Part:
                        frame_inertia=(6e-4, 6e-4, 6e-6), friction=(0.9, 0.8), solver_iters=32)
 
 
+def _shelf(z_top: float, slot_w: float, slot_end: float, front: float, back: float, y0: float, y1: float, n: int):
+    """Boxes for a shelf from x `front` to `back` and y `y0` to `y1`, its top at `z_top`, with `n` slots `slot_w` wide,
+    open towards -x and closed at `slot_end`, centred at y = 0, PITCH, 2 PITCH ..."""
+    t, zc = PIP_STAND_T, z_top - PIP_STAND_T / 2
+    out = [((back - slot_end, y1 - y0, t), ((back + slot_end) / 2, (y0 + y1) / 2, zc))]
+    edges = [y0] + [v for k in range(n) for v in (k * PIP_PLACE_PITCH - slot_w / 2, k * PIP_PLACE_PITCH + slot_w / 2)] + [y1]
+    for a, b in zip(edges[::2], edges[1::2]):
+        out.append(((slot_end - front, b - a, t), ((slot_end + front) / 2, (a + b) / 2, zc)))
+    return out
+
+
 def pipette_holder(name: str, pos) -> m.Part:
-    """A printed stand: a 60 x 60 x 8 mm base, a post at +x, and a cradle open towards -x whose two prongs, 22 mm apart,
-    carry the pipette's finger hook collar at 203 mm."""
-    base = ((0.060, 0.060, 0.008), (0.0, 0.0, 0.004))
-    post = ((0.010, 0.016, HOLDER_CRADLE_Z), (0.025, 0.0, HOLDER_CRADLE_Z / 2))
-    prongs = [((0.040, 0.006, 0.006), (0.005, s * 0.014, HOLDER_CRADLE_Z - 0.003)) for s in (1, -1)]
-    bridge = ((0.008, 0.034, 0.006), (0.025, 0.0, HOLDER_CRADLE_Z - 0.003))
-    pieces = [base, post, bridge, *prongs]
-    parts = [(f"p{k}", m.box(*p), "pla") for k, p in enumerate(pieces)]
+    """The 3-place acrylic pipette stand, its origin under the axis of the place nearest the work (-y): a base, an
+    upright back at +x, an upper shelf whose 28 mm slots carry the pipettes' finger hooks, and a lower shelf whose 20 mm
+    slots keep their noses in line. The slots open towards -x."""
+    dx, dy, h = PIP_STAND
+    t = PIP_STAND_T
+    front, back = -0.035, 0.025
+    y0 = -(dy - 2 * PIP_PLACE_PITCH) / 2
+    y1 = y0 + dy
+    pieces = [((dx, dy, t), (front + dx / 2, (y0 + y1) / 2, t / 2)),
+              ((t, dy, h - t), (back + t / 2, (y0 + y1) / 2, t + (h - t) / 2))]
+    for w, z, end in PIP_SLOTS:
+        pieces += _shelf(z, w, end, front, back, y0, y1, 3)
+    parts = [(f"p{k}", m.box(*p), "acrylic") for k, p in enumerate(pieces)]
     cols = [m.col_box(f"c{k}", *p, offset=0.001) for k, p in enumerate(pieces)]
     return m.fixed(name, pos, parts, cols, LOOKS)
 
 
 def tube_rack(name: str, pos) -> m.Part:
-    """A POM block with one hole, holding an open 1.5 mL tube with 1.0 mL of electrolyte."""
+    """The CoolRack M6, its origin under the well that holds the open 1.5 mL tube with 1.0 mL of electrolyte. Every well
+    but that one is seen only (a dark disc on the top); the colliders leave that one open."""
     sx, sy, sz = RACK
-    hole = TUBE_OD / 2 + 0.0003
-    pieces = [((sx, sy, TUBE_SEAT), (0, 0, TUBE_SEAT / 2)),
-              ((sx, sy / 2 - hole, sz - TUBE_SEAT), (0, (sy / 2 + hole) / 2, (sz + TUBE_SEAT) / 2)),
-              ((sx, sy / 2 - hole, sz - TUBE_SEAT), (0, -(sy / 2 + hole) / 2, (sz + TUBE_SEAT) / 2)),
-              ((sx / 2 - hole, 2 * hole, sz - TUBE_SEAT), ((sx / 2 + hole) / 2, 0, (sz + TUBE_SEAT) / 2)),
-              ((sx / 2 - hole, 2 * hole, sz - TUBE_SEAT), (-(sx / 2 + hole) / 2, 0, (sz + TUBE_SEAT) / 2))]
-    parts = [(f"p{k}", m.box(*p), "pom_white") for k, p in enumerate(pieces)]
+    tx, ty = TUBE_XY_IN_RACK
+    cx, cy = -tx, -ty  # the rack's centre from its origin
+    hole = RACK_WELL_D / 2
+    fl = TUBE_SEAT
+    x0, x1, y0, y1 = cx - sx / 2, cx + sx / 2, cy - sy / 2, cy + sy / 2
+    pieces = [((sx, sy, fl), (cx, cy, fl / 2)),
+              ((sx, y1 - hole, sz - fl), (cx, (y1 + hole) / 2, (sz + fl) / 2)),
+              ((sx, -hole - y0, sz - fl), (cx, (y0 - hole) / 2, (sz + fl) / 2)),
+              ((x1 - hole, 2 * hole, sz - fl), ((x1 + hole) / 2, 0, (sz + fl) / 2)),
+              ((-hole - x0, 2 * hole, sz - fl), ((x0 - hole) / 2, 0, (sz + fl) / 2))]
+    parts = [(f"p{k}", m.box(*p), "alu") for k, p in enumerate(pieces)]
     cols = [m.col_box(f"c{k}", *p, offset=0.001) for k, p in enumerate(pieces)]
+    # round the open well's square corners, just under the top
+    parts.append(("well", m.lathe([(hole, fl), (hole * 1.45, fl), (hole * 1.45, sz - 0.0002), (hole, sz - 0.0002), (hole, fl)], 32), "alu"))
+    for i in (-1, 0, 1):
+        for j in (-0.5, 0.5):
+            wx, wy = cx + i * RACK_PITCH, cy + j * RACK_PITCH
+            if abs(wx) < 1e-6 and abs(wy) < 1e-6:
+                continue
+            parts.append((f"hole{i + 1}{int(j + 0.5)}", m.cylinder(hole, 0.0002, (wx, wy, sz + 0.0001), segments=32), "hole"))
     ro, ri = TUBE_OD / 2, TUBE_ID / 2
     z0 = TUBE_SEAT
     tube_prof = [(0.0, z0), (0.0015, z0), (ro, z0 + 0.018), (ro, z0 + TUBE_H), (ro + 0.0007, z0 + TUBE_H), (ro + 0.0007, z0 + TUBE_H + 0.002),

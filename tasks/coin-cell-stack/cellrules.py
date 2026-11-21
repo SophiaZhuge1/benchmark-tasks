@@ -21,6 +21,7 @@ GAUGE_R = 0.0065  # m: the depth gauge reads the spacer's top at 4 points on thi
 GAUGE_SPREAD = 0.0003  # m: the 4 readings agree within this (the stack under the spacer lies flat)
 GAUGE_HIGH = 0.0003  # m: and none is higher than the nominal stack by more than this (nothing doubled, folded or raised)
 NOMINAL_STACK = 0.0001 + 0.00026 + 0.0001 + 0.0010  # m: zinc, separator, zinc, spacer, floor to the spacer's top
+SINK_TOL = 0.00015  # m: after the spacer, how far one simulated thin disc may sink below the one under it
 SEP_GAP = 0.00005  # m: the separator lies above the first zinc and under the second (the meter: no zinc-to-zinc contact)
 FINGER_NEAR = 0.002  # m: a fingertip this close to a part's outline counts as touching it
 MOVED = 0.0010  # m: a part moved this far in all by gripper fingertips (summed over every contact) is displaced
@@ -38,7 +39,7 @@ class Layout:
     axis: tuple  # the can's axis, x y
     floor: float  # the can's floor (inside)
     rim: float  # the can's rim
-    stand: tuple  # the tweezer stand's slot centre x y, and the stand's top z
+    stand: tuple  # the tweezer rack's well centre x y, and the rack's top z
     holder: tuple  # the pipette's home origin (tip end) x y z
 
 
@@ -97,7 +98,8 @@ class CellJudge:
     finger_travel: dict = field(default_factory=dict)  # part -> its travel over finished contacts with the fingertips, m
     left_can: list = field(default_factory=list)  # parts that left the can after they had been laid in it
     peak: dict = field(default_factory=dict)  # part -> (highest over the rim, farthest from the axis) since it arrived, m
-    pre_press_sep: bool | None = None  # the separator between the zinc discs in the latest step before the press began
+    pre_spacer_sep: bool | None = None  # the separator between the zinc discs in the latest step before the spacer arrived
+    sep_now: bool | None = None  # the same, read in this step (for the log)
     press_started: bool = False
     blot_wet: bool = False
     left_table: list = field(default_factory=list)
@@ -134,8 +136,9 @@ class CellJudge:
                     self.left_can.append(name)  # each part once: lifted back out after it was laid in
         if s.cap_pressing and "cap" in self.arrived:
             self.press_started = True
-        if not self.press_started:
-            self.pre_press_sep = self.separated(s)
+        self.sep_now = self.separated(s)
+        if "spacer" not in self.arrived:
+            self.pre_spacer_sep = self.sep_now
         away = s.left.size == 0 or float(np.min(np.linalg.norm(s.left[:, :2] - np.asarray(lay.axis), axis=1))) > ARM_AWAY
         for name in self.arrived:
             if name in self.frozen or name not in s.parts:
@@ -228,6 +231,14 @@ class CellJudge:
             return False
         return bool(sep.pos[2] > z1.pos[2] + SEP_GAP and z2.pos[2] > sep.pos[2] + SEP_GAP)
 
+    def not_swapped(self, s: Snapshot) -> bool:
+        """After the spacer is on: no layer has passed below the one under it by more than SINK_TOL. The simulated thin
+        discs can sink into each other by up to a zinc disc's thickness; a swapped separator and zinc show 0.26 mm."""
+        z1, sep, z2 = (s.parts.get(n) for n in ("zinc_1", "separator", "zinc_2"))
+        if None in (z1, sep, z2):
+            return False
+        return bool(sep.pos[2] > z1.pos[2] - SINK_TOL and z2.pos[2] > sep.pos[2] - SINK_TOL)
+
     def gauge(self, s: Snapshot) -> tuple[bool, str]:
         """The depth gauge on the spacer's top: the stack under it flat, and nothing doubled, folded or raised."""
         sp = s.parts.get("spacer")
@@ -264,8 +275,9 @@ class CellJudge:
 
     def no_short(self, s: Snapshot) -> bool:
         """The meter, cap and spring lifted off, probe on the spacer, reads over R0: the separator lies between the zinc
-        discs (judged before the press, since the simulated thin discs can sink into each other under it) and covers
-        both, and the spacer does not touch the can's wall."""
+        discs (judged in the last step before the spacer arrives: the simulated 0.1 and 0.26 mm discs can sink into each
+        other under the 1.55 g spacer's drop from the rim and under the press) and covers both, and the spacer does not
+        touch the can's wall."""
         z1, sep, z2 = (s.parts.get(n) for n in ("zinc_1", "separator", "zinc_2"))
         if None in (z1, sep, z2):
             return False
@@ -273,7 +285,10 @@ class CellJudge:
         cover = (DIAM["separator"] - DIAM["zinc_1"]) / 2
         if np.linalg.norm(z1.centre_xy(1e-4) - sc) > cover or np.linalg.norm(z2.centre_xy(1e-4) - sc) > cover:
             return False
-        if not (self.pre_press_sep if self.press_started else self.separated(s)):
+        if "spacer" in self.arrived:  # strict up to the spacer; after it only a swap of layers counts
+            if not (self.pre_spacer_sep and self.not_swapped(s)):
+                return False
+        elif not self.separated(s):
             return False
         if "spacer" not in s.parts or self.offset("spacer", s.parts["spacer"]) >= (CAN_ID - DIAM["spacer"]) / 2:
             return False
@@ -282,9 +297,12 @@ class CellJudge:
     def tools_stowed(self, s: Snapshot) -> bool:
         sx, sy, stop = self.lay.stand
         tips = np.asarray(s.tweezers[0])
-        tw = abs(tips[0] - sx) < 0.004 and abs(tips[1] - sy) < 0.017 and tips[2] < stop - 0.010 and s.tweezers_tilt < 20.0
-        d = np.asarray(s.pipette[0]) - np.asarray(self.lay.holder)  # the hook's collar on the cradle's prongs
-        pip = -0.012 < d[0] < 0.015 and abs(d[1]) < 0.004 and abs(d[2]) < 0.002 and s.pipette_tilt < 10.0
+        # tips down in the 29 mm well (the frame's origin lies within 4 mm of the tips' midpoint), well below its rim
+        tw = math.hypot(tips[0] - sx, tips[1] - sy) < 0.0145 and tips[2] < stop - 0.010 and s.tweezers_tilt < 20.0
+        d = np.asarray(s.pipette[0]) - np.asarray(self.lay.holder)  # the finger hook's collar on the stand's upper shelf
+        # hung in its own place: within the 28 mm slot's width (the body sits anywhere across it, and a hanging pipette
+        # leans a few degrees, which moves the tip's end), the collar on the shelf
+        pip = -0.012 < d[0] < 0.015 and abs(d[1]) < 0.014 and abs(d[2]) < 0.002 and s.pipette_tilt < 10.0
         return bool(tw and pip)
 
     # -- the tier --------------------------------------------------------------------------------------------------
