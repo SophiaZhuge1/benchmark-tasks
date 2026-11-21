@@ -67,9 +67,10 @@ videos, the fingertip-cover blot, the depth gauge, the meter and the scale would
 - **Meter (over R0).** Read with the cap and the spring lifted off, so it needs neither: a weighted probe on the
   spacer, the other on the can's wall. The separator lies between the zinc discs (above the first, under the second) and
   covers both, and the spacer does not touch the can's wall: an offset of 1.85 mm brings it to the wall, and a spacer
-  offset of 1.85 mm or more scores 0. In the simulation the separator-between-zincs check is read in the last step before the spacer arrives; after
-  that, only a swap of layers (one sunk more than 0.15 mm below the one under it) counts, because the simulated thin
-  discs can sink into each other under the spacer's drop and the press (see Fidelity).
+  offset of 1.85 mm or more scores 0. In the simulation the separator-between-zincs check is read in the last step
+  before the spacer arrives; after that, only a swap of layers (one sunk more than 0.15 mm below the one under it)
+  counts, because the simulated thin discs can sink into each other under the spacer's drop and the press (see
+  Fidelity).
 - **Spring.** Seen in its own frame before the cap covers it: an offset of 2.25 mm or more puts it on the can's wall
   (a short once the cell is crimped) and scores 0.
 - **Cap.** The cap is seated when it is open side down, square, and its gasket is inside the can's mouth all round. It
