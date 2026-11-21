@@ -209,7 +209,7 @@ def _leg(side: float):
 
 def tweezers(name: str, pos, close: float = 0.0) -> m.Part:
     """Plastic battery tweezers: leg a and the joined head are the frame; leg b turns on a sprung hinge at the head,
-    joint zero at rest (tips 24 mm apart), positive closing, up to the tips meeting."""
+    joint zero at rest (the tips' inner faces 30 mm apart), positive closing, up to the tips meeting."""
     parts_a, cols_a = _leg(+1.0)
     parts_b, cols_b = _leg(-1.0)
     head = ((TW_LEG_W, 2 * TW_LEG_T, 0.010), (0.0, 0.0, TW_L - 0.005))

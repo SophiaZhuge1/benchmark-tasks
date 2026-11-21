@@ -96,7 +96,9 @@ videos, the fingertip-cover blot, the depth gauge, the meter and the scale would
   the order, each part laid once, and how far any fingertip contact moves a part in the can. Phone C, 45 cm above the
   middle of the dishes on its 2x camera, films the pickups in 4K: a field of about 32 x 18 cm, about 0.083 mm per pixel
   (1 mm is about 12 px); the dishes' 90 mm rims are the scale. It shows how far any fingertip contact moves a part in a
-  dish. Finger travel is summed over both videos and the whole trial.
+  dish. Finger travel is summed over both videos and the whole trial. Where the gripper hides a part from phone C
+  during a pick, its travel is read from its position before and after. (The demo video's dish view is rendered at
+  6 px per mm, half phone C's resolution; it is a demo-only view, not a policy camera.)
 - **Blot.** Each gripper's finger pads wear single-use 50 um film covers. After the trial, press the covered fingertips on
   blot paper: a wet mark scores 0. The covers then go to zinc waste, so electrolyte never reaches the robot's pads.
 - **Cap and spring.** Lift them out with plastic tweezers, if present, onto a tared boat; weigh them (0.001 g).
@@ -138,7 +140,8 @@ Offline checks of the rules on hand-built trials, with no simulator: `python -m 
   and re-seat parts. A full 9,600-step trial takes about 1.5 to 2 hours.
 - `object_jitter=0` keeps the layout fixed, so no seed is needed.
 - Model run: Dream-1 on the task's own instruction and 9,600-step limit (320 x 176 cameras, 8 rows per request), one
-  session from the first action to the end: task score 0.0. The video is `model_run.mp4`.
+  session from the first action to the end: task score 0.0. The video is `model_run.mp4`. It was recorded before the
+  tool holders were replaced with the catalogue ones; the parts, can, dishes and tube position are unchanged.
 
 ## Files
 
