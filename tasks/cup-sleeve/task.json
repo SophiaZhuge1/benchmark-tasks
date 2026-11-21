@@ -16,5 +16,6 @@
   "run_limit": "2,400 steps (120 seconds at 20 Hz)",
   "reset_notes": "Slide the sleeve down off the cup's base without squeezing the cup, press it flat along its two factory creases and stand it back in the organizer compartment on its narrow edge, creases toward +y and -y. Replace the sleeve if it is torn or crushed, or if its creases have gone soft (pressed flat and let go, it gapes less than 10 mm at the middle, or a fold has appeared off the creases). Cover the lid's sip hole with a strip of tape for real trials. Top the cup up to 400 g of water, check the lid is snapped on all round, and stand it on its mark with the sip hole toward the robot; replace the cup if its wall is dented or creased. Wipe any water off the counter. Use zero object jitter.",
   "fidelity": "Cup and lid: one rigid body, 0.43 kg (water fixed mass), so dents, lid lift and spills are not simulated: a 6 N squeeze from native contact forces stands for them. Sleeve: 16 rigid 1.5 mm strips in a closed loop of sprung hinges, two the creases; rest angles follow bends past 6 deg (creases 10), so board takes a set. Friction: inner face 0.3 on the cup, outer 1.0 under fingers. All estimates.",
-  "scores": "Dream-1 run: 0.0 (valid run); scripted demo: 1.0 (1,001 steps)"
+  "scores": "Dream-1 run: 0.0 (valid run); scripted demo: 1.0 (1,001 steps)",
+  "media": "M-6MJSPW"
 }
