@@ -20,5 +20,5 @@
   "reset_notes": "Open the instep strap: peel its hook patch off, draw the strap back out through its D-ring until about 5 cm of tail stands out beyond the ring with the pull tab upright, and let the outer wing of the upper spring open; check with a ruler that its edge is 40 mm from the inner edge under the strap and with the spring scale that about 5 N on the tab closes it (re-splay if the padding has relaxed). Re-draw the pen line at the D-ring's outer bar. Leave the forefoot strap fastened. Set the sole back on its tape mark, toes toward the robot. The shoe stays on the foot between trials; the straps are sewn on, so replace the shoe if the instep strap's hook patch clogs or no longer holds the 5 N pull.",
   "fidelity": "Leg, foot and shoe: rigid stand-in shapes on one articulation, the leg on a sprung, damped two-axis knee pivot; the opening's outer wing a sprung flap with a rigid D-ring. Strap: 34 hinged thin plates, sliding through the D-ring by contact. Hook and loop: a joint per plate pair forms at >= 2 N measured contact, faces opposed; breaks at 2.5 N peel or 17 N shear (typical, ASTM D5170/D5169). Forefoot strap, dressing, padding visual; strap and D-ring sizes assumed. The 5 N pull: a capped drive.",
   "scores": "Dream-1 run: 0.0 (valid run); scripted demo: 1.0 (487 steps)",
-  "media": ""
+  "media": "M-8LSW5U"
 }
