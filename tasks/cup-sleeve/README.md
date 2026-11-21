@@ -11,6 +11,42 @@ over. The sleeve comes flat, folded along two creases; it is opened into a ring 
 already full and lidded (the lid is wider than the sleeve's opening), it goes on from the bottom and wedges on the
 cup's taper. The cup's thin wall must not be squeezed.
 
+## Why it matters (Societal relatability)
+
+Putting a sleeve on a hot paper cup is something most coffee drinkers have done themselves, not only baristas: hot
+coffee to go is a daily habit for a large share of adults, single-wall paper cups are too hot to hold bare, and the
+corrugated sleeve is the standard answer, handed over by staff or taken from a dispenser on the self-serve counter.
+
+- **Coffee is drunk daily, and much of it away from home.** "Overall past-day coffee consumption steady at 66% of
+  American adults", and "out-of-home consumption among past-day coffee drinkers reached 38%"; also "55% of past-week
+  out-of-home coffee buyers ordered at a drive-thru". National Coffee Association, *2026 National Coffee Data Trends
+  Fall Report* (Dig Insights, June 8-24, 2026, nationally representative sample of 1,882 US adults), press release of
+  15 September 2026: https://www.ncausa.org/newsroom/NCA-Coffee-tops-beverage-charts-again-specialty-coffee-hits-new-high
+- **Billions of disposable hot cups a year (UK data).** "Almost half of all hot drinks are now sold in disposable cups. [...] 1 in
+  5 people visit a coffee shop on a daily basis. [...] This results in at least 2.5 billion coffee cups being thrown
+  away each year in the UK". House of Commons Environmental Audit Committee, *Disposable Packaging: Coffee Cups*, Second
+  Report of Session 2017-19, HC 657, published 5 January 2018:
+  https://publications.parliament.uk/pa/cm201719/cmselect/cmenvaud/657/657.pdf
+- **The sleeve replaced the second cup.** "In the past, two paper cups were frequently nested together for better
+  insulation. Then in January 1997, Starbucks introduced a corrugated paper sleeve to be used as an insulating layer in
+  place of a second cup." The same report says "the majority of Starbucks' beverage business is take-out" and that
+  before the sleeve "Starbucks was double-cupping approximately 60 percent of its drinks". *Report of the Starbucks
+  Coffee Company/Alliance for Environmental Innovation Joint Task Force*, 15 April 2000:
+  https://library.edf.org/AssetLink/477d3gh10kfo1f6kfnapt48fil82v728.PDF
+- **Why sleeves exist.** The cup sleeve was patented by its inventor as US 5,425,497, "Cup holder" (J. Sorensen, filed
+  9 November 1993, granted 20 June 1995): https://patents.google.com/patent/US5425497A/en. Its origin story, from a
+  drive-through: "The thin paper cup was way too hot to hold." E. Welles, "To Serve & Protect", *Fortune Small
+  Business*, 1 November 2001 (archived):
+  https://web.archive.org/web/20131119085418/https://money.cnn.com/magazines/fsb/fsb_archive/2001/11/01/312461/
+- **Customers sleeve their own cups.** Sleeve dispensers are sold for the self-serve counter, e.g. the Cal-Mil 2050
+  "Java Jacket hot cup sleeve dispenser": "Holds hot cup sleeves (sold separately) to help protect customers from burns
+  [...] Ideal for self-serve drink counters" (WebstaurantStore product page, viewed 21 November 2026):
+  https://www.webstaurantstore.com/cal-mil-2050-java-jacket-hot-cup-sleeve-dispenser/2112050.html
+
+So the act is familiar from both sides of the counter: baristas sleeve cups before handing them over, and customers
+take a flat sleeve from the dispenser, open it and slide it onto their own lidded cup. Chains that use double-wall cups
+skip the sleeve.
+
 ## Files
 
 | File | What it is |
