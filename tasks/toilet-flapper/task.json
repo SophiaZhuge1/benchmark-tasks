@@ -20,5 +20,5 @@
   "reset_notes": "About 2 minutes. Lift the chain out of the clip and leave the clip hooked in the lever's middle hole. Pull each ear back off its peg (spread it outward over the peg's tip), slide the flapper 15 mm forward on the seat to its pencil line, ears in front of the pegs, and lay the chain along its tape path on the floor. Check the refill tube is clipped to the overflow tube's rim and the handle is at rest. Replace the flapper if an ear tears or its hole has stretched loose on its peg; replace the chain clip if it no longer grips a bead.",
   "fidelity": "Tank parts rigid. Flapper: rigid seal and cup. Peg core 3 mm (real 5.6 mm pin): stable contact. Ear hole 8.5 mm, no stretch force (real push not measured): held on only when on the peg and pushed home on its boss with at least 0.5 N of contact force; easier to line up. Ear arm 1 N per 13 mm (estimate). Bead 1.5 g (real ~0.3 g): solver stability. Clip takes a bead within 8 mm for 0.3 s. Tank back-to-robot (real front-on): YAM wrists clear the far wall. Press computed. No water.",
   "scores": "Scripted demo: 1.0 (732 steps; 3 of 3 runs). Scripted failures: right ear left off its peg 0.25; chain clipped three beads too long (36 mm of slack) 0.5. Dream-1 run: 0.0 (valid run).",
-  "media": ""
+  "media": "M-QZF76T"
 }
