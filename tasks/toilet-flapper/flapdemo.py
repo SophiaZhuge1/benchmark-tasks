@@ -1,19 +1,6 @@
-"""The scripted reference demo, open loop from the fixed start: Cartesian waypoints for each arm, played by the
-harness's ``yam_scripted`` policy with IK on the arm's URDF. It reads nothing from the simulator while it runs; the
-points where the chain is picked up and where the chain meets the clip come from a logged first run (the chain's resting
-place after the flapper is seated), as for any part that moves before it is grasped.
-
-1. Each hand reaches into the tank over the rim and pinches one of the flapper's ear tabs by its front and back edges
-   (the hole free between the fingers), tilted 25 degrees in. The hands draw the ears apart (each rubber arm bends
-   outward) and slide the flapper back on the seat until each ear's hole is in line with its peg, outside its tip.
-2. The left hand pushes its ear in over the left peg while the right hand holds the right ear spread; then the right
-   hand pushes its ear in over the right peg while the left hand holds the left ear on. Both let go and lift clear.
-3. The left hand parks. The right hand picks the chain up off the floor at the bead that leaves about 18 mm of slack,
-   lifts it straight up, presses that bead into the clip's slot, holds it, lets go, draws its fingers back along the
-   chain and parks.
-
-Modes (TASK_DEMO): success; one_ear (the right ear is let go in front of its peg, never pushed on); slack (the chain is
-clipped three beads too long).
+"""Open-loop YAM reference waypoints for installing the flapper from the front.
+Both hands lift the flapper, spread its tabs, align the holes and lower them
+beside the pegs before pressing inward. The left hand handles the chain.
 """
 
 from __future__ import annotations
@@ -56,12 +43,12 @@ def grip(close, app) -> np.ndarray:
     return np.column_stack([x, np.cross(z, x), z])
 
 
-def ear_grip(side: int, tilt_in: float = 25.0, fwd: float | None = None, yaw: float = 0.0) -> np.ndarray:
+def ear_grip(side: int, tilt_in: float = 18.0, fwd: float | None = None, yaw: float = 0.0) -> np.ndarray:
     """Fingers down, tilted ``tilt_in`` toward the midline and ``fwd`` toward +x, closing along x turned by ``yaw``
     (rad) about the vertical: the pads take an ear tab by its front and back edges, the hole free between them."""
     if fwd is None:
         fwd = 20
-    a, b = math.radians(18), math.radians(fwd)
+    a, b = math.radians(tilt_in), math.radians(fwd)
     app = np.array([math.sin(b) * math.cos(a), -side * math.sin(a), -math.cos(a) * math.cos(b)])
     close = -side * np.array([math.cos(yaw), math.sin(yaw), 0.0])
     return grip(close, app)
@@ -83,7 +70,7 @@ def home(side: str, t: float = 2.0) -> Waypoint:
 
 
 OPEN = -0.017          # fingers 34 mm apart: round an ear tab 18 mm across
-PINCH = -0.004         # closing on the tab's 18 mm with about 25 N a finger
+PINCH = -0.0065         # closing on the tab's 18 mm with about 25 N a finger
 PINCH_Z = 0.014        # the TCP this far above the ear's hole (F z), the pads on the tab's edges
 SPREAD = 0.015         # each ear drawn this far outward to clear its peg's tip
 PUSH_IN = -0.0035       # the TCP aimed this far past the ear's seated place: the arm gives, and the tab is pushed home
@@ -141,7 +128,7 @@ def plan(mode: str, f_start, hinge_w, slot_w=None, chain_pick=None, chain_put=No
 
     def Rs(side, spread, fwd=None):
         sg = 1 if side == "left" else -1
-        return ear_grip(sg, fwd=fwd, yaw=0.0)
+        return ear_grip(sg, fwd=fwd, yaw=spread_yaw(sg, spread))
 
     def EP(side, origin, spread=0.0, dz=PINCH_Z):
         return ear_point(origin, 1 if side == "left" else -1, spread, dz)
@@ -154,11 +141,12 @@ def plan(mode: str, f_start, hinge_w, slot_w=None, chain_pick=None, chain_put=No
     P.both(0.8, EP("left", f0), EP("right", f0), PINCH, "pinch the ear tab", R["left"], R["right"])
     # draw the ears apart (each rubber arm bends outward), then slide the flapper back on the seat until each ear's
     # hole is in line with its peg, just outside the peg's tip
-    lifted = f0 + np.array((0.0, 0.0, 0.002))
-    P.both(1.5, EP("left", lifted, SPREAD), EP("right", lifted, SPREAD), PINCH, "draw the ears apart",
-           Rs("left", SPREAD), Rs("right", SPREAD))
-    P.both(1.5, EP("left", h, SPREAD), EP("right", h, SPREAD), PINCH, "holes in line with the pegs",
-           Rs("left", SPREAD), Rs("right", SPREAD))
+    lifted = f0 + np.array((-0.015, 0., 0.042))
+    above = h + np.array((0., 0., 0.042))
+    P.both(1.5, EP("left", lifted), EP("right", lifted), PINCH, "raise seal clear of the seat", R["left"], R["right"])
+    P.both(1.5, EP("left", lifted, SPREAD), EP("right", lifted, SPREAD), PINCH, "draw tabs apart above the pegs", Rs("left", SPREAD), Rs("right", SPREAD))
+    P.both(1.0, EP("left", above, SPREAD), EP("right", above, SPREAD), PINCH, "carry spread tabs over peg tips", Rs("left", SPREAD), Rs("right", SPREAD))
+    P.both(1.6, EP("left", h, SPREAD), EP("right", h, SPREAD), PINCH, "lower holes to the peg axis", Rs("left", SPREAD), Rs("right", SPREAD))
     # 2. left ear over its peg while the right hand holds its ear spread
     tip = tk.PEG_TIP_Y + 0.0035 - tk.EAR_Y  # spread at which the hole's inner face meets the peg's tip
     if mode == "one_ear":  # scripted failure: the right hand first takes its ear forward, out of line with its peg

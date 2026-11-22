@@ -102,7 +102,7 @@ Scripted reference policy: the same command with `--policy yam_scripted`, which 
 
 ## The scripted demo
 
-Both hands enter over the rim, spread the ears, align the holes and press each ear against its peg boss. The right hand then parks. The left hand lifts the chain, aligns the selected bead outside the fork mouth and presses along the fork toward the front wall before releasing it. The waypoints are open loop.
+Both hands enter over the rim, pinch the tabs, lift the flapper clear of the seat, spread the ears, then lower the holes beside the pegs and press inward. The installed-layout run reached 0.5 with both ears on their pegs, the valve seal seated and both hands clear. Chain installation remains unverified. The right hand then parks. The left hand lifts the chain, aligns the selected bead outside the fork mouth and presses along the fork toward the front wall before releasing it. The waypoints are open loop.
 
 ## Files
 

@@ -19,6 +19,6 @@
   "run_limit": "2,400 steps (2 minutes at 20 Hz)",
   "reset_notes": "About 2 minutes. Lift the chain out of the clip and leave the clip hooked in the lever's middle hole. Pull each ear back off its peg (spread it outward over the peg's tip), slide the flapper 15 mm forward on the seat to its pencil line, ears in front of the pegs, and lay the chain along its tape path on the floor. Check the refill tube is clipped to the overflow tube's rim and the handle is at rest. Replace the flapper if an ear tears or its hole has stretched loose on its peg; replace the chain clip if it no longer grips a bead.",
   "fidelity": "Front-facing tank; solid room wall 10 mm behind china. Rigid clip fork with 2 mm wire gap. One bead enters from the mouth and presses the end stop at ≥0.5 N on two consecutive samples before spring retention; threshold estimated, clip flex unmodelled. Rigid seal/cup. Ear hole 8.5 mm, peg core 3 mm (real pin 5.6 mm); ear seats at ≥0.5 N boss contact. Ear stiffness estimated. Beads 1.5 g (real ~0.3 g), two per rigid link. Handle test computed. Dry tank.",
-  "scores": "The revised installed-layout scripted trial scored 0.0. Full-score demonstration pending.",
+  "scores": "Installed-layout Isaac Lab reference reached 0.5: both ears on their pegs, seal seated and arms clear. Full-score chain installation remains pending.",
   "media": ""
 }
