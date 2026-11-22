@@ -1,8 +1,8 @@
 """Fit a new toilet flapper: hook its two ears over the overflow tube's pegs, seat it on the flush valve, and set its
 bead chain into the clip on the trip lever with the right slack.
 
-A two-piece toilet tank stands on the table, lid off and empty (water off, as when a flapper is changed), its back
-toward the robot. The old flapper has been taken off. The new one rests on the flush valve's seat, 15 mm forward of its
+A two-piece toilet tank stands on the table, lid off and empty (water off, as when a flapper is changed), its handle
+facing the robot and its rear against a wall. The old flapper has been taken off. The new one rests on the flush valve's seat, 15 mm forward of its
 place, its ears in front of the overflow tube's pegs and its bead chain lying on the tank's floor; the chain clip
 already hangs from the trip lever's middle hole.
 """
@@ -24,22 +24,24 @@ import robotpts  # noqa: E402
 import scenekit  # noqa: E402
 import steptime  # noqa: E402
 import toiletkit as tk  # noqa: E402
+from yam_arena import station
 from yam_arena.task_file import TABLE_TOP  # noqa: E402
 
 SCENE = "station"
 TOP = TABLE_TOP[SCENE]
+station.BASES.update(left=(-0.12, 0.345, TOP + 0.0825), right=(-0.12, -0.345, TOP + 0.0825))
 MODE = os.environ.get("TASK_DEMO", "success")
 
 ZF = tk.RAIL_H + tk.BOTTOM                    # the interior floor above the table
-T0 = np.array((0.327, 0.0, TOP + ZF))         # tank frame origin (world)
+T0 = np.array((0.275, 0.0, TOP + ZF))         # tank frame origin (world)
 # The new flapper has been put into the tank: its seal rests on the valve seat 15 mm forward of its fitted place, so its
 # ears stand just in front of the pegs, and its chain lies on the tank's floor, round the valve to the right and back.
-F_START = T0 + np.array((tk.TUBE_X + 0.015, 0.0, tk.PEG_Z))
+F_START = T0 + tk.INSTALLED_R @ np.array((tk.TUBE_X + 0.015, 0.0, tk.PEG_Z))
 CHAIN_PATH_T = ((0.062, -0.040, 0.003), (-0.040, -0.056, 0.003), (-0.040, -0.165, 0.003))
 
 TOILET = tk.Toilet(name="toilet", pos=tuple(T0), size=(0.19, 0.43, 0.26), color=tk.CHINA)
 FLAPPER = tk.Flapper(name="flapper", pos=tuple(F_START), size=(0.10, 0.07, 0.03), color=(0.1, 0.1, 0.1),
-                     chain_path=tuple(tuple(float(v) for v in T0 + np.array(p)) for p in CHAIN_PATH_T))
+                     start_yaw=math.pi, chain_path=tuple(tuple(float(v) for v in T0 + tk.INSTALLED_R @ np.array(p)) for p in CHAIN_PATH_T))
 OBJECTS = [TOILET, FLAPPER]
 SUCCESS_HOLD_S = 0.0
 # The demo video's views into the tank (tankcam.py, TASK_TANKCAM=<folder>), tank frame: eye, target, focal length (mm)
@@ -77,7 +79,7 @@ ANG = np.linspace(0, 2 * np.pi, 12, endpoint=False)
 def hole_t(fraw, ear: str) -> np.ndarray:
     """An ear's hole centre in the tank frame (the ear body's origin is its arm's root)."""
     R = tk.rotmat(fraw["quat"][ear])
-    return fraw["pos"][ear] + R @ np.array((-tk.ARM_ROOT_X, 0.0, 0.0)) - T0
+    return tk.INSTALLED_R.T @ (fraw["pos"][ear] + R @ np.array((-tk.ARM_ROOT_X, 0.0, 0.0)) - T0)
 
 
 def seal_rim(fraw) -> tuple:
@@ -111,7 +113,7 @@ def kit_points(fraw, traw) -> np.ndarray:
     rim = []
     for z in (tk.DISK_TOP - tk.DISK_H, tk.DISK_TOP + tk.CUP_H):
         rim.append(np.stack([tk.DISK_R * np.cos(ANG), tk.DISK_R * np.sin(ANG), np.full_like(ANG, z)], 1))
-    pts = [np.vstack(rim) @ R.T + fraw["pos"]["disk"], np.array([hole_t(fraw, e) + T0 for e in ("ear_l", "ear_r")])]
+    pts = [np.vstack(rim) @ R.T + fraw["pos"]["disk"], np.array([tk.INSTALLED_R @ hole_t(fraw, e) + T0 for e in ("ear_l", "ear_r")])]
     pts.append(np.array([tk.bead_pos(fraw, b, DL) for b in range(FLAPPER.n_beads)
                          if tk.seg_name(b // tk.SEG_BEADS) in fraw["pos"]]).reshape(-1, 3))
     Rl = tk.rotmat(traw["quat"]["lever"])
@@ -201,10 +203,7 @@ def _step_inner(env):
         _set_lever(env)
     fraw = tk.raw_state(env, "flapper")
     traw = tk.raw_state(env, "toilet")
-    links = scenekit.robot_links(env)
-    tips = np.array([links[s][k] for s in links for k in ("tip_left", "tip_right")])
-    _S["clip"].update(_S["n"], fraw, traw, tips)
-    _S["clip"].follow(traw)
+    _S["clip"].update(_S["n"], fraw, traw, env)
     _S["push"].attach(env)
     _S["push_n"] = _S["push"].read(float(getattr(env.unwrapped, "physics_dt", 1.0 / 240.0)))
     _S["ears"].update(_S["n"], {"l": hole_t(fraw, "ear_l"), "r": hole_t(fraw, "ear_r")}, _S["push_n"])
@@ -220,7 +219,7 @@ def _step_inner(env):
         import tankcam
         if _S["n"] == 1:
             env_path = tk.PATHS["toilet"].rsplit("/", 1)[0]
-            tankcam.start(env_path, {k: (T0 + np.array(e), T0 + np.array(t), f) for k, (e, t, f) in TANK_VIEWS.items()})
+            tankcam.start(env_path, {k: (T0 + tk.INSTALLED_R @ np.array(e), T0 + tk.INSTALLED_R @ np.array(t), f) for k, (e, t, f) in TANK_VIEWS.items()})
         tankcam.step()
     _log(fraw, traw, sc)
 
@@ -230,6 +229,7 @@ def _log(fraw, traw, sc):
     if not out:
         return
     rec = {"step": _S["n"], "score": sc.score, "check": sc.last, "clip": _S["clip"].on, "meas": _S.get("meas"), "ear_on": dict(_S["ears"].on),
+           "clip_events": list(_S["clip"].events),
            "push": {k: round(v, 3) for k, v in _S["push_n"].items()},
            "disk": np.round(fraw["pos"]["disk"] - T0, 4).tolist(), "lift": round(lift_deg(fraw), 2),
            "spread": [round(float(fraw["joint"][k]), 4) for k in ("ear_l_spread", "ear_r_spread")],
@@ -257,14 +257,14 @@ def score(objects) -> float:
     return float(_S["scorer"].score)
 
 
-HINGE_W = T0 + tk.HINGE_T                     # the pegs' axis at y 0 (world)
-SLOT_W = T0 + tk.clip_slot_T()                # the chain clip's slot at rest (world)
+HINGE_W = T0 + tk.INSTALLED_R @ tk.HINGE_T                     # the pegs' axis at y 0 (world)
+SLOT_W = T0 + tk.INSTALLED_R @ tk.clip_slot_T()                # the chain clip's slot at rest (world)
 # Where the right hand picks the chain up (the bead that gives the right slack, where it lies on the tank's floor) and
 # where it presses that bead into the clip's slot.
-CHAIN_PICK = T0 + np.array((-0.040, -0.073, 0.012))  # bead 27's place on the floor: about 18 mm of slack
-CHAIN_PUT = SLOT_W + np.array((-0.012, 0.009, -0.010))  # the held bead into the clip's slot
+CHAIN_PICK = T0 + tk.INSTALLED_R @ np.array((-0.040, -0.073, 0.012))  # bead 27's place on the floor: about 18 mm of slack
+CHAIN_PUT = SLOT_W + tk.INSTALLED_R @ np.array((-0.006, 0., 0.))  # the held bead into the clip's slot
 # the scripted failure "slack" picks the chain further along; it clips bead 30 (about 36 mm of slack)
-CHAIN_PICK_FAULT = {"slack": T0 + np.array((-0.045, -0.087, 0.012))}
+CHAIN_PICK_FAULT = {"slack": T0 + tk.INSTALLED_R @ np.array((-0.045, -0.087, 0.012))}
 CHAIN_PUT_FAULT = {"slack": CHAIN_PUT + np.array((0.007, -0.003, 0.0))}  # that bead held where bead 27 would be
 
 

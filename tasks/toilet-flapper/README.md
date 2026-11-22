@@ -1,7 +1,7 @@
 # Fit a new toilet flapper
 
 A two-piece toilet tank stands on the table, lid off and empty (the water shut off and the tank flushed, as when a
-flapper is changed), its back toward the robot. The old flapper has been taken off and the new one put into the tank:
+flapper is changed), its front handle toward the robot and its back against the room wall. The old flapper has been taken off and the new one put into the tank:
 it rests on the flush valve's seat, a little forward of its place, with its two rubber ears in front of the overflow
 tube's pegs and its bead chain lying on the tank's floor. The chain clip already hangs from the trip lever. The robot
 must fit the flapper, hooking both ears over their pegs so that it hangs on them seated on the valve, and set the chain
@@ -10,7 +10,7 @@ into the clip at the bead that leaves the right slack, then let go.
 What makes it hard: the ears are soft rubber on bendable arms and the pegs stick out sideways from the overflow tube,
 so each ear must be drawn outward past its peg's tip, lined up and pushed in along the peg, and the second ear is worked
 while the first is held on. The work is two-handed and low in a deep, narrow tank, beside the overflow tube and under the
-fill valve's refill tube; the chain is then set at the trip lever on the far wall. The chain must then be set at the right bead: too short and it holds the flapper open (the
+fill valve's refill tube; the chain is then set at the trip lever on the front wall. The chain must then be set at the right bead: too short and it holds the flapper open (the
 toilet runs), too long and the flush is short. The result is checked by working the handle.
 
 Category: Impact on jobs. The workers who change flappers are building maintenance technicians in apartments, hotels
@@ -38,7 +38,7 @@ A task file for the `yam_arena` embodiment (Isaac Lab-Arena 0.3.1).
 | Base | two 2x4 offcuts (38 x 89 mm, 25 cm long) laid flat under the tank, either side of the valve shank; tank strapped to them, offcuts clamped to the table | tank floor 5 cm, rim 29.5 cm above the table |
 | Flapper | one new 2 in universal flapper with peg ears and its stainless bead chain, the same model in every trial (Fluidmaster 502P21) | seal 72 mm, chain 25 cm, 6 mm bead pitch |
 | Chain clip | the flapper kit's stainless clip, hooked in the trip arm's middle hole | |
-| Lid | the tank's lid, lying flat on the table to the robot's right | 46 x 20 cm |
+| Lid | the tank's lid, lying flat on the table to the robot's left | 46 x 20 cm |
 | Scoring tools | 0.5 mm feeler gauge, steel rule, phone camera; a pencil mark on the overflow tube 13 cm above the floor | |
 
 ## Real items
@@ -96,21 +96,13 @@ inspect-robots run --embodiment yam_arena --policy dream \
   --scorer task_score --max-steps 2400 --store-frames --log-dir runs/dream
 ```
 
-Scripted reference demo (scores 1.0): the same command with `--policy yam_scripted`, which plays `demo()`.
+Scripted reference policy: the same command with `--policy yam_scripted`, which plays `demo()`.
 `TASK_DEMO` selects a scripted failure instead: `one_ear` (the right ear is let go in front of its peg: 0.25) or
 `slack` (the chain is clipped three beads too long, about 36 mm of slack: 0.5). Offline scorer tests (no simulator): `python test_flapscore.py`.
 
 ## The scripted demo
 
-Open-loop Cartesian waypoints played by `yam_scripted` (`flapdemo.py`). The demo reads nothing from the simulator; the
-point where the right hand picks up the chain and where it presses that bead into the clip were taken from a logged
-run, as for any part that moves before it is grasped. Each hand reaches into the tank over the rim and takes one ear
-tab by its front and back edges (the hole stays free between the fingers), tilted 25 degrees in. The hands draw the
-ears apart and slide the flapper back on the seat until each ear's hole is in line with its peg; the left hand pushes
-its ear in over its peg and home against the peg's boss while the right hand holds the right ear spread, then the right
-ear is pushed on in the same way while the left hand holds its ear. Both let go and lift out; the left hand parks. The right hand picks the chain up off the floor at
-the bead that leaves about 18 mm of slack, lifts it straight up, presses that bead into the clip's slot, holds it there,
-lets go, draws its fingers back along the chain and parks.
+Both hands enter over the rim, spread the ears, align the holes and press each ear against its peg boss. The right hand then parks. The left hand lifts the chain, aligns the selected bead outside the fork mouth and presses along the fork toward the front wall before releasing it. The waypoints are open loop.
 
 ## Files
 
@@ -128,11 +120,7 @@ lets go, draws its fingers back along the chain and parks.
 
 ## Layout
 
-The tank stands with its back toward the robot so that both arms can reach down to the pegs (they are near the
-tank's back wall): from the front, the YAM's wrists would meet the tank's back wall. The trip lever is a right-hand one
-so that the chain is set by the right arm while the left one is out of the way. The flapper starts in the tank, on
-the seat just forward of its place, as a worker sets it down before fitting it; carrying it in over the rim is not
-part of the task.
+Both YAM arms stand on 8 cm risers in front of the installed tank. The base centers are 69 cm apart, with their midpoint 39.5 cm in front of the valve seat. The overflow tube and pegs are on the far side. A solid room-wall collider spans 1.5 m, rises 1.2 m above the tank floor and begins 10 mm behind the rear china face. The robot must clear the tank rim on entry and withdrawal. Place the physical tank against a wall or clamp a panel at the same clearance.
 
 ## Fidelity: departures from the real trial
 
@@ -143,17 +131,13 @@ Each as "sim (real): reason".
 - Ear hole 8.5 mm square, with no stretch force (real: a hole smaller than the peg that the rubber is stretched over;
   the push needed is not measured): an ear is held on its peg only when its hole is on the peg (centre within 4 mm of
   the peg's axis, past the tip) and its tab is pushed home against the peg's boss, the physics engine's contact force
-  along the peg being at least 0.5 N for 0.1 s (the demo pushes with about 1.5 to 6 N); a spring then draws the hole
+  along the peg being at least 0.5 N for 0.1 s (sampled at 20 Hz); a spring then draws the hole
   round the peg for 0.5 s, and the ear hangs on the core. Lining the hole up is easier than on the real, tight hole.
 - Ear spring about 1 N spreads an ear 13 mm (real: an estimate, not measured): each ear is a holed rubber tab on a
   sprung arm; the flapper's seal and cup are rigid.
 - Bead mass 1.5 g (real about 0.3 g): heavier beads keep the solver steady. The chain is 21 rigid links of two beads on
   ball joints.
-- Chain clip as a proximity model (real: a bead is pressed into the clip's slot): the clip takes whichever bead is held
-  within 8 mm of its slot for 0.3 s, with no force or direction needed.
-- Tank turned back toward the robot (real: a tank is worked on from its front): turned, the pegs are on the robot's
-  side and the YAM's wrists clear the far wall as they reach down to them (from the front, the wrists would meet the
-  tank's back wall); the act of fitting the flapper and setting the chain is unchanged.
+- The lever carries a rigid side-entry fork with a 2 mm wire gap. The selected bead enters from the open end, moves at least 8.1 mm along the fork, and presses its end stop. PhysX contact points on that face are attributed to a bead on the contacting chain link using its surface distance. The same bead must supply at least 0.5 N along the slot on two consecutive control samples before a retaining spring engages. The threshold is an estimate. The spring represents the real clip's retention after seating. Clip flex is omitted.
 - Handle press computed (real: the handle is pressed): the scorer's press is computed from the lever's travel (40
   degrees) and the chain's length from the lug to the clipped bead; the flapper lifts once the chain is taut, up to its
   stop against the overflow tube (66 degrees). A chain pulled taut against the flapper's stop is beyond what this

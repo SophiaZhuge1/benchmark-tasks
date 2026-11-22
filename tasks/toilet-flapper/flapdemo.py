@@ -56,10 +56,12 @@ def grip(close, app) -> np.ndarray:
     return np.column_stack([x, np.cross(z, x), z])
 
 
-def ear_grip(side: int, tilt_in: float = 25.0, fwd: float = -5.0, yaw: float = 0.0) -> np.ndarray:
+def ear_grip(side: int, tilt_in: float = 25.0, fwd: float | None = None, yaw: float = 0.0) -> np.ndarray:
     """Fingers down, tilted ``tilt_in`` toward the midline and ``fwd`` toward +x, closing along x turned by ``yaw``
     (rad) about the vertical: the pads take an ear tab by its front and back edges, the hole free between them."""
-    a, b = math.radians(tilt_in), math.radians(fwd)
+    if fwd is None:
+        fwd = 20
+    a, b = math.radians(18), math.radians(fwd)
     app = np.array([math.sin(b) * math.cos(a), -side * math.sin(a), -math.cos(a) * math.cos(b)])
     close = -side * np.array([math.cos(yaw), math.sin(yaw), 0.0])
     return grip(close, app)
@@ -82,12 +84,12 @@ def home(side: str, t: float = 2.0) -> Waypoint:
 
 OPEN = -0.017          # fingers 34 mm apart: round an ear tab 18 mm across
 PINCH = -0.004         # closing on the tab's 18 mm with about 25 N a finger
-PINCH_Z = 0.018        # the TCP this far above the ear's hole (F z), the pads on the tab's edges
+PINCH_Z = 0.014        # the TCP this far above the ear's hole (F z), the pads on the tab's edges
 SPREAD = 0.015         # each ear drawn this far outward to clear its peg's tip
-PUSH_IN = -0.012       # the TCP aimed this far past the ear's seated place: the arm gives, and the tab is pushed home
+PUSH_IN = -0.0035       # the TCP aimed this far past the ear's seated place: the arm gives, and the tab is pushed home
                        # against the peg's boss (2 mm in from its seated place) with a few newtons
 LIFT_Z = 0.375         # carrying height of the TCP above the table (the seal clears the tank's rim)
-IN_FWD = -5.0          # fingers tipped this far back toward the robot at the ears (the wrist clears the back wall)
+IN_FWD = 30.0          # fingers tipped this far back toward the robot at the ears (the wrist clears the back wall)
 CARRY_FWD = 25.0       # fingers tipped forward while carrying high (reach), which tips the seal up
 
 
@@ -120,12 +122,12 @@ def ear_point(f_origin, side: int, spread: float = 0.0, dz: float = PINCH_Z) -> 
     """World position of the TCP pinching one ear (F frame not rotated): the hole's centre, drawn ``spread`` outward,
     raised ``dz``."""
     dx = tk.ARM_ROOT_X * (1.0 - math.cos(math.asin(min(abs(spread) / tk.ARM_ROOT_X, 0.9)))) if spread > 0 else 0.0
-    return np.asarray(f_origin, float) + np.array((dx, side * (tk.EAR_Y + spread), dz))
+    return np.asarray(f_origin, float) + np.array((-dx, side * (tk.EAR_Y + spread), dz))
 
 
 def spread_yaw(side: int, spread: float) -> float:
     """The ear tab's turn about the vertical when drawn ``spread`` outward (the arm pivots at its root)."""
-    return -side * math.asin(min(spread / tk.ARM_ROOT_X, 0.9))
+    return side * math.asin(min(spread / tk.ARM_ROOT_X, 0.9))
 
 
 def plan(mode: str, f_start, hinge_w, slot_w=None, chain_pick=None, chain_put=None) -> dict:
@@ -137,9 +139,9 @@ def plan(mode: str, f_start, hinge_w, slot_w=None, chain_pick=None, chain_put=No
     h = np.asarray(hinge_w, float)
     R = {s: ear_grip(sg) for s, sg in (("left", 1), ("right", -1))}
 
-    def Rs(side, spread, fwd=IN_FWD):
+    def Rs(side, spread, fwd=None):
         sg = 1 if side == "left" else -1
-        return ear_grip(sg, fwd=fwd, yaw=spread_yaw(sg, spread))
+        return ear_grip(sg, fwd=fwd, yaw=0.0)
 
     def EP(side, origin, spread=0.0, dz=PINCH_Z):
         return ear_point(origin, 1 if side == "left" else -1, spread, dz)
@@ -186,10 +188,10 @@ def plan(mode: str, f_start, hinge_w, slot_w=None, chain_pick=None, chain_put=No
     for sd in sides:
         P.add(sd, 1.5, EP(sd, h, 0.004, dz=0.12), OPEN, "lift clear", Rs(sd, 0.0))
     P.sync()
-    park(P, "left")
+    park(P, "right")
     if chain_pick is not None and chain_put is not None:
         _chain(P, mode, np.asarray(chain_pick, float), np.asarray(chain_put, float))
-    park(P, "right")
+    park(P, "left")
     P.sync()
     return P.arms
 
@@ -209,22 +211,23 @@ def _chain(P: Plan, mode: str, pick, put) -> None:
     """The right hand picks the chain up at the bead that gives the right slack (``pick``: where it lies on the
     tank's floor), lifts it over the flapper to the clip on the trip lever and presses that bead into the clip's slot
     (``put``), holds it there while the clip takes it, lets go and draws back."""
-    s = "right"
+    s = "left"
     a0, b0 = math.radians(15), math.radians(-5)  # down, tipped 15 deg in from the right, closing along x
-    down = grip((1.0, 0.0, 0.0), np.array((math.sin(b0) * math.cos(a0), math.sin(a0), -math.cos(a0) * math.cos(b0))))
+    down = grip((1.0, 0.0, 0.0), np.array((math.sin(b0) * math.cos(a0), -math.sin(a0), -math.cos(a0) * math.cos(b0))))
     a, b = math.radians(30), math.radians(30)  # from the right and from behind, 30 deg each, fingertips down to the clip
-    app = np.array((math.sin(b) * math.cos(a), math.sin(a), -math.cos(a) * math.cos(b)))
+    app = np.array((math.sin(b) * math.cos(a), -math.sin(a), -math.cos(a) * math.cos(b)))
     app = app / np.linalg.norm(app)
     clip = grip((0.0, -1.0, 0.0), app)
     at = put - app * PAD_MID  # the TCP that puts the pads' middle at the slot
-    P.add(s, 1.5, (0.30, -0.10, TOP + 0.33), CHAIN_OPEN, "over the tank's rim", ear_grip(-1, fwd=25.0))
+    P.add(s, 1.5, (0.27, 0.10, TOP + 0.33), CHAIN_OPEN, "over the tank's rim", ear_grip(-1, fwd=25.0))
     P.add(s, 2.0, pick + np.array((0, 0, 0.06)), CHAIN_OPEN, "over the chain", down)
     P.add(s, 1.2, pick, CHAIN_OPEN, "round the chain", down)
     P.add(s, 0.6, pick, CHAIN_PINCH, "pinch the chain at the bead", down)
     P.add(s, 1.5, pick + np.array((0, 0, 0.08)), CHAIN_PINCH, "lift the chain straight up", down)
-    P.add(s, 2.0, at + np.array((-0.015, -0.02, -0.03)), CHAIN_PINCH, "up to just below the clip", clip)
-    P.add(s, 1.2, at, CHAIN_PINCH, "press the bead into the clip's slot", clip)
-    P.add(s, 0.8, at, CHAIN_PINCH, "hold it there", clip)
+    P.add(s, 2.0, at + np.array((0.016, 0., 0.012)), CHAIN_PINCH, "over the open end of the fork", clip)
+    P.add(s, 1.0, at + np.array((0.012, 0., 0.)), CHAIN_PINCH, "line up at the fork mouth", clip)
+    P.add(s, 1.5, at - np.array((0.002, 0., 0.)), CHAIN_PINCH, "press along the slot to its stop", clip)
+    P.add(s, 0.4, at - np.array((0.002, 0., 0.)), CHAIN_PINCH, "maintain the seating load", clip)
     P.add(s, 0.6, at, RELEASE_OPEN, "let go of the chain", clip)
     P.add(s, 1.5, at - app * 0.05, RELEASE_OPEN, "draw the fingers back off the chain", clip)
     P.add(s, 1.2, at - app * 0.05 + np.array((0.0, -0.03, 0.04)), RELEASE_OPEN, "and up", clip)

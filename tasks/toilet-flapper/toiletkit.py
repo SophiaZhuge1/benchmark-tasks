@@ -27,16 +27,18 @@ import sys
 from dataclasses import dataclass
 
 import numpy as np
+from clipseat import ClipSeat
 from yam_arena.task_file import Box, ObjectState
 
 # -- tank geometry (T frame, m) ---------------------------------------------------------------------------------------
-IN_X = (-0.107, 0.080)            # interior: back wall (robot side) and front wall inner faces
+IN_X = (-0.107, 0.080)            # interior: back wall (room-wall side) and front wall inner faces
+INSTALLED_R = np.diag([-1.0, -1.0, 1.0])  # tank +x points toward the robot
 IN_Y = 0.205                      # interior half-width
 WALL = 0.010
 DEPTH = 0.245                     # interior floor to rim
 BOTTOM = 0.012                    # the tank's bottom slab
 LID_SIZE = (0.46, 0.20, 0.022)   # the tank's lid, lying on the table
-LID_CENTRE_T = (-0.020, -0.43, -0.050 + 0.011)
+LID_CENTRE_T = (0.125, -0.43, -0.050 + 0.011)
 RAIL_H = 0.038                    # two 2x4 rails under the tank, laid flat (38 mm)
 VALVE_R, VALVE_TOP = 0.041, 0.018  # flush valve body (flange and nut collar) inside the tank
 SEAT_R, SEAT_TOP, SEAT_IN = 0.034, 0.030, 0.025  # the valve seat ring: outer radius, top, opening radius
@@ -422,6 +424,7 @@ def _spawn_toilet(prim_path: str, cfg, translation=None, orientation=None, **kwa
     root = UsdGeom.Xform.Define(stage, prim_path)
     T = np.array(translation or (0.0, 0.0, 0.0), dtype=float)
     root.AddTranslateOp(precision=UsdGeom.XformOp.PrecisionDouble).Set(Gf.Vec3d(*T))
+    root.AddOrientOp().Set(Gf.Quatf(0, 0, 0, 1))
     B = _Builder(stage, prim_path, spec.friction)
     china = B.look("china", CHINA, 0.30)
     china_in = B.look("china_in", (0.88, 0.88, 0.86), 0.35)
@@ -440,6 +443,8 @@ def _spawn_toilet(prim_path: str, cfg, translation=None, orientation=None, **kwa
     ex0, ex1, ey = x0 - WALL, x1 + WALL, IN_Y + WALL
     zc = (zr - BOTTOM) / 2
     hz = zr + BOTTOM
+    # A solid room wall, 10 mm behind the rear china face.
+    B.box(f"{tank}/room_wall", (ex0 - 0.035, 0, 0.576), (0.050, 1.50, 1.248), china_in)
     # walls (china), floor, bottom slab
     B.box(f"{tank}/wall_back", ((ex0 + x0) / 2, 0, zc), (WALL, 2 * ey, hz), china)
     B.box(f"{tank}/wall_front", ((ex1 + x1) / 2, 0, zc), (WALL, 2 * ey, hz), china)
@@ -510,7 +515,7 @@ def _spawn_toilet(prim_path: str, cfg, translation=None, orientation=None, **kwa
     B.box(f"{tank}/handle", (ex1 + 0.020, py + LEVER_DIR * 0.040, pz - 0.004), (0.012, 0.075, 0.016), chrome, collide=False)
     # lever arm (its own link): a flat plastic arm along +y from the pivot, holes near its end, the clip in one hole
     lev = f"{prim_path}/lever"
-    B.body(lev, (px, py, pz), IDENT, spec.lever_mass, inertia=(1e-4, 1e-5, 1e-4), com=(0, LEVER_DIR * LEVER_LEN / 2, 0))
+    B.body(lev, (px, py, pz), IDENT, spec.lever_mass, inertia=(1e-4, 1e-5, 1e-4), com=(0, LEVER_DIR * LEVER_LEN / 2, 0), report=True)
     B.box(f"{lev}/arm", (0, LEVER_DIR * LEVER_LEN / 2, 0), (0.004, LEVER_LEN, 0.014), lever_l, collide=False)
     B.cyl(f"{lev}/hub", (0.006, 0, 0), 0.010, 0.012, "X", lever_l, collide=False)
     for k, hy in enumerate(LEVER_HOLES):
@@ -521,9 +526,13 @@ def _spawn_toilet(prim_path: str, cfg, translation=None, orientation=None, **kwa
     # chain between two beads (visual; ClipCatcher holds the bead)
     B.cyl(f"{lev}/clip_hook", (0, hy, 0.004), 0.0012, 0.006, "Y", chrome, collide=False)
     B.box(f"{lev}/clip_top", (-CLIP_BACK / 2, hy, 0.008), (CLIP_BACK + 0.004, 0.0024, 0.0024), chrome, collide=False)
-    B.box(f"{lev}/clip_back", (-CLIP_BACK - 0.002, hy, -CLIP_DROP / 2 + 0.004), (0.0024, 0.0024, CLIP_DROP + 0.010),
-          chrome, collide=False)
-    B.box(f"{lev}/clip_jaw", (-CLIP_BACK, hy, -CLIP_DROP - 0.001), (0.008, 0.010, 0.0015), chrome, collide=False)
+    # A side-entry fork. Its two shelves support the bead above a 2 mm wire gap.
+    # The backstop's inner face is one collider radius past the seated bead centre.
+    for k, sign in enumerate((-1, 1)):
+        B.box(f"{lev}/clip_jaw_{k}", (-CLIP_BACK - 0.003, hy + sign * 0.0025, -CLIP_DROP - 0.003),
+              (0.012, 0.003, 0.001), chrome, offset=0.0002)
+    B.box(f"{lev}/clip_stop", (-CLIP_BACK + BEAD_COL_R + 0.0005, hy, -CLIP_DROP + 0.007),
+          (0.001, 0.008, 0.021), chrome, offset=0.0002)
     j = B.revolute(f"{lev}/lever_hinge", tank, lev, (px, py, pz), IDENT, (0, 0, 0), IDENT, "X", spec.lever_k,
                    spec.lever_c, lo=min(0.0, LEVER_DIR * 70.0), hi=max(0.0, LEVER_DIR * 70.0))
     # articulation
@@ -535,7 +544,7 @@ def _spawn_toilet(prim_path: str, cfg, translation=None, orientation=None, **kwa
     fj = UsdPhysics.FixedJoint.Define(stage, f"{prim_path}/fixed")
     fj.CreateBody1Rel().SetTargets([Sdf.Path(tank)])
     fj.CreateLocalPos0Attr(Gf.Vec3f(*map(float, T)))
-    fj.CreateLocalRot0Attr(Gf.Quatf(1, 0, 0, 0))
+    fj.CreateLocalRot0Attr(Gf.Quatf(0, 0, 0, 1))
     fj.CreateLocalPos1Attr(Gf.Vec3f(0, 0, 0))
     fj.CreateLocalRot1Attr(Gf.Quatf(1, 0, 0, 0))
     return root.GetPrim()
@@ -649,8 +658,8 @@ def _spawn_flapper(prim_path: str, cfg, translation=None, orientation=None, **kw
     # clip joints (disabled): bead i held at the clip's slot
     toilet = next((PATHS[n] for n, s in _SPECS.items() if isinstance(s, Toilet)), None)
     if toilet is not None:
-        lev = f"{toilet}/tank"  # anchored on the tank at the slot's rest place; ClipCatcher.follow moves it with the lever
-        slot_l = clip_slot_T()
+        lev = f"{toilet}/lever"
+        slot_l = clip_slot_T() - np.array(LEVER_PIVOT)
         for i in range(CLIP_FROM, spec.n_beads):
             jp = f"{prim_path}/clip_{i:02d}"
             boff = dirs[i // SEG_BEADS] * bead_offset(i)
@@ -725,7 +734,7 @@ def _arena_object(spec):
                                              damping=spec.lever_c),
                 "refill": ImplicitActuatorCfg(joint_names_expr=["refill_j_.*"], stiffness=spec.refill_k,
                                               damping=spec.refill_c)}
-        pose = Pose(position_xyz=tuple(float(v) for v in spec.pos), rotation_xyzw=IDENT)
+        pose = Pose(position_xyz=tuple(float(v) for v in spec.pos), rotation_xyzw=(0, 0, 1, 0))
     else:
         acts = {"ears": ImplicitActuatorCfg(joint_names_expr=["ear_.*"], stiffness=spec.ear_k, damping=spec.ear_c),
                 "chain": ImplicitActuatorCfg(joint_names_expr=["link_.*"], stiffness=0.0, damping=spec.bead_c)}
@@ -791,37 +800,42 @@ def kit_state(env, name: str) -> KitState:
 # -- the chain clip -----------------------------------------------------------------------------------------------------
 
 class ClipCatcher:
-    """Switches on the clip joint of the bead held within the slot's window for DWELL steps (0.3 s); it
-    holds for good after that (a real clip holds the chain until it is lifted out by hand, which the task never asks
-    for)."""
-
-    SLOT_R = 0.008    # a bead within this of the slot's point (across the slot) counts as in it
-    SLOT_Z = 0.008    # ... and within this up or down
-    DWELL = 6         # control steps (0.3 s)
-
-    def __init__(self, flapper: str = "flapper", toilet: str = "toilet"):
+    """Track each bead through the fork, then require a measured load on its stop."""
+    def __init__(self, flapper="flapper", toilet="toilet"):
         self.flapper, self.toilet = flapper, toilet
-        self.on: int | None = None
-        self.since: dict = {}
-        self.events: list = []
+        self.on = None
+        self.events = []
+        self.seat = ClipSeat()
+        self.view = None
 
     def slot_world(self, traw) -> np.ndarray:
         p, q = traw["pos"]["lever"], traw["quat"]["lever"]
         return p + rotmat(q) @ np.array((-CLIP_BACK, LEVER_HOLES[CLIP_HOLE], -CLIP_DROP))
 
-    def candidate(self, fraw, traw) -> int | None:
-        """The bead in the slot: of the beads within the slot's window, the nearest to the slot's point."""
-        s = self.slot_world(traw)
-        spec = _SPECS[self.flapper]
-        dl = chain_dirs_local(spec)
-        best, bd = None, 1e9
-        for i in range(CLIP_FROM, spec.n_beads):
-            if seg_name(i // SEG_BEADS) not in fraw["pos"]:
-                break
-            d = bead_pos(fraw, i, dl) - s
-            if math.hypot(d[0], d[1]) < self.SLOT_R and abs(d[2]) < self.SLOT_Z and float(np.linalg.norm(d)) < bd:
-                best, bd = i, float(np.linalg.norm(d))
-        return best
+    def stop_loads(self, env, centres, slot, rotation):
+        """Attribute contacts on the stop face to the contacting bead by contact point."""
+        if self.view is None:
+            sim = articulation(env, self.toilet)._physics_sim_view
+            self.view = sim.create_rigid_contact_view([PATHS[self.toilet] + "/lever"],
+                filter_patterns=[[PATHS[self.flapper] + "/" + seg_name(k) for k in range(len(centres) // SEG_BEADS)]], max_contact_data_count=256)
+        dt = float(env.unwrapped.physics_dt)
+        forces, points, normals, _, counts, starts = self.view.get_contact_data(dt)
+        loads = np.zeros(len(centres))
+        forces, points, normals, counts, starts = map(as_np, (forces, points, normals, counts, starts))
+        origin = _origin(env)
+        for segment, (count, start) in enumerate(zip(counts.flat, starts.flat)):
+            for k in range(int(start), int(start + count)):
+                point = points[k] - origin
+                x, y, z = rotation.T @ (point - slot)
+                if abs(x - BEAD_COL_R) > 0.0008 or abs(y) > 0.004 or abs(z) > 0.004:
+                    continue
+                first = segment * SEG_BEADS
+                distances = np.linalg.norm(centres[first:first + SEG_BEADS] - point, axis=1)
+                local_bead = int(np.argmin(distances))
+                bead = first + local_bead
+                if distances[local_bead] <= BEAD_COL_R + 0.0007:
+                    loads[bead] += max(0., float(forces[k].item()) * float(normals[k] @ rotation[:, 0]))
+        return loads
 
     def _set(self, i: int, on: bool):
         import omni.usd
@@ -830,21 +844,23 @@ class ClipCatcher:
         prim = stage.GetPrimAtPath(f"{PATHS[self.flapper]}/clip_{i:02d}")
         UsdPhysics.Joint(prim).GetJointEnabledAttr().Set(bool(on))
 
-    def update(self, step: int, fraw, traw, fingertips=None) -> int | None:
-        """The clip takes the bead nearest its slot once some bead has stayed inside the slot's window for DWELL
-        control steps running (a proximity model: no force, direction or release is checked; ``fingertips`` unused)."""
+    def update(self, step, fraw, traw, env):
         if self.on is not None:
             self.check_pull(step, fraw, traw)
             return self.on
-        i = self.candidate(fraw, traw)
-        if i is None:
-            self.since = {}
-            return None
-        self.since = {"n": self.since.get("n", 0) + 1}  # the chain has been in the slot this many steps running
-        if self.since["n"] >= self.DWELL:
-            self._set(i, True)
-            self.on = i
-            self.events.append((step, "clip", i))
+        spec = _SPECS[self.flapper]
+        dirs = chain_dirs_local(spec)
+        centres = np.array([bead_pos(fraw, i, dirs) for i in range(spec.n_beads)])
+        rotation = rotmat(traw["quat"]["lever"])
+        slot = self.slot_world(traw)
+        loads = self.stop_loads(env, centres, slot, rotation)
+        for i in range(CLIP_FROM, spec.n_beads):
+            local = (centres[i] - slot) @ rotation
+            if self.seat.sample(i, local, loads[i]):
+                self._set(i, True)
+                self.on = i
+                self.events.append((step, "clip", i, float(loads[i])))
+                break
         return self.on
 
     PULL_OUT_M = 0.010  # the clip lets the chain go if its bead is dragged this far out of the slot
@@ -857,25 +873,14 @@ class ClipCatcher:
             self._set(self.on, False)
             self.events.append((step, "chain_out", self.on, round(d, 4)))
             self.on = None
-            self.since = {}
+            self.seat = ClipSeat()
             self.out = True
-
-    def follow(self, traw) -> None:
-        """Keep the held bead's spring anchored on the slot as the lever moves (the clip hangs from the lever)."""
-        if self.on is None:
-            return
-        import omni.usd
-        from pxr import UsdPhysics
-        d = self.slot_world(traw) - (traw["pos"]["tank"] + clip_slot_T())
-        prim = omni.usd.get_context().get_stage().GetPrimAtPath(f"{PATHS[self.flapper]}/clip_{self.on:02d}")
-        for k, ax in enumerate(("transX", "transY", "transZ")):
-            UsdPhysics.DriveAPI(prim, ax).GetTargetPositionAttr().Set(float(d[k]))
 
     def release(self):
         if self.on is not None:
             self._set(self.on, False)
         self.on = None
-        self.since = {}
+        self.seat = ClipSeat()
 
 
 class EarCatcher:
@@ -960,7 +965,7 @@ class EarPush:
 
     def read(self, dt: float) -> dict:
         m = as_np(self.view.get_contact_force_matrix(dt))  # (2 ears, 1 filter, 3), world frame, on the ear
-        return {"l": float(m[0, 0, 1]), "r": float(-m[1, 0, 1])}
+        return {"l": float(-m[0, 0, 1]), "r": float(m[1, 0, 1])}
 
 
 # -- yam_arena hooks ------------------------------------------------------------------------------------------------------
