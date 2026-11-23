@@ -8,12 +8,12 @@
     "hook and loop"
   ],
   "instruction": "Wrap the loose tie around the folded umbrella, press it closed and lay the fastened umbrella on the table.",
-  "context": "A collapsed umbrella can spring loose in a bag. The handle hand turns the bundle while the other keeps the fabric gathered, guides the tie and presses the fastener.",
+  "context": "A collapsed umbrella springs loose in a bag unless its tie is wrapped and fastened. People usually turn the bundle with the handle hand while the other keeps the fabric gathered, guides the tie and presses the fastener; any way of wrapping that leaves it gathered, fastened and holding after release counts.",
   "setup": "Two YAM arms, an ordinary flat table and a folded compact umbrella with a 239 × 24 mm strap, a 55 mm hook region and a 72 mm loop region. The handle starts in the left gripper and the right gripper begins open.",
-  "scoring": "Cumulative end-state score: 0.25 if gathered to ≤80% of loose diameter and held or supported; 0.50 with ≥4.7 rad of winding; 0.75 with a ≥360° guided turn, ≥365° winding and engaged, overlapping hook-and-loop; 1.00 after a controlled set-down with table support, both grippers ≥20 mm clear and one second of stillness.",
+  "scoring": "End-state score; how the tie is wound and which hand acts are not scored. 0.25: canopy gathered to ≤80% of its loose shaft-centred diameter (end-on photo, ruler) while held in a gripper or resting on the table. 0.50: also the tie ≥270° round the shaft. 0.75: also ≥365° round with visible overlap and the hook patch engaged on the loop patch (photo). 1.00: also lowered onto the table, not dropped (it rests on the table before the last gripper opens; side video), both grippers ≥20 mm clear and not touching it, and once released the wrap stays gathered, wound and fastened with nothing moving for 1 s, still so at the end. Otherwise 0.",
   "run_limit": "1800 control steps (90 seconds at 20 Hz)",
   "reset_notes": "Settle the preheld handle and freely hanging strap under gravity before the episode.",
-  "fidelity": "A free shaft, twelve sprung canopy sections and fifteen hinged strap sections approximate folded fabric. Three hook segments can meet four loop segments. Patch overlap and measured normal load govern attachment; bonded areas can peel or shear apart. The demo reads simulator poses and contact forces. Table contact and clearance verify release. Material constants are uncalibrated.",
+  "fidelity": "A free shaft, twelve sprung canopy sections and fifteen hinged strap sections approximate folded fabric. Hook-and-loop engages when overlapping, aligned patches are pressed at ≥0.15 N for three controls by either gripper; bonded areas can peel or shear apart. Pad and table contact forces and clearance verify holding and release. The demo reads simulator poses, contact forces and the fastener state, never the score. Material constants are uncalibrated.",
   "scores": "Dream-1: 0.00/1.00. Scripted two-YAM demonstration: 1.00/1.00.",
   "media": "M-ES5T9L"
 }

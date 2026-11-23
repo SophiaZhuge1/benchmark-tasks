@@ -26,6 +26,9 @@ PAD_SEPARATION = 0.0013    # permitted free space between the two mating faces
 PAD_OVERLAP = 0.008
 FINGER_CLEARANCE = 0.020
 SETTLE_STEPS = 20         # one second at the required 20 Hz
+PARTIAL_WRAP = 4.7        # radians: the strap reaches three quarters of the way round
+FULL_WRAP = math.radians(365)  # once round the canopy with visible overlap
+FASTENED_AREA = 0.000048  # m^2 of hook face still engaged with the loop face
 SEAM = AXIS + [0, 0, LOOSE_RADIUS + STRAP_THICK / 2]
 PLEAT_ANGLES = np.deg2rad(np.arange(0, 360, 30))
 
@@ -85,7 +88,7 @@ def mating_points(base, tip):
 def pad_mates(base, tip):
     delta = base.rotation.T @ (tip.pos-base.pos)
     return (abs(delta[0]) <= PAD_LENGTH-PAD_OVERLAP and abs(delta[1]) <= STRAP_WIDTH*0.4
-            and len(mating_points(base,tip))*CELL_AREA >= 0.000048)
+            and len(mating_points(base,tip))*CELL_AREA >= FASTENED_AREA)
 
 
 def press_samples(previous, *, mated, held, touching, normal_load):
@@ -104,6 +107,7 @@ def strap_winding(points, centre):
 
 @dataclass(frozen=True)
 class Outcome:
+    """End-state observations. How the strap was wound is not recorded: any route counts."""
     pleat_radius: float
     winding: float
     mated: bool
@@ -111,24 +115,37 @@ class Outcome:
     fingers_clear: bool
     still: bool
     handle_held: bool
-    guided_turn: float = 0.0
     table_supported: bool = False
     both_clear: bool = False
     set_down: bool = False
 
 
 def score_outcome(outcome, released_steps):
-    if not (outcome.handle_held or (outcome.set_down and outcome.table_supported)) or not all(map(math.isfinite, (outcome.pleat_radius, outcome.winding, outcome.guided_turn))):
+    """The highest tier whose observable conditions all hold now.
+
+    0.25 gathered; 0.50 also wrapped three quarters round; 0.75 also wrapped once round with
+    overlap and fastened; 1.00 also lowered onto the table, released and retained for one second.
+    """
+    if not all(map(math.isfinite, (outcome.pleat_radius, outcome.winding))):
+        return 0.0
+    if not (outcome.handle_held or outcome.table_supported):
         return 0.0
     if outcome.pleat_radius > CLOSED_RADIUS:
         return 0.0
-    if outcome.winding < 4.7:
+    if outcome.winding < PARTIAL_WRAP:
         return 0.25
-    if outcome.winding < math.radians(365) or outcome.guided_turn < 2 * math.pi or not (outcome.latched and outcome.mated):
+    if outcome.winding < FULL_WRAP or not (outcome.latched and outcome.mated):
         return 0.5
-    if not (outcome.both_clear and outcome.set_down and outcome.table_supported and outcome.fingers_clear and outcome.still and released_steps >= SETTLE_STEPS):
+    if not (outcome.both_clear and outcome.fingers_clear and outcome.table_supported and outcome.set_down
+            and outcome.still and released_steps >= SETTLE_STEPS):
         return 0.75
     return 1.0
+
+
+def set_down(resting_now, rested_when_released, still_held):
+    """Lowered onto the table, not dropped: it rests on the table now, no gripper holds it, and it was
+    already resting on the table in the last control in which a gripper held it."""
+    return bool(resting_now and rested_when_released and not still_held)
 
 
 def engaged_cells(previous, base, tip, loaded_points):

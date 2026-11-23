@@ -9,35 +9,50 @@ from geometry import (
     AXIS, Outcome, Pad, SETTLE_STEPS, STRAP_SEGMENT, STRAP_THICK, TABLE_Z,
     open_strap, pad_mates, press_samples, radial, score_outcome, strap_winding,
     engaged_cells, HOOK_FACE, mating_points, CELL_AREA, STRAP_WIDTH, PAD_LENGTH,
+    PARTIAL_WRAP, set_down,
 )
 
 
 class UmbrellaChecks(unittest.TestCase):
-    finished = Outcome(0.030, np.deg2rad(366), True, True, True, True, True, np.deg2rad(360),True,True,True)
+    # gathered, wound 366 degrees, fastened, released, resting on the table after a lowered set-down
+    finished = Outcome(0.030, np.deg2rad(366), True, True, True, True, False, True, True, True)
 
     def test_end_scores_and_release_hold(self):
         end = self.finished
         self.assertEqual(score_outcome(end, SETTLE_STEPS), 1.0)
         for changes, credit in [
             ({"fingers_clear": False}, 0.75),
-            ({"still": False}, 0.75),
-            ({"latched": False}, 0.5),
-            ({"mated": False}, 0.5),
-            ({"winding": 1.5}, 0.25),
-            ({"pleat_radius": 0.040}, 0.0),
-            ({"handle_held": False}, 1.0),
-            ({"handle_held": False, "table_supported": False}, 0.0),
-            ({"set_down": False}, 0.75),
             ({"both_clear": False}, 0.75),
-            ({"winding": np.deg2rad(364.9)}, 0.5),
-            ({"guided_turn": np.deg2rad(359.9)}, 0.5),
-            ({"guided_turn": 0.0}, 0.5),
-            ({"guided_turn": float("nan")}, 0.0),
+            ({"still": False}, 0.75),
+            ({"set_down": False}, 0.75),                       # dropped onto the table
+            ({"latched": False}, 0.5),                         # strap not fastened
+            ({"mated": False}, 0.5),                           # hook face no longer engaged
+            ({"winding": np.deg2rad(364.9)}, 0.5),             # no overlap: not once round
+            ({"winding": PARTIAL_WRAP - 0.01}, 0.25),
+            ({"winding": 1.5, "latched": False, "mated": False}, 0.25),
+            ({"pleat_radius": 0.040}, 0.0),                    # canopy not gathered
+            ({"table_supported": False}, 0.0),                 # neither held nor on the table
+            ({"table_supported": False, "handle_held": True}, 0.75),  # fastened but still in a hand
+            ({"handle_held": True}, 1.0),
             ({"winding": float("nan")}, 0.0),
+            ({"pleat_radius": float("nan")}, 0.0),
         ]:
             with self.subTest(changes=changes):
                 self.assertEqual(score_outcome(replace(end, **changes), SETTLE_STEPS), credit)
+        # Retention: the released wrap must stay gathered, wound and fastened for a full second.
         self.assertEqual(score_outcome(end, SETTLE_STEPS - 1), 0.75)
+
+    def test_score_has_no_technique_terms(self):
+        # The outcome records the end state only; no handle turn or hand assignment enters it.
+        self.assertEqual(set(Outcome.__dataclass_fields__), {
+            "pleat_radius", "winding", "mated", "latched", "fingers_clear", "still", "handle_held",
+            "table_supported", "both_clear", "set_down"})
+
+    def test_set_down_needs_table_contact_before_release(self):
+        self.assertTrue(set_down(True, True, False))     # lowered onto the table, then let go
+        self.assertFalse(set_down(True, False, False))   # let go above the table: dropped
+        self.assertFalse(set_down(True, True, True))     # still held
+        self.assertFalse(set_down(False, True, False))   # rolled or slid off afterwards
 
     def test_gathering_alone_cannot_complete_the_task(self):
         from geometry import RELAXED_ENVELOPE_RADIUS

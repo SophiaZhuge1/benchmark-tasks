@@ -17,6 +17,7 @@ from geometry import (
     PAD_LENGTH, TAB_LENGTH, TAB_PINCH, Outcome, PLEAT_ANGLES, PLEAT_HALF_WIDTH, Pad, SETTLE_STEPS, STRAP_COUNT, STRAP_SEGMENT,
     STRAP_THICK, STRAP_WIDTH, TABLE_Z, TIP_Y, open_strap, pad_mates, radial,
     engaged_cells, HOOK_FACE, mating_points, CELL_AREA, press_samples, score_outcome, strap_winding, strip_frame,
+    FASTENED_AREA, set_down,
 )
 from joints import Connection, fastener_broken, recruit, row_group_intact, register, set_fastener
 from yam_arena.constants import FINGER_CLOSED, FINGER_OPEN, PAD_TIP_PAST_TCP, TCP_OFFSET
@@ -133,7 +134,17 @@ TABLE_SURFACE = Body.build("landing_surface", (AXIS[0], 0., TABLE_Z + 0.002), 1.
     kinematic=True, contact_offset=0.0006)
 OBJECTS = [CORE, *PLEATS, *STRAP, *EXTENSION, TABLE_SURFACE]
 MOVING = (CORE, *PLEATS, *STRAP, *EXTENSION)
+STRAP_BODIES = tuple(range(1 + len(PLEATS), len(MOVING)))  # indices of the strap links in MOVING
+NEGATIVE = os.getenv("UMBRELLA_NEGATIVE", "")  # scripted failure routes for the scorer check; read by the demo only
 trial = None
+# What the scripted demonstrator may read: simulator poses, contact forces and the fastener
+# model's own engagement state. It is refreshed after each control and never holds a score.
+sensed = {}
+demo_memory = {}  # the demonstrator's own notes between its two arms
+CONTROLLER_KEYS = ("handle", "acquired", "placement_started", "carry_requested", "core_frame", "centre",
+                   "landed", "handle_load", "landing_q", "table_load", "receiver", "normal_pressure",
+                   "handle_turn", "tail", "fingers", "free_patch", "rock_contact", "steps", "jaw_force",
+                   "tacked", "fastened", "patch_outward")
 
 
 def _pad(state):
@@ -210,8 +221,7 @@ def _measure(states, fingers, fastened):
             distances.append(np.linalg.norm(points - np.clip(points, low, high), axis=1).min())
         held = bool(grip.any(axis=1).all() and opposed and bottom > TABLE_Z + 0.020)
         clear = min(distances) >= FINGER_CLEARANCE
-    return Outcome(radius, winding, pad_mates(base, tip), fastened, clear, still, held,
-                   (trial or {}).get("guided_turn", 0.0))
+    return Outcome(radius, winding, pad_mates(base, tip), fastened, clear, still, held)
 
 
 BOX_CORNERS = np.indices((2, 2, 2)).reshape(3, -1).T.astype(bool)
@@ -223,6 +233,8 @@ def _grip_sensors(env):
     scene = env.unwrapped.scene
     stage = get_current_stage()
     contacts = []
+    grips = []
+    everything = [f"/World/envs/env_0/{spec.name}/body" for spec in MOVING]
     for arm, names in (("left_robot", ("umbrella",)), ("right_robot", ("strap_11", "strap_tip"))):
         robot = scene[arm]
         root = robot.root_physx_view.prim_paths[0]
@@ -233,6 +245,10 @@ def _grip_sensors(env):
         bodies = [f"/World/envs/env_0/{name}/body" for name in names]
         contacts.append(robot._physics_sim_view.create_rigid_contact_view(
             bodies, filter_patterns=[tips for _ in bodies], max_contact_data_count=256))
+        # Either gripper's two pads against every part of the umbrella: holding, pressing and release
+        # are judged the same way whichever hand does them.
+        grips.append(robot._physics_sim_view.create_rigid_contact_view(
+            everything, filter_patterns=[tips for _ in everything]))
     base = "/World/envs/env_0"
     hook_paths = [f"{base}/{spec.name}/body" for spec in HOOKS]
     receiver_paths = [f"{base}/{spec.name}/body" for spec in RECEIVERS]
@@ -242,7 +258,7 @@ def _grip_sensors(env):
     bodies = [f"{base}/{spec.name}/body" for spec in (CORE,*PLEATS)]
     support = robot._physics_sim_view.create_rigid_contact_view(
         bodies, filter_patterns=[tables for _ in bodies])
-    return contacts, patch, support
+    return contacts, patch, support, grips
 
 
 def _observe_physics_motion(env):
@@ -250,7 +266,7 @@ def _observe_physics_motion(env):
     if getattr(scene, "_umbrella_observes_motion", False):
         return
     origin = as_numpy(scene.env_origins[0])
-    sensors, patch, support = _grip_sensors(env)
+    sensors, patch, support, grips = _grip_sensors(env)
     original = scene.update
     def update(dt):
         original(dt)
@@ -260,6 +276,15 @@ def _observe_physics_motion(env):
             table_force = support.get_contact_force_matrix(float(dt))
             table_force = as_numpy(table_force) if hasattr(table_force,"detach") else table_force.numpy()
             trial["support_impulse"] = trial.get("support_impulse",0.) + dt*abs(table_force[...,2].sum())
+            grip_load = []
+            for view in grips:
+                native = view.get_contact_force_matrix(float(dt))
+                force = native.numpy() if not hasattr(native, "detach") else as_numpy(native)
+                grip_load.append(np.linalg.norm(force, axis=-1).reshape(len(MOVING), 2))
+            grip_load = np.asarray(grip_load)  # arm, umbrella body, pad
+            trial["grip_impulse"] = trial.get("grip_impulse", np.zeros((2,2))) + dt*grip_load.sum(axis=1)
+            trial["strap_grip_impulse"] = (trial.get("strap_grip_impulse", np.zeros((2,2)))
+                                           + dt*grip_load[:, STRAP_BODIES].sum(axis=1))
             loads = []
             for side, view in enumerate(sensors):
                 if side == 0:
@@ -340,7 +365,9 @@ def reset_trial():
     global trial
     set_fastener()
     trial = dict(fastened=False, mating_steps=0, released_steps=0, steps=0, outcome=None,
-                 roll=0.0, previous_angle=0.0)
+                 roll=0.0, previous_angle=0.0, dropped=False)
+    sensed.clear()
+    demo_memory.clear()
 
 
 @on_step
@@ -382,6 +409,11 @@ def update_trial(env):
     guided = bool(inside.any(axis=1).all() and jaws[1, 2] * jaws[4, 2] <= 0)
     span = max(trial.pop("pad_span", 0.), 1e-9)
     forces = trial.pop("pad_impulse", np.zeros((2,2))) / span
+    # Mean load of each gripper pad (arm x pad) on any part of the umbrella, and on the strap alone.
+    grip_all = trial.pop("grip_impulse", np.zeros((2,2))) / span
+    grip_strap = trial.pop("strap_grip_impulse", np.zeros((2,2))) / span
+    pinched = bool((grip_all > 0.1).all(axis=1).any())
+    strap_pressed = bool((grip_strap > 0.1).any() or (grip_strap > 0.04).all(axis=1).any())
     pair_loads = trial.pop("patch_impulse", np.zeros(len(PAIRS))) / span
     pressure_load = pair_loads[index]
     trial["normal_pressure"] = pressure_load
@@ -390,47 +422,46 @@ def update_trial(env):
     # Pads must actually squeeze the named body, in the intended grip region.
     # Express positions in the shaft frame to distinguish the handle from the canopy.
     airborne = all(states[spec.name].pos[2] + (np.where(BOX_CORNERS,*reversed(spec.local_bounds())) @ rotation(states[spec.name].quat_xyzw)[2]).min() > TABLE_Z+0.020 for spec in MOVING)
-    outcome = replace(outcome, handle_held=bool(airborne and min(forces[0])>0.1))
+    # Held: both pads of either gripper bear at least 0.1 N on the umbrella.
+    outcome = replace(outcome, handle_held=pinched)
+    left_holding = bool(airborne and min(forces[0]) > 0.1)  # the scripted demo's handle hand, for its own turn count
     guided = bool(min(forces[1])>0.04 and np.linalg.norm(fingers[[7,10]].mean(axis=0)-grip.pos)<0.024)
     previous = trial.get("basis", basis)
     relative = previous.T @ basis
     twist = np.arctan2(relative[0, 2] - relative[2, 0], relative[0, 0] + relative[2, 2])
     if not trial["steps"]:
         trial["started_clear"] = _patch_distance(fingers[6:], grip) > 0.025
-    # Freeze the turn at first engagement, so rotating an already fastened umbrella earns no credit.
+    # Controller observation for the scripted demonstrator only: how far its handle hand has turned
+    # the shaft while its other hand guides the strap. Neither the score nor the fastener reads it.
     if "completed_turn" in trial:
-        # This event describes the uninterrupted two-hand turn already observed.
-        # Current winding, adhesion and a supported release are assessed separately.
-        trial["guided_turn"] = trial["completed_turn"]
-    elif not trial["fastened"] and outcome.handle_held and guided and trial["started_clear"]:
+        trial["handle_turn"] = trial["completed_turn"]
+    elif not trial["fastened"] and left_holding and guided and trial["started_clear"]:
         trial.setdefault("acquired", trial["steps"])
         trial["net_turn"] = trial.get("net_turn", 0.0) - twist
-        trial["guided_turn"] = max(trial.get("guided_turn",0.), trial["net_turn"])
-    elif (not trial["fastened"] and outcome.handle_held and trial.get("guided_turn",0.) >= 2*np.pi
+        trial["handle_turn"] = max(trial.get("handle_turn",0.), trial["net_turn"])
+    elif (not trial["fastened"] and left_holding and trial.get("handle_turn",0.) >= 2*np.pi
           and max(forces[1]) > 0.1):
-        # A verified completed turn can transition to a one-sided press. The
-        # working hand must still bear on the strap; no further rotation accrues.
         pass
     elif not trial["fastened"]:
-        trial["net_turn"] = trial["guided_turn"] = 0.0
+        trial["net_turn"] = trial["handle_turn"] = 0.0
         trial.pop("acquired", None)
-    if trial.get("guided_turn",0.) >= 2*np.pi:
-        trial.setdefault("completed_turn",trial["guided_turn"])
+    if trial.get("handle_turn",0.) >= 2*np.pi:
+        trial.setdefault("completed_turn",trial["handle_turn"])
     trial["basis"] = basis.copy()
     trial["guided"] = guided
-    outcome = replace(outcome, guided_turn=trial.get("guided_turn", 0.0))
     if outcome.mated and not trial.get("saw_mating"):
         print(f"[fastener] opposed patches overlapped at step {trial['steps']}", flush=True)
         trial["saw_mating"] = True
     if not trial["fastened"]:
-        touching = min(_patch_distance(fingers[6:], grip), _patch_distance(fingers[6:], tail)) <= 0.006
+        # A fingertip of either gripper at the strap end or its hook patch.
+        touching = min(_patch_distance(fingers, grip), _patch_distance(fingers, tail)) <= 0.006
         # A loaded narrow row can adhere first. It carries only the measured
         # row's shear and peel capacity while the arm rolls the wider face down.
         sites = mating_points(base,tail)
         if trial.get("cell_panel") != index:
             trial["cell_panel"] = index
             trial["hook_cells"] = {}
-        verified_touch = touching and pressure_load >= .15 and max(forces[1])>.1
+        verified_touch = touching and pressure_load >= .15 and strap_pressed
         trial["hook_cells"] = engaged_cells(trial.get("hook_cells",{}) if trial.get("tacked") else {},base,tail,
                                             sites if verified_touch else [])
         retained = len(trial["hook_cells"])*CELL_AREA
@@ -453,22 +484,24 @@ def update_trial(env):
             touching_row = (len(sites)*CELL_AREA >= 0.000012 and abs(dx)<PAD_LENGTH-0.008
                             and abs(dy)<STRAP_WIDTH*0.4)
             trial["tack_steps"] = press_samples(trial.get("tack_steps",0),mated=touching_row,
-                held=guided,touching=touching,normal_load=pressure_load)
+                held=strap_pressed,touching=touching,normal_load=pressure_load)
             if trial["tack_steps"]>=3:
                 set_fastener(_pad(states[PAIRS[index][0].name]),_pad(states[PAIRS[index][1].name]),base,tail,index,sites)
                 trial["tack_points"] = ((sites-base.pos)@base.rotation,(sites-tail.pos)@tail.rotation)
                 trial["tacked"] = True
                 print("[partial row]",trial["steps"],"area_mm2",len(sites)*CELL_AREA*1e6,flush=True)
+        # Engagement needs only a loaded press of overlapping, aligned patches by a gripper for three
+        # controls, however the strap was wound and whichever hand presses.
         trial["mating_steps"] = press_samples(trial["mating_steps"], mated=outcome.mated,
-                                              held=(guided or (trial["guided_turn"] >= 2*np.pi and max(forces[1])>0.1)),
-                                              touching=touching, normal_load=pressure_load)
-        if trial["mating_steps"] >= 3 and trial["guided_turn"] >= 2*np.pi:
+                                              held=strap_pressed, touching=touching, normal_load=pressure_load)
+        if trial["mating_steps"] >= 3:
             indices = list(trial["hook_cells"])
             world = (tail.pos + HOOK_FACE[indices]@tail.rotation.T
                      if indices else mating_points(base,tail))
             set_fastener(_pad(states[PAIRS[index][0].name]), _pad(states[PAIRS[index][1].name]), base, tail, index, world, seated=True)
             print(f"[fastener] engaged at step {trial['steps']}", flush=True)
             trial["fastened"] = True
+            trial["retained_area"] = len(world)*CELL_AREA
             trial["tacked"] = False
             trial["patch_outward"] = base.rotation[:, 2].copy()
             trial["release_joints"] = {}
@@ -516,7 +549,8 @@ def update_trial(env):
             if receiver.rotation[:,2]@hook.rotation[:,2]>.90:
                 retained_area+=np.count_nonzero(attached)*CELL_AREA
         trial["peel_steps"] = 0 if retained_area>0 else trial["peel_steps"]+1
-        outcome=replace(outcome,mated=bool(retained_area>=.000048))
+        trial["retained_area"]=retained_area
+        outcome=replace(outcome,mated=bool(retained_area>=FASTENED_AREA))
         if fastener_broken() or trial["peel_steps"]>=2:
             print(f"[fastener] released at step {trial['steps']} retained_mm2={retained_area*1e6:.1f}",flush=True)
             set_fastener()
@@ -540,6 +574,11 @@ def update_trial(env):
     supported = table_load > 0.6 and abs(bottom-TABLE_Z) <= 0.018
     trial["bottom"] = bottom
     trial["table_load"] = table_load
+    if pinched:
+        # Whether the umbrella already rested on the table while a gripper still held it.
+        trial["rested_when_released"] = bool(supported)
+    placed = set_down(supported, trial.get("rested_when_released", False), pinched)
+    trial["dropped"] = bool(supported and not pinched and not trial.get("rested_when_released", False))
     if supported and trial.get("placement_started") and "landing_q" not in trial:
         trial["landing_q"] = {}
         for left,name in ((True,"left_robot"),(False,"right_robot")):
@@ -547,14 +586,13 @@ def update_trial(env):
             jids=[list(robot.joint_names).index(f"joint{i}") for i in range(1,7)]
             trial["landing_q"][left]=as_numpy(robot.data.joint_pos[0])[jids].copy()
 
-    if outcome.latched and outcome.mated and min(forces[0]) > 0.1:
+    # Controller phases for the scripted demonstrator (fastener state, table load and pad loads only).
+    if trial["fastened"] and trial.get("retained_area", 0.) >= FASTENED_AREA and min(forces[0]) > 0.1:
         trial["placement_started"] = True
     if trial.get("placement_started") or (trial["steps"] >= 1340 and forces.max() > 0.1):
         trial["carry_requested"] = True
     if supported and trial.get("carry_requested") and forces.max() > 0.1:
         trial["landed"] = True
-    if supported and trial.get("placement_started") and min(forces[0]) > 0.1 and outcome.latched:
-        trial["set_down"] = True
     left_clear = True
     for spec in MOVING:
         state = states[spec.name]
@@ -563,8 +601,9 @@ def update_trial(env):
         if np.linalg.norm(points-np.clip(points,low,high),axis=1).min() < FINGER_CLEARANCE:
             left_clear = False
             break
-    outcome = replace(outcome,table_supported=bool(supported),set_down=bool(trial.get("set_down")),
-                      both_clear=bool(left_clear and outcome.fingers_clear and forces.max()<0.10))
+    # Set down: resting on the table now, and already resting on it when the last gripper let go.
+    outcome = replace(outcome,table_supported=bool(supported),set_down=placed,
+                      both_clear=bool(left_clear and outcome.fingers_clear and grip_all.max()<0.10))
     native_still = outcome.still
     outcome = replace(outcome, still=bool(observed_still))
     ready_for_release = score_outcome(outcome, SETTLE_STEPS) == 1.0
@@ -584,11 +623,13 @@ def update_trial(env):
         handle_pos = trial["handle"]
         patch_offset = np.round(1000*(base.rotation.T @ (tail.pos-base.pos))).astype(int).tolist()
         print(f"[handheld] {trial['steps']} handle_z={trial['handle'][2]-TABLE_Z:.3f} "
-              f"forces={forces.round(1).tolist()} press_N={pressure_load:.2f} held={outcome.handle_held} guided={guided} turn={np.degrees(outcome.guided_turn):.1f} "
+              f"forces={forces.round(1).tolist()} press_N={pressure_load:.2f} held={outcome.handle_held} guided={guided} turn={np.degrees(trial.get('handle_turn',0.)):.1f} "
               f"winding={np.degrees(outcome.winding):.1f} radius={1000*outcome.pleat_radius:.1f} "
-              f"latched={outcome.latched} clear={outcome.fingers_clear} table_N={table_load:.2f} both_clear={outcome.both_clear} set_down={outcome.set_down} "
+              f"latched={outcome.latched} clear={outcome.fingers_clear} table_N={table_load:.2f} both_clear={outcome.both_clear} set_down={outcome.set_down} dropped={trial['dropped']} score={score_outcome(outcome, trial['released_steps']):.2f} "
               f"patch_mm={patch_offset} alignment={np.dot(base.rotation[:,2],tail.rotation[:,2]):.2f} left_mm={np.round(1000*(fingers[[1,4]].mean(axis=0)-handle_pos)).astype(int).tolist()} "
               f"right_mm={np.round(1000*(fingers[[7,10]].mean(axis=0)-grip.pos)).astype(int).tolist()}", flush=True)
+    sensed.clear()
+    sensed.update({key: trial[key] for key in CONTROLLER_KEYS if key in trial})
 
 
 def score(objects):
@@ -626,14 +667,33 @@ def _held_action(plan, t):
     if not hasattr(plan, "_handoff"):
         plan.q = (INITIAL_GRASP_Q if left else APPROACH_Q).copy()
         plan._handoff = True
-    if not trial or "handle" not in trial:
+    if not sensed or "handle" not in sensed:
         return np.r_[plan.q, 0.0 if left else APPROACH_OPEN], "hold handle; open strap hand"
-    acquired = trial.get("acquired")
-    if trial.get("placement_started") or trial.get("carry_requested"):
+    if NEGATIVE == "none":
+        return np.r_[plan.q, 0.0 if left else APPROACH_OPEN], "negative: hold the handle and leave the strap"
+    acquired = sensed.get("acquired")
+    if not left and (NEGATIVE == "unfastened" and sensed["handle_turn"] >= 2*np.pi or hasattr(plan, "_skip")):
+        # Negative route: let go of the wound strap without pressing the fastener.
+        if not hasattr(plan, "_skip"):
+            tcp, frame = ik.tcp_pose(plan.q, plan.base_pos)
+            plan._skip = (t, tcp.copy(), frame.copy(), getattr(plan, "_last_opening", 0.))
+        start, anchor, frame, opening = plan._skip
+        finger = opening + (1. - opening)*_phase(t, start, 1.0)
+        target = anchor - 0.100*_phase(t, start + 0.6, 1.8)*frame[:, 2]
+        q, _, _ = ik.solve(target, matrix_to_quat_xyzw(frame), plan.q, base_pos=plan.base_pos, rot_weight=0.18, iters=48)
+        plan.q += np.clip(q - plan.q, -0.085, 0.085)
+        return np.r_[plan.q, finger], "negative: let go of the strap without pressing it"
+    if left and NEGATIVE == "drop" and sensed.get("placement_started"):
+        # Negative route: open the handle hand in mid-air once the strap is fastened.
+        if not hasattr(plan, "_drop"):
+            plan._drop = t
+        # Wait until the strap hand has opened and backed away, then open the handle hand in mid-air.
+        return np.r_[plan.q, _phase(t, plan._drop + 3.0, 0.5)], "negative: drop the fastened umbrella"
+    if (sensed.get("placement_started") or sensed.get("carry_requested")) and not (NEGATIVE == "drop" and not left):
         if not hasattr(plan,"_carry"):
             tcp, frame = ik.tcp_pose(plan.q,plan.base_pos)
-            basis = trial["core_frame"]
-            centre = trial["centre"]
+            basis = sensed["core_frame"]
+            centre = sensed["centre"]
             plan._carry = (t,plan.q.copy(),basis.T@(tcp-centre),basis.T@frame)
             plan._carry_opening = getattr(plan,"_last_opening",0.)
             plan._placement_z = tcp[2]
@@ -645,7 +705,7 @@ def _held_action(plan, t):
                 plan._landing_pose = goal,neutral,hover
         start,original,offset,orientation = plan._carry
         finger = plan._carry_opening
-        if not trial.get("landed"):
+        if not sensed.get("landed"):
             if left:
                 goal,frame,target = plan._landing_pose
                 phase = _phase(t,start,4.0)
@@ -655,17 +715,19 @@ def _held_action(plan, t):
                 target[2] = max(TABLE_Z+0.016,target[2]-0.0016)
             else:
                 # Follow the measured core during the carry, including its rotation.
-                basis = trial["core_frame"]
-                target = trial["centre"]+basis@offset
+                basis = sensed["core_frame"]
+                target = sensed["centre"]+basis@offset
                 frame = basis@orientation
-                if trial["handle_load"] < 0.1:
+                if sensed["handle_load"] < 0.1:
                     plan._placement_z = max(TABLE_Z+.012,min(plan._placement_z,target[2])-.0025)
                     target[2] = plan._placement_z
         else:
+            if NEGATIVE == "held":
+                return np.r_[plan.q, finger], "negative: keep hold after setting the umbrella down"
             if not hasattr(plan,"_on_table"):
                 # Freeze the measured wrist, removing the downward command that
                 # accumulated while the compliant handle contacts loaded up.
-                feedback=trial.get("landing_q",{}).get(left,plan.q)
+                feedback=sensed.get("landing_q",{}).get(left,plan.q)
                 pos,frame = ik.tcp_pose(feedback,plan.base_pos)
                 plan.q=feedback.copy()
                 plan._on_table = (t,pos.copy(),frame.copy())
@@ -675,21 +737,21 @@ def _held_action(plan, t):
             elapsed=t-landed
             if left:
                 if elapsed<1.:
-                    plan._relief_z+=np.clip((trial["table_load"]-1.)*.00008,-.00015,.0005)
+                    plan._relief_z+=np.clip((sensed["table_load"]-1.)*.00008,-.00015,.0005)
                     plan._relief_z=np.clip(plan._relief_z,-.001,.005)
                 target[2]+=plan._relief_z
                 finger=_phase(t,landed,.75)
                 target-=.065*_phase(t,landed+.8,1.2)*frame[:,2]
                 target[2]+=.05*_phase(t,landed+1.35,1.1)
             else:
-                normal=trial["receiver"].rotation[:,2]
+                normal=sensed["receiver"].rotation[:,2]
                 if not hasattr(plan,"_seating_normal"):
                     plan._seating_normal=normal.copy()
                     plan._seating_travel=0.
                 if elapsed<2.:
                     # While the handle hand clears, maintain modest normal
                     # pressure on the wrap without dragging the loose edge.
-                    plan._seating_travel+=np.clip((.85-trial["normal_pressure"])*.00012,-.00012,.00016)
+                    plan._seating_travel+=np.clip((.85-sensed["normal_pressure"])*.00012,-.00012,.00016)
                     plan._seating_travel=np.clip(plan._seating_travel,-.001,.004)
                 target-=plan._seating_travel*plan._seating_normal
                 finger += (1.-finger)*_phase(elapsed,2.0,1.)
@@ -710,21 +772,21 @@ def _held_action(plan, t):
         if setup < 1.:
             plan.q = (1-setup)*INITIAL_GRASP_Q + setup*ROLL_PATH[0]
             return np.r_[plan.q,0.0], "maintain the pinch while centring the wrist"
-        if trial["guided_turn"] >= 2*np.pi:
+        if sensed["handle_turn"] >= 2*np.pi:
             plan._turn_done = True
         if acquired is not None and not getattr(plan, "_turn_done", False):
             angle = getattr(plan,"_angle",0.)
             speed = 0.70 - 0.35*_phase(angle,225.,75.)
             plan._angle = min(410.,angle + speed)
         angle = getattr(plan,"_angle",0.)
-        trial["wrist_target"] = angle
+        demo_memory["wrist_target"] = angle
         segment = min(int(angle // 5), len(ROLL_PATH)-2)
         blend = angle/5-segment
         plan.q = (1-blend)*ROLL_PATH[segment] + blend*ROLL_PATH[segment+1]
         return np.r_[plan.q,0.0], "squeeze the handle and roll the shoulder, forearm and wrist together"
     else:
-        strip = trial["tail"]
-        tcp = trial["fingers"][[7,10]].mean(axis=0)
+        strip = sensed["tail"]
+        tcp = sensed["fingers"][[7,10]].mean(axis=0)
         frame = PINCH_FRAME.copy()
         target = strip.pos - (1-_phase(t,0.3,2.2))*0.060*frame[:,2]
         if acquired is None:
@@ -743,29 +805,29 @@ def _held_action(plan, t):
         finger = 0.0 if plan._closed else APPROACH_OPEN
         if acquired is not None:
             if not hasattr(plan, "_anchor"):
-                plan._anchor = tcp.copy() - trial["centre"]
+                plan._anchor = tcp.copy() - sensed["centre"]
             # Keep the tension trajectory continuous even when the sensor loses contact.
-            fraction = np.clip(trial.get("wrist_target",0.) / 360., 0., 1.)
+            fraction = np.clip(demo_memory.get("wrist_target",0.) / 360., 0., 1.)
             direction = plan._anchor.copy()
             direction[1] = 0.
             radius = np.linalg.norm(direction)
             # The guiding hand travels with the shaft during the second half so
             # the sewn strap never has to stretch by a second circumference.
-            angle = trial.get("wrist_target",0.)
+            angle = demo_memory.get("wrist_target",0.)
             follow = -np.deg2rad(110)*_phase(angle,90.,250.)
             polar = np.arctan2(direction[0],direction[2]) + follow
             target_radius = max(0.032,radius*(1.-0.80*fraction))
-            target = trial["centre"] + target_radius*radial(polar)
+            target = sensed["centre"] + target_radius*radial(polar)
             target[1] = strip.pos[1]
             normal = PINCH_FRAME[:,0]
             theta = np.arctan2(normal[0],normal[2]) + follow
             frame = _grip_frame(radial(theta),(0.,1.,0.))
-            if trial["guided_turn"] >= 2*np.pi and not hasattr(plan,"_press_target"):
+            if sensed["handle_turn"] >= 2*np.pi and not hasattr(plan,"_press_target"):
                 plan._press_target = target.copy()
                 plan._press_angle = np.arctan2(frame[0,0],frame[2,0])
                 plan._press_start = t
             if hasattr(plan,"_press_target"):
-                receiver, tip = trial["receiver"], trial["free_patch"]
+                receiver, tip = sensed["receiver"], sensed["free_patch"]
                 delta = receiver.rotation.T @ (tip.pos-receiver.pos)
                 centred = abs(delta[0])<0.006 and abs(delta[1])<0.005
                 gap = STRAP_THICK-0.0005 if centred else max(delta[2],0.005)
@@ -784,8 +846,8 @@ def _held_action(plan, t):
                 frame = _grip_frame(radial(plan._press_angle),(0.,1.,0.))
                 # Roll the flap down about its loaded edge without sweeping the
                 # edge away. The total wrist correction is fixed at first touch.
-                contact = trial.get("rock_contact")
-                if contact and trial["steps"]-contact[0]<=1 and not hasattr(plan,"_rock"):
+                contact = sensed.get("rock_contact")
+                if contact and sensed["steps"]-contact[0]<=1 and not hasattr(plan,"_rock"):
                     from scipy.spatial.transform import Rotation
                     tip_n,base_n = tip.rotation[:,2],receiver.rotation[:,2]
                     axis = np.cross(tip_n,base_n)
@@ -803,22 +865,22 @@ def _held_action(plan, t):
                     frame = pitch@start_frame
                     target = pivot+pitch@lever-0.0015*_phase(t,start+1.,1.5)*receiver.rotation[:,2]
 
-        if trial["guided_turn"] >= 2*np.pi and not trial.get("fastened"):
+        if sensed["handle_turn"] >= 2*np.pi and not sensed.get("fastened"):
             # Keep enough pinch to tension the webbing, then let it conform as
             # the outer jaw presses. Feedback uses the opposing fingertip loads.
             if not hasattr(plan,"_grip_opening"):
                 plan._grip_opening = getattr(plan,"_last_opening",0.)
-            measured = min(trial["jaw_force"])
-            target_load = 1.4 if trial.get("tacked") else 3.0
+            measured = min(sensed["jaw_force"])
+            target_load = 1.4 if sensed.get("tacked") else 3.0
             adjustment = np.clip((measured-target_load)*0.000014,-0.00012,0.00018)
             plan._grip_opening = np.clip(plan._grip_opening+adjustment/abs(FINGER_OPEN),0.,.65)
             finger = float(plan._grip_opening)
-        if trial.get("fastened"):
+        if sensed.get("fastened"):
             if not hasattr(plan, "_release"):
                 # Keep the inner jaw at its contact radius as both jaws open.
                 # Opening in place moves that jaw into the closed canopy.
                 outward = frame[:, 0].copy()
-                if np.dot(outward, trial["patch_outward"]) < 0:
+                if np.dot(outward, sensed["patch_outward"]) < 0:
                     outward *= -1
                 plan._release = t, target.copy(), frame.copy(), finger, outward
             start, anchor, frame, opening, outward = plan._release
