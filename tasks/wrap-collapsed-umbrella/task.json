@@ -15,5 +15,5 @@
   "reset_notes": "Simulation: the preheld handle and freely hanging strap settle under gravity before the episode. Real trials, about 2 minutes: 1) peel the hook patch fully off and unwind the tie; 2) hold the handle with the canopy down and shake gently three times so the folds hang loose, frame still collapsed; 3) pick lint off both fastener faces; 4) measure the loose shaft-centred diameter end-on: within ±5 mm of the reference taken before the first trial (about 99 mm in the model), otherwise shake and re-measure; 5) put the handle in the left gripper, seam up, tie hanging, and open the right gripper about 60 mm from the tie.",
   "fidelity": "Twelve sprung canopy and fifteen hinged strap sections approximate the fabric; constants uncalibrated. Hook-and-loop engages when aligned, overlapping patches are pressed at ≥0.15 N for three controls, in sim only by a gripper fingertip at the strap end or hook patch (real trials accept any press). Standard test closures are far heavier (18–24 N), so engaging is much easier than real. The real example folds to 178 mm (190 mm canopy here) and lists no tie sizes. The demo never reads scores.",
   "scores": "Dream-1: 0.00/1.00. Scripted two-YAM demonstration: 1.00/1.00.",
-  "media": "M-ES5T9L"
+  "media": "M-AAVX9D"
 }
